@@ -17,6 +17,8 @@ import 'package:tayssir/utils/extensions/strings.dart';
 import '../../../providers/data/data_provider.dart';
 import '../../../resources/resources.dart';
 import '../../../router/app_router.dart';
+import 'package:tayssir/features/streaks/presentation/streak_notifier.dart';
+import 'package:tayssir/features/streaks/presentation/streak_dialog_content.dart';
 import 'widgets/results/result_stats_widget.dart';
 
 class ExerciceResultScreen extends HookConsumerWidget {
@@ -27,6 +29,19 @@ class ExerciceResultScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final exercisesState = ref.watch(exercicesProvider);
     final dataState = ref.watch(dataProvider);
+
+    ref.listen(streakNotifierProvider, (previous, next) {
+      if (next.hasValue &&
+          next.value != null &&
+          next.value!.streakIncreasedToday) {
+        Future.delayed(const Duration(milliseconds: 600), () {
+          if (context.mounted) {
+            showStreakDialog(context, next.value!);
+          }
+        });
+      }
+    });
+
     final isComplete = exercisesState.bestProgress == 100;
     final user = ref.watch(userNotifierProvider).requireValue!;
     final visib = dataState

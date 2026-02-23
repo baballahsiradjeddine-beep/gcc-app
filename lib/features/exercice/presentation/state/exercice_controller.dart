@@ -12,6 +12,7 @@ import 'package:tayssir/services/actions/dialog_service.dart';
 
 import '../../../../services/course_service.dart';
 import '../../../../services/actions/bottom_sheet_service.dart';
+import 'package:tayssir/features/streaks/presentation/streak_notifier.dart';
 import 'exercise_state.dart';
 
 final currentUnitIdProvider = StateProvider<int>((ref) => 0);
@@ -170,6 +171,10 @@ class ExerciseNotifier extends StateNotifier<ExerciseState> {
     state = state.setResultPoints(submittedPoints);
     state = state.setBestProgress(response.bestProgress);
     ref.read(userNotifierProvider.notifier).updateUserPoints(submittedPoints);
+
+    // Ping streak async, listeners like ResultScreen will catch it if successful
+    ref.read(streakNotifierProvider.notifier).pingStreak();
+
     state = state.setSubmittingStatus(const AsyncData<void>(null));
     if (context.mounted) {
       context.pushReplacementNamed(AppRoutes.results.name);
@@ -229,7 +234,7 @@ class ExerciseNotifier extends StateNotifier<ExerciseState> {
     try {
       await ref.read(dataRepoProvider).reportExercise(
             state.currentExercise.id,
-             reason,
+            reason,
           );
       state = state.setReportingStatus(const AsyncData<void>(null));
       AppLogger.logInfo('Exercise reported successfully');

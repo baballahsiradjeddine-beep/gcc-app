@@ -49,6 +49,8 @@ class EndPoints {
   static const subscribeWithPaper = '/v2/purchase/initiate-manual-payment';
   static const subscribeWithChargily = '/v2/purchase/initiate-chargily';
   static const settings = '/v2/settings';
+  static const streaks = '/v2/streaks';
+  static const pingStreak = '/v2/streaks/ping';
   static const reportExercise = '/v2/reports/question';
   static const contactUs = '/v2/reports/contact';
 }
