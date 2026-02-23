@@ -1,6 +1,4 @@
-import 'dart:convert';
 
-import 'package:flutter/services.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tayssir/constants/app_consts.dart';

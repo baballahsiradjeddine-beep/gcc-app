@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -13,7 +12,6 @@ import 'package:tayssir/common/sliver_scrolling_widget.dart';
 import 'package:tayssir/constants/strings.dart';
 import 'package:tayssir/features/subscriptions/presentation/chargily/chargily_controller.dart';
 import 'package:tayssir/features/subscriptions/presentation/paper/custom_back_button.dart';
-import 'package:tayssir/providers/auth/auth_notifier.dart';
 import 'package:tayssir/providers/data/data_provider.dart';
 import 'package:tayssir/providers/user/subscription_model.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';

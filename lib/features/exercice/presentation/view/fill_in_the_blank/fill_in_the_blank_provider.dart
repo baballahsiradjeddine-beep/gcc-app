@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tayssir/debug/app_logger.dart';
 import 'package:tayssir/providers/data/models/fill_in_the_blank_exercise.dart';
 
 import '../../state/exercice_controller.dart';

@@ -1,4 +1,4 @@
-package com.bayan.bayan_app
+package com.bayan.elearning
 
 import io.flutter.embedding.android.FlutterActivity
 

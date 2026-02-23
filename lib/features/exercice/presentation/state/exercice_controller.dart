@@ -8,7 +8,6 @@ import 'package:tayssir/features/home/data/courses_repository.dart';
 import 'package:tayssir/providers/data/data_provider.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';
 import 'package:tayssir/router/app_router.dart';
-import 'package:tayssir/services/actions/dialog_service.dart';
 
 import '../../../../services/course_service.dart';
 import '../../../../services/actions/bottom_sheet_service.dart';

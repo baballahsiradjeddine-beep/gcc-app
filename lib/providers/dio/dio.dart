@@ -15,7 +15,7 @@ final authDioProvider = Provider<Dio>((ref) {
     'contentType': 'application/json; charset=UTF-8',
     'Accept': 'application/json',
   };
-  if (false)
+  if (false) {
     dio.interceptors.add(PrettyDioLogger(
         requestHeader: true,
         requestBody: true,
@@ -30,6 +30,7 @@ final authDioProvider = Provider<Dio>((ref) {
         },
         error: true,
         compact: true));
+  }
   return dio;
 });
 

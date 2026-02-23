@@ -8,7 +8,6 @@ import 'package:tayssir/common/tayssir_commune_drop_down.dart';
 import 'package:tayssir/common/tayssir_speciality_drop_down.dart';
 import 'package:tayssir/common/tayssir_wilaya_drop_down.dart';
 import 'package:tayssir/features/auth/presentation/register/state/register_controller.dart';
-import 'package:tayssir/features/auth/presentation/register/views/specitlity.dart';
 import 'package:tayssir/providers/divisions/division_model.dart';
 import 'package:tayssir/providers/divisions/divisions.dart';
 import 'package:tayssir/providers/user/commune.dart';

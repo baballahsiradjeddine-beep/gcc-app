@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tayssir/common/core/app_scaffold.dart';
 import 'package:tayssir/common/core/custom_app_bar.dart';
-import 'package:tayssir/features/home/presentation/home_screen.dart';
 import 'package:tayssir/features/home/presentation/subscribe_section.dart';
 
 class EmptyContentWidget extends StatelessWidget {

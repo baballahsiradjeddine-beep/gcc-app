@@ -105,7 +105,7 @@ class NotificationsRepository {
         page: page,
         totalPages: totalPages,
       );
-    } catch (e, st) {
+    } catch (e) {
       AppLogger.logError('Error fetching notifications: $e');
       rethrow;
     }
@@ -114,7 +114,7 @@ class NotificationsRepository {
   Future<void> markAsRead({required String id}) async {
     try {
       await remoteDataSource.markAsRead(id);
-    } catch (e, st) {
+    } catch (e) {
       AppLogger.logError('Error marking notification as read: $e');
       rethrow;
     }

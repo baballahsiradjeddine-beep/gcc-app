@@ -6,7 +6,6 @@ import 'package:tayssir/features/auth/presentation/register/state/verify_state.d
 import '../../../../../exceptions/app_exception.dart';
 import '../../../../../providers/user/commune.dart';
 import '../../../../../providers/user/wilaya.dart';
-import '../know_option.dart';
 
 class RegisterState extends Equatable {
   final int currentPage;

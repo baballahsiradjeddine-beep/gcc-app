@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tayssir/features/streaks/data/streak_model.dart';
+import 'package:tayssir/features/streaks/utils/streak_share_utils.dart';
 import 'package:tayssir/resources/colors/app_colors.dart';
 
 class StreakDialogContent extends StatelessWidget {
@@ -25,20 +26,20 @@ class StreakDialogContent extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               "مبارك لك 🎉",
               style: TextStyle(
                 fontSize: 22,
-                color: const Color(0xFFF28F3B),
+                color: Color(0xFFF28F3B),
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 5),
             Text(
               "${streak.currentStreak} أيام متواصلة",
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 26,
-                color: const Color(0xFFF28F3B),
+                color: Color(0xFFF28F3B),
                 fontWeight: FontWeight.w900,
               ),
             ),
@@ -84,7 +85,7 @@ class StreakDialogContent extends StatelessWidget {
 
             const SizedBox(height: 25),
 
-            Text(
+            const Text(
               "لا تتوقف... كل يوم يصنع فارقاً!",
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -102,8 +103,7 @@ class StreakDialogContent extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      // Optionally handle share functionality
-                      Navigator.of(context).pop();
+                      StreakShareUtils.shareStreak(context, streak);
                     },
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
@@ -113,7 +113,7 @@ class StreakDialogContent extends StatelessWidget {
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       "مشاركة",
                       style: TextStyle(
                         fontSize: 16,
@@ -136,7 +136,7 @@ class StreakDialogContent extends StatelessWidget {
                       ),
                       backgroundColor: Colors.white,
                     ),
-                    child: Text(
+                    child: const Text(
                       "تابع",
                       style: TextStyle(
                         fontSize: 16,

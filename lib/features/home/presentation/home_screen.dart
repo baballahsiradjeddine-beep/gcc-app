@@ -1,6 +1,4 @@
-import 'dart:developer';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,10 +8,7 @@ import 'package:tayssir/constants/app_consts.dart';
 import 'package:tayssir/debug/app_logger.dart';
 import 'package:tayssir/features/home/presentation/subscribe_section.dart';
 import 'package:tayssir/features/home/presentation/view_style.dart';
-import 'package:tayssir/providers/data/models/chapter_model.dart';
 import 'package:tayssir/providers/data/models/material_model.dart';
-import 'package:tayssir/providers/token/token_controller.dart';
-import 'package:tayssir/services/course_service.dart';
 import 'package:tayssir/utils/extensions/strings.dart';
 
 import '../../../providers/data/data_provider.dart';

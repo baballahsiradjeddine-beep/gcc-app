@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tayssir/exceptions/app_exception.dart';
 import 'package:tayssir/features/auth/data/auth_repository.dart';
-import 'package:tayssir/features/auth/presentation/register/know_option.dart';
 import 'package:tayssir/features/auth/presentation/register/state/otp_type.dart';
 
 import '../../../../../providers/user/commune.dart';

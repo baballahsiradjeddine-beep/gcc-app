@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:tayssir/features/home/presentation/home_screen.dart';
 import 'package:tayssir/features/home/presentation/view_style.dart';
 
 import 'change_view_widget.dart';

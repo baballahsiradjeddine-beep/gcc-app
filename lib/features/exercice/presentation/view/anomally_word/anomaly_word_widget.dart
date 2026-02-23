@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tayssir/features/exercice/presentation/state/exercice_controller.dart';
 import 'package:tayssir/features/exercice/presentation/view/select_right_option/latext_text_widget.dart';
-import 'package:tayssir/features/exercice/presentation/view/select_right_option/select_right_option_view.dart';
 import 'package:tayssir/providers/data/models/latex_field.dart';
 import 'package:tayssir/resources/colors/app_colors.dart';
 

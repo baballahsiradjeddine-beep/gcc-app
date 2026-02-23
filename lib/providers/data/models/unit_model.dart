@@ -3,7 +3,6 @@
 import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
-import 'package:tayssir/debug/app_logger.dart';
 
 enum UnitVisibility { available, premium }
 

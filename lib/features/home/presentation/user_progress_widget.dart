@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:tayssir/features/home/presentation/home_screen.dart';
 import 'package:tayssir/features/units/widgets/unit_circle_progress_widget.dart';
-import 'package:tayssir/features/units/widgets/unit_progress_widget.dart';
 import 'package:tayssir/providers/data/data_provider.dart';
-import 'package:tayssir/providers/data/models/material_model.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';
 import 'package:tayssir/resources/colors/app_colors.dart';
 

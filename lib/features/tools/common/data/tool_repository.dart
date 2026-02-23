@@ -22,7 +22,7 @@ class ToolRepository {
       final response = await remoteDataSource.getCardsData();
       final data = response.data['data'] as Map<String, dynamic>;
       return CardDataModel.fromMap(data);
-    } catch (e, st) {
+    } catch (e) {
       AppLogger.logError('Error fetching cards data: $e');
       rethrow;
     }
@@ -33,7 +33,7 @@ class ToolRepository {
       final response = await remoteDataSource.getResumesData();
       final data = response.data['data'] as Map<String, dynamic>;
       return ResumeDataModel.fromJson(data);
-    } catch (e, st) {
+    } catch (e) {
       AppLogger.logError('Error fetching resumes data: $e');
       rethrow;
     }
@@ -45,7 +45,7 @@ class ToolRepository {
       AppLogger.logInfo(response);
       final data = response.data['data'] as Map<String, dynamic>;
       return BacsDataModel.fromJson(data);
-    } catch (e, st) {
+    } catch (e) {
       AppLogger.logError('Error fetching bacs data: $e');
       rethrow;
     }

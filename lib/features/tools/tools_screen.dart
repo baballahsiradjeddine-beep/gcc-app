@@ -14,7 +14,6 @@ import 'package:tayssir/providers/user/user_notifier.dart';
 import '../../../common/core/app_scaffold.dart';
 import '../../../common/core/custom_app_bar.dart';
 
-import '../home/presentation/home_screen.dart';
 import '../home/presentation/widgets/course_widget.dart';
 import '../home/presentation/widgets/courses_grid_view.dart';
 import '../home/presentation/widgets/courses_list_view.dart';

@@ -29,7 +29,7 @@ class PairTwoWordsNotifier extends StateNotifier<PairTwoWordsState> {
   void setFirstColumnWord(int index) {
     if (!state.isFirstSelectable(index)) {
       return;
-    };
+    }
     if (!state.canClick) return;
 
     state = state.setFirstColumnWord(index);

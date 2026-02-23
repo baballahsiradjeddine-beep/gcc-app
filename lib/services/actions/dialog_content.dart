@@ -6,7 +6,6 @@ import 'package:tayssir/common/app_buttons/big_button.dart';
 import 'package:tayssir/common/custom_cached_image.dart';
 import 'package:tayssir/constants/strings.dart';
 import 'package:tayssir/features/exercice/presentation/view/select_right_option/latext_text_widget.dart';
-import 'package:tayssir/features/exercice/presentation/view/select_right_option/select_right_option_view.dart';
 import 'package:tayssir/providers/data/models/latex_field.dart';
 import 'package:tayssir/resources/colors/app_colors.dart';
 

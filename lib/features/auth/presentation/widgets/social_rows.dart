@@ -6,10 +6,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:tayssir/constants/app_consts.dart';
-import 'package:tayssir/debug/app_logger.dart';
 import 'package:tayssir/features/auth/presentation/login/login_controller.dart';
 import 'package:tayssir/features/auth/presentation/register/state/register_controller.dart';
-import 'package:tayssir/providers/dio/dio.dart';
 import 'package:tayssir/providers/google/google_sign_in.dart';
 import 'package:tayssir/resources/resources.dart';
 

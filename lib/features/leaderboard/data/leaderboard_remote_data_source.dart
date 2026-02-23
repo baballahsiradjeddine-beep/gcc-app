@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tayssir/constants/end_points.dart';
 import 'package:tayssir/debug/app_logger.dart';
-import 'package:tayssir/features/leaderboard/data/leaderboard_remote_data_source.dart';
 import 'package:tayssir/providers/dio/dio.dart';
 
 class LeaderboardRemoteDataSource {

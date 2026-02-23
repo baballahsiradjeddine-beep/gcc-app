@@ -8,7 +8,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tayssir/common/sliver_scrolling_widget.dart';
 import 'package:tayssir/features/subscriptions/data/subscription_repository.dart';
 import 'package:tayssir/features/subscriptions/presentation/paper/custom_back_button.dart';
-import 'package:tayssir/features/subscriptions/presentation/paper/subscription_paper_screen.dart';
 import 'package:tayssir/features/subscriptions/presentation/widgets/subscription_option.dart';
 import 'package:tayssir/providers/user/subscription_model.dart';
 import 'package:tayssir/router/app_router.dart';

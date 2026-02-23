@@ -9,7 +9,6 @@ import 'package:tayssir/features/home/presentation/banner_widget.dart';
 import 'package:tayssir/features/home/presentation/user_progress_widget.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 final bannerItemsProvider = FutureProvider<List<BannerModel>>((ref) async {
   // Simulate fetching banners from an API or database

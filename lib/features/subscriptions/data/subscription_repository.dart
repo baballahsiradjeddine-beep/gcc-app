@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tayssir/debug/app_logger.dart';
 import 'package:tayssir/exceptions/app_exception.dart';
 import 'package:tayssir/features/subscriptions/data/init_chargily_payment_dto.dart';
 import 'package:tayssir/features/subscriptions/data/subscription_remote_data_source.dart';

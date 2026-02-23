@@ -4,9 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tayssir/exceptions/app_exception.dart';
 import 'package:tayssir/features/subscriptions/data/subscription_repository.dart';
-import 'package:tayssir/providers/data/data_provider.dart';
 import 'package:tayssir/providers/user/subscription_model.dart';
-import 'package:tayssir/providers/user/user_notifier.dart';
 
 class SubscriptionPaperState extends Equatable {
   final AsyncValue<void> state;

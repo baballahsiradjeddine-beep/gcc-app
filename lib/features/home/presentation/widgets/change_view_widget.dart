@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tayssir/debug/app_logger.dart';
-import 'package:tayssir/features/home/presentation/home_screen.dart';
 import 'package:tayssir/features/home/presentation/view_style.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';
 import 'package:tayssir/resources/resources.dart';

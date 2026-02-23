@@ -9,10 +9,8 @@ import 'package:tayssir/features/tools/card_swipper/card_pattern_painter.dart';
 import 'package:tayssir/features/tools/card_swipper/category_filter_section.dart';
 import 'package:tayssir/features/tools/common/data/tool_repository.dart';
 import 'package:tayssir/features/tools/resumes/models/resume_data_model.dart';
-import 'package:tayssir/providers/dio/dio.dart';
 import 'package:tayssir/router/app_router.dart';
 
-import 'package:equatable/equatable.dart';
 
 final resumeDataProvider = FutureProvider<ResumeDataModel>((ref) async {
   final res = await ref.watch(toolRepositoryProvider).getResumesData();

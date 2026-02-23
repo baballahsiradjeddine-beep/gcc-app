@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 // import 'package:flutter_math_fork/flutter_math.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_tex/flutter_tex.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:latext/latext.dart';
-import 'package:tayssir/debug/app_logger.dart';
 import 'package:tayssir/features/exercice/presentation/view/execise_number_widget.dart';
 import 'package:tayssir/providers/data/models/latex_field.dart';
-import 'package:tayssir/resources/colors/app_colors.dart';
 
 import '../state/exercice_controller.dart';
 

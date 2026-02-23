@@ -1,4 +1,3 @@
-import '../../presentation/register/know_option.dart';
 
 class RegisterRequestModel {
   String username;

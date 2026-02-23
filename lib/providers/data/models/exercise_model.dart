@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'dart:ui';
 
-import 'package:tayssir/debug/app_logger.dart';
 import 'package:tayssir/providers/data/models/anomaly_word_exercise.dart';
 import 'package:tayssir/providers/data/models/fill_in_the_blank_exercise.dart';
 import 'package:tayssir/providers/data/models/latex_field.dart';

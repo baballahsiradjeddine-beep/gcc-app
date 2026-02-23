@@ -32,8 +32,8 @@ def keystoreProperties = new Properties()
 
 
 android {
-    namespace = "com.bayan"
-    compileSdk = 35
+    namespace = "com.bayan.elearning"
+    compileSdk = 36
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -46,7 +46,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.bayan"
+        applicationId = "com.bayan.elearning"
         minSdkVersion = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()

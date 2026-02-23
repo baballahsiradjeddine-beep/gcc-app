@@ -8,9 +8,7 @@ import 'package:tayssir/common/sliver_scrolling_widget.dart';
 import 'package:tayssir/constants/strings.dart';
 import 'package:tayssir/features/auth/data/know_options/know_option_model.dart';
 import 'package:tayssir/features/auth/data/know_options/know_option_repository.dart';
-import 'package:tayssir/features/auth/presentation/register/know_option.dart';
 import 'package:tayssir/features/auth/presentation/register/state/register_controller.dart';
-import 'package:tayssir/resources/resources.dart';
 import 'package:tayssir/utils/extensions/context.dart';
 
 import '../widgets/option_selection.dart';

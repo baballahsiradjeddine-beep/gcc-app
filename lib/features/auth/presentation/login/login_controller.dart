@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tayssir/debug/app_logger.dart';
-import 'package:tayssir/providers/user/user_notifier.dart';
 
 import '../../../../exceptions/app_exception.dart';
 import '../../data/auth_repository.dart';

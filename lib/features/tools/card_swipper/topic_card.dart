@@ -121,16 +121,15 @@ class TopicCard extends ConsumerWidget {
                 SizedBox(height: 12.h),
 
                 // Description
-                if (item.description != null)
-                  Text(
-                    item.description!,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: Colors.white.withOpacity(0.8),
-                      height: 1.3,
-                    ),
-                    textAlign: TextAlign.center,
+                Text(
+                  item.description,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: Colors.white.withOpacity(0.8),
+                    height: 1.3,
                   ),
+                  textAlign: TextAlign.center,
+                ),
 
                 SizedBox(height: 20.h),
 

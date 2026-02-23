@@ -1,4 +1,3 @@
-import 'package:tayssir/providers/data/models/latex_field.dart';
 
 class Blank {
   // final LatexField<String> correctWord;

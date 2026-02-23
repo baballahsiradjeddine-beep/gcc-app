@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:tayssir/features/tools/resumes/models/resume_material_model.dart';
 import 'package:tayssir/features/tools/resumes/models/resume_unit_model.dart';
-import 'package:tayssir/features/tools/resumes/resumes_screen.dart';
 
 class ResumeDataModel extends Equatable {
   final List<ResumeMaterialModel> materials;

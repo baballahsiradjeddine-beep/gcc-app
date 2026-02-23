@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:tayssir/features/units/widgets/animated_circular_progress_widget.dart';
 import 'package:tayssir/features/units/widgets/unit_circle_progress_widget.dart';
 import 'package:tayssir/features/units/widgets/unit_credentials_widget.dart';
-import 'circular_progress_widget.dart';
 
 class TayssirProgressWidget extends StatelessWidget {
   const TayssirProgressWidget(

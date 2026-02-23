@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
@@ -8,13 +7,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:tayssir/common/core/app_scaffold.dart';
 import 'package:tayssir/features/tools/card_swipper/state/card_swipper_controller.dart';
-import 'package:tayssir/features/tools/card_swipper/state/card_swipper_controller.dart';
-import 'package:tayssir/features/tools/card_swipper/state/card_swipper_state.dart';
 import 'package:tayssir/features/tools/card_swipper/category_filter_section.dart';
 import 'package:tayssir/features/tools/card_swipper/topic_card.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';
 import 'package:tayssir/services/actions/dialog_service.dart';
-import 'package:tayssir/services/actions/snack_bar_service.dart';
 
 class CardSwipperScreen extends HookConsumerWidget {
   const CardSwipperScreen({super.key});

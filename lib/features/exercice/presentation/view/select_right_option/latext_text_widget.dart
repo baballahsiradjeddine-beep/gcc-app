@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tex/flutter_tex.dart';
 // import 'package:flutter_math_fork/flutter_math.dart';
-import 'package:latext/latext.dart';
 import 'package:tayssir/debug/app_logger.dart';
 
 class LatextTextWidget extends StatelessWidget {

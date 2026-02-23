@@ -5,10 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tayssir/debug/app_logger.dart';
 import 'package:tayssir/exceptions/app_exception.dart';
 import 'package:tayssir/features/auth/data/auth_repository.dart';
-import 'package:equatable/equatable.dart';
 import 'package:tayssir/features/settings/security/change_email/change_email_state.dart';
 
-import '../../../auth/presentation/register/state/verify_state.dart';
 
 
 final changeEmailControllerProvider = StateNotifierProvider.autoDispose<

@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tayssir/features/leaderboard/data/leaderboard_repository.dart';
-import 'package:tayssir/features/leaderboard/leaderboard_screen.dart';
 import 'package:tayssir/features/leaderboard/state/leaderboard_state.dart';
 import '../../../exceptions/app_exception.dart';
 

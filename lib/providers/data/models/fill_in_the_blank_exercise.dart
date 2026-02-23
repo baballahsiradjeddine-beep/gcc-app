@@ -1,6 +1,5 @@
 import 'package:tayssir/providers/data/models/blank.dart';
 import 'package:tayssir/providers/data/models/exercise_model.dart';
-import 'package:tayssir/providers/data/models/latex_field.dart';
 
 class FillInTheBlankExercise extends ExerciseModel {
   // final LatexField<String> sentence;

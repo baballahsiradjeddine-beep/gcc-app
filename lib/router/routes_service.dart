@@ -1,16 +1,12 @@
 // ignore_for_file: unused_catch_stack, unused_local_variable
 
 import 'dart:async';
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-import 'package:tayssir/app.dart';
 import 'package:tayssir/common/data/configs.dart';
-import 'package:tayssir/features/home/data/image_precache_service.dart';
-import 'package:tayssir/providers/data/data_provider.dart';
 import 'package:tayssir/providers/google/google_sign_in.dart';
 import 'package:tayssir/providers/token/token_controller.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';

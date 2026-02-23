@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tayssir/exceptions/app_exception.dart';
 import 'package:tayssir/features/auth/data/change_password_request.dart';
 import 'package:tayssir/features/auth/data/exist_response.dart';
-import 'package:tayssir/services/auth/google_service.dart';
 
 import '../../../providers/token/tokens_model.dart';
 import '../../../utils/extensions/response.dart';

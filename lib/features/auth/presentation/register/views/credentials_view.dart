@@ -9,7 +9,6 @@ import 'package:tayssir/constants/strings.dart';
 import 'package:tayssir/features/auth/presentation/login/custom_text_form_field.dart';
 import 'package:tayssir/features/auth/presentation/login/google_sign_in_widget.dart';
 import 'package:tayssir/features/auth/presentation/widgets/or_widget.dart';
-import 'package:tayssir/features/auth/presentation/widgets/social_rows.dart';
 import 'package:tayssir/utils/extensions/context.dart';
 import 'package:tayssir/utils/validators.dart';
 import 'package:tayssir/features/auth/presentation/register/widgets/change_auth_type_widget.dart';
