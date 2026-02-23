@@ -31,7 +31,7 @@ class NotificationsRepository {
       // final testNotifications = [
       //   NotificationModel(
       //     id: '1',
-      //     title: 'مرحباً بك في تيسير!',
+      //     title: 'مرحباً بك في بيان!',
       //     body: 'شكراً لانضمامك إلى منصتنا. ابدأ بالتعرف على الميزات المتاحة.',
       //     isRead: false,
       //     time: DateTime.now().subtract(const Duration(minutes: 5)),

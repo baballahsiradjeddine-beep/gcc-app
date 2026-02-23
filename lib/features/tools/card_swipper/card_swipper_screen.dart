@@ -68,7 +68,7 @@ class CardSwipperLoadingView extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(bottom: 10.h),
                 child: Text(
-                  'بطاقات تيسير',
+                  'بطاقات بيان',
                   style: TextStyle(
                     fontSize: 24.sp,
                     fontWeight: FontWeight.bold,
@@ -162,7 +162,7 @@ class CardSwipperDataView extends HookConsumerWidget {
               Padding(
                 padding: EdgeInsets.only(bottom: 10.h),
                 child: Text(
-                  'بطاقات تيسير',
+                  'بطاقات بيان',
                   style: TextStyle(
                     fontSize: 24.sp,
                     fontWeight: FontWeight.bold,
@@ -297,7 +297,7 @@ class CardSwipperDataView extends HookConsumerWidget {
                     Text(
                       ref.watch(userNotifierProvider).requireValue!.isSub
                           ? '${filteredTopics.length} ${filteredTopics.length == 1 ? 'بطاقة' : 'بطاقات'} للمراجعة'
-                            : 'لديك فقط ${filteredTopics.length} ${filteredTopics.length == 1 ? 'بطاقة' : 'بطاقات'} في الخطة المجانية',
+                          : 'لديك فقط ${filteredTopics.length} ${filteredTopics.length == 1 ? 'بطاقة' : 'بطاقات'} في الخطة المجانية',
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w600,

@@ -69,8 +69,8 @@ class AppStrings {
   // specility
   static const String speciality = "الشعبة";
 
-  // from where u know  the app tayssir
-  static const String fromWhereYouKnowTayssir = "من اين تعرفت على تطبيق تيسير؟";
+  // from where u know  the app bayan
+  static const String fromWhereYouKnowTayssir = "من اين تعرفت على تطبيق بيان؟";
 
   // facebook
   static const String facebook = "فيسبوك";

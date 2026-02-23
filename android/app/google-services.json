@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "72429524357",
+    "project_id": "bayan-e-learning",
+    "storage_bucket": "bayan-e-learning.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:72429524357:android:b5a1fb25d24492de65a0ec",
+        "android_client_info": {
+          "package_name": "com.bayan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3pX16S-jaD0TRJFpHXAjfyO7w0ObLnl8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

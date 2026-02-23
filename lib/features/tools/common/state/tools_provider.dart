@@ -10,7 +10,7 @@ final toolsProvider = Provider<List<ToolModel>>((ref) {
   final configs = ref.watch(configsProvider).requireValue;
   final allTools = [
     ToolModel(
-      name: 'بطاقات تيسير',
+      name: 'بطاقات بيان',
       description: 'بطاقات تعليمية تفاعلية',
       pathName: AppRoutes.cardSwipper.name,
       startColor: const Color(0xffCB2487),

@@ -90,7 +90,7 @@ class ResumesLoadingView extends StatelessWidget {
                     ),
                     SizedBox(width: 10.w),
                     Text(
-                      'ملخصات تيسير',
+                      'ملخصات بيان',
                       style: TextStyle(
                         fontSize: 28.sp,
                         fontWeight: FontWeight.bold,
@@ -226,7 +226,7 @@ class ResumesDataView extends HookWidget {
                     ),
                     SizedBox(width: 10.w),
                     Text(
-                      'ملخصات تيسير',
+                      'ملخصات بيان',
                       style: TextStyle(
                         fontSize: 28.sp,
                         fontWeight: FontWeight.bold,

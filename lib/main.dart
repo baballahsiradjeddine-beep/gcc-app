@@ -8,9 +8,11 @@ import 'package:talker_riverpod_logger/talker_riverpod_logger.dart';
 import 'package:tayssir/environment_config.dart';
 import 'package:tayssir/resources/resources.dart';
 import 'package:tayssir/utils/svg_utils.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:toastification/toastification.dart';
 
 import 'app.dart';
+import 'package:tayssir/services/fcm_service.dart';
 
 initBox() async {
   await GetSecureStorage.init(password: EnvironmentConfig.boxPassword);
@@ -27,6 +29,8 @@ preserveSvgCache() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  await FCMService.initialize();
   await initBox();
   await preserveSvgCache();
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,

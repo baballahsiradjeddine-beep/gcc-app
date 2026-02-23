@@ -47,7 +47,7 @@ final configsProvider = FutureProvider<ConfigModel>((ref) async {
       bacSolutionsActive: false,
       resumesActive: false,
       appVersion: '1.2.6',
-      paymentName: 'Tayssir',
+      paymentName: 'BAYAN E-LEARNING',
       paymentNumber: '0022500000000',
       isChargilyActive: true,
     );

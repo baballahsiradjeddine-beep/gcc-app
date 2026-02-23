@@ -29,7 +29,7 @@ class Tayssir extends ConsumerWidget {
           textDirection: TextDirection.rtl,
           child: MaterialApp.router(
             routerConfig: router,
-            title: 'Tayssir',
+            title: 'BAYAN E-LEARNING',
             builder: DevicePreview.appBuilder,
             // builder: (context, child) {
             //   return UpgradeAlert(

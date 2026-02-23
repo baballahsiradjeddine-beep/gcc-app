@@ -54,7 +54,7 @@ class SubscribeCardButton extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'بطاقة تيسير :',
+                  'بطاقة بيان :',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16.sp,

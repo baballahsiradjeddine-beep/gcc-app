@@ -264,7 +264,7 @@ class SubscriptionPaperScreen extends HookConsumerWidget {
                             ),
                             Text(
                               // 'SIRADJ EDDINE BABALLAH',
-                              configs.paymentName ?? 'Tayssir',
+                              configs.paymentName ?? 'BAYAN E-LEARNING',
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 14.sp,

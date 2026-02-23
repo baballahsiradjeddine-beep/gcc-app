@@ -64,6 +64,8 @@ dependencies:
   flutter_tex: ^5.1.10
   sign_in_with_apple: ^7.0.1
   url_launcher: ^6.3.2
+  firebase_core: ^4.4.0
+  firebase_messaging: ^16.1.1
   # connectivity_plus: ^6.0.3
 
   
