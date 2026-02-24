@@ -58,8 +58,8 @@ class MaterialModel extends Equatable {
     return MaterialModel(
       id: map['id'] as int,
       title: map['name'] as String,
-      gradiantColorStart: map['color'] as String,
-      gradiantColorEnd: map['secondary_color'] as String,
+      gradiantColorStart: map['color'] as String? ?? '#2196F3',
+      gradiantColorEnd: map['secondary_color'] as String? ?? '#2196F3',
       imageList: map['image'] == null ? '' : map['image'] as String,
       imageGrid: map['image_grid'] == null
           ? map['image'] == null

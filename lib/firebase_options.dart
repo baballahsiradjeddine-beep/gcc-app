@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyC3pX16S-jaD0TRJFpHXAjfyO7w0ObLnl8',
-    appId: '1:72429524357:android:6b4227e3c60d62ef65a0ec',
+    appId: '1:72429524357:android:e6c9d919abdeafe965a0ec',
     messagingSenderId: '72429524357',
     projectId: 'bayan-e-learning',
     storageBucket: 'bayan-e-learning.firebasestorage.app',
@@ -68,11 +68,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyBCqgm2Clq2cMNIeAeFvtu7GKupU06y3MU',
-    appId: '1:72429524357:ios:4c382d44b90312f665a0ec',
+    appId: '1:72429524357:ios:181dec0990b9fd5c65a0ec',
     messagingSenderId: '72429524357',
     projectId: 'bayan-e-learning',
     storageBucket: 'bayan-e-learning.firebasestorage.app',
-    iosBundleId: 'com.bayan.bayanApp',
+    iosBundleId: 'com.bayan.elearning',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
@@ -83,4 +83,5 @@ class DefaultFirebaseOptions {
     authDomain: 'bayan-e-learning.firebaseapp.com',
     storageBucket: 'bayan-e-learning.firebasestorage.app',
   );
+
 }

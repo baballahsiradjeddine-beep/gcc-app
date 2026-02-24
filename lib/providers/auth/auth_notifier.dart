@@ -5,6 +5,7 @@ import 'package:tayssir/providers/user/user_notifier.dart';
 import '../../utils/enums/auth_state.dart';
 import '../data/data_provider.dart';
 import '../user/user_model.dart';
+import 'package:tayssir/services/fcm_service.dart';
 
 extension UserStateChecks on AsyncValue<UserModel?> {
   bool get isValidUserTransition {
@@ -71,6 +72,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
             next.asData!.value!.isEmailVerified) {
           AppLogger.logInfo("User just verified his email");
           ref.read(dataProvider.notifier).getData();
+          FCMService.syncToken();
           return;
         }
 
@@ -82,6 +84,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
             next.asData!.value != null &&
             !next.asData!.value!.isEmpty) {
           AppLogger.logInfo("User is already authenticated");
+          FCMService.syncToken();
           return;
         }
 
@@ -94,7 +97,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
         }
         if (next.validUserValue) {
           setLoading();
-          if (next.canGetData) ref.read(dataProvider.notifier).getData();
+          if (next.canGetData) {
+            ref.read(dataProvider.notifier).getData();
+            FCMService.syncToken();
+          }
           setAuthenticated();
           return;
         }

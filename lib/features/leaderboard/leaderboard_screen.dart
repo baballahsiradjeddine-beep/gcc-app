@@ -81,24 +81,27 @@ class LeaderboardScreen extends ConsumerWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          PodiumUserWidget(
-                            user: top3[1],
-                            place: 2,
-                            size: 90,
-                            offsetY: 35,
-                          ),
-                          PodiumUserWidget(
-                            user: top3[0],
-                            place: 1,
-                            size: 110,
-                            offsetY: 0,
-                          ),
-                          PodiumUserWidget(
-                            user: top3[2],
-                            place: 3,
-                            size: 80,
-                            offsetY: 50,
-                          ),
+                          if (top3.length > 1)
+                            PodiumUserWidget(
+                              user: top3[1],
+                              place: 2,
+                              size: 90,
+                              offsetY: 35,
+                            ),
+                          if (top3.isNotEmpty)
+                            PodiumUserWidget(
+                              user: top3[0],
+                              place: 1,
+                              size: 110,
+                              offsetY: 0,
+                            ),
+                          if (top3.length > 2)
+                            PodiumUserWidget(
+                              user: top3[2],
+                              place: 3,
+                              size: 80,
+                              offsetY: 50,
+                            ),
                         ],
                       ),
                     ),

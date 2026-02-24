@@ -33,8 +33,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await FCMService.initialize();
   await initBox();
+  await FCMService.initialize();
   await preserveSvgCache();
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
       overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);

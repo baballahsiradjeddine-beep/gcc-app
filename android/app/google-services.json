@@ -7,28 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:72429524357:android:b5a1fb25d24492de65a0ec",
+        "mobilesdk_app_id": "1:72429524357:android:e6c9d919abdeafe965a0ec",
         "android_client_info": {
-          "package_name": "com.bayan"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyC3pX16S-jaD0TRJFpHXAjfyO7w0ObLnl8"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:72429524357:android:6b4227e3c60d62ef65a0ec",
-        "android_client_info": {
-          "package_name": "com.bayan.bayan_app"
+          "package_name": "com.bayan.elearning"
         }
       },
       "oauth_client": [],

@@ -57,71 +57,7 @@ class AppLogger {
     LogType type = LogType.auth,
     bool forceTestAccount = false,
   }) async {
-    if (AppConsts.testAccounts.contains(email) && !forceTestAccount) {
-      _logger.i('Skipping log sending for test account: $email');
-      return;
-    }
-
-    final String deviceInfo = await DeviceHelper.getDeviceInfo();
-    final String discordWebhookUrl = _getWebhookUrl(type);
-    final String formattedMessage = '''
-**📌 System Log**
---------------------------------
-
-⏰ **Timestamp:** <t:${(DateTime.now().millisecondsSinceEpoch / 1000).round()}:F>
-📱 ** App Version:** ${AppConsts.appVersion}
-📱 **Device:** `$deviceInfo`
-👤 **User:** `$email`
-🔍 **Module:** **${type.toString().split('.').last}**
-
-📋 **Details:**
-```
-$content
-```
- 
---------------------------------
-''';
-
-    int attempts = 0;
-    const int maxAttempts = 5;
-    const int baseDelay = 1000;
-
-    while (attempts < maxAttempts) {
-      try {
-        _logger.i('Sending log to Discord... (Attempt ${attempts + 1})');
-        await _dio.post(
-          discordWebhookUrl,
-          data: {
-            "content": formattedMessage,
-          },
-          options: Options(
-            headers: {'Content-Type': 'application/json'},
-          ),
-        );
-        _logger.i('Log sent successfully to Discord.');
-        break;
-      } catch (e) {
-        _logger.w("Error sending log to Discord: $e");
-        if (e is DioException) {
-          if (e.response?.statusCode == 429) {
-            final retryAfter =
-                e.response?.headers['retry-after']?.first ?? baseDelay;
-            _logger.w(
-                'Rate limit exceeded. Retrying in $retryAfter seconds... (Attempt ${attempts + 1})');
-
-            await Future.delayed(
-                Duration(seconds: int.parse(retryAfter.toString())));
-            attempts++;
-            continue;
-          }
-        }
-        _logger.w("Failed to send log to Discord: $e");
-        break;
-      }
-    }
-
-    if (attempts == maxAttempts) {
-      _logger.w('Exceeded max retries. Failed to send log to Discord.');
-    }
+    // Discord logging disabled as requested
+    return;
   }
 }
