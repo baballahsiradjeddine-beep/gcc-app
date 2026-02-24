@@ -18,7 +18,6 @@ import '../../../providers/data/data_provider.dart';
 import '../../../resources/resources.dart';
 import '../../../router/app_router.dart';
 import 'package:tayssir/features/streaks/presentation/streak_notifier.dart';
-import 'package:tayssir/features/streaks/presentation/streak_dialog_content.dart';
 import 'widgets/results/result_stats_widget.dart';
 
 class ExerciceResultScreen extends HookConsumerWidget {
@@ -29,18 +28,6 @@ class ExerciceResultScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final exercisesState = ref.watch(exercicesProvider);
     final dataState = ref.watch(dataProvider);
-
-    ref.listen(streakNotifierProvider, (previous, next) {
-      if (next.hasValue &&
-          next.value != null &&
-          next.value!.streakIncreasedToday) {
-        Future.delayed(const Duration(milliseconds: 600), () {
-          if (context.mounted) {
-            showStreakDialog(context, next.value!);
-          }
-        });
-      }
-    });
 
     final isComplete = exercisesState.bestProgress == 100;
     final user = ref.watch(userNotifierProvider).requireValue!;
@@ -142,7 +129,13 @@ class ExerciceResultScreen extends HookConsumerWidget {
                 final unitId = dataState
                     .getChapterById(exercisesState.exercises.first.chapterId)
                     .unitId;
+
+                final streakState = ref.read(streakNotifierProvider).value;
+                final bool didStreakIncrease =
+                    streakState?.streakIncreasedToday ?? false;
+
                 await Future.delayed(const Duration(milliseconds: 100));
+
                 if (context.mounted) {
                   await AppLogger.sendLog(
                     email: user.email,
@@ -150,12 +143,25 @@ class ExerciceResultScreen extends HookConsumerWidget {
                         'Finished exercise: ${dataState.getChapterById(exercisesState.exercises.first.chapterId).title} Accuracy: ${exercisesState.accuracy.toPercentage()}',
                     type: LogType.chapters,
                   );
-                  context.pushReplacementNamed(
-                    AppRoutes.chapters.name,
-                    pathParameters: {
-                      'unitId': unitId.toString(),
-                    },
-                  );
+
+                  if (context.mounted) {
+                    if (didStreakIncrease) {
+                      context.pushReplacementNamed(
+                        AppRoutes.streak.name,
+                        extra: {
+                          'streak': streakState!,
+                          'unitId': unitId,
+                        },
+                      );
+                    } else {
+                      context.pushReplacementNamed(
+                        AppRoutes.chapters.name,
+                        pathParameters: {
+                          'unitId': unitId.toString(),
+                        },
+                      );
+                    }
+                  }
                 }
               },
             )

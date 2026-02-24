@@ -42,6 +42,7 @@ import '../features/settings/settings_screen.dart';
 import '../features/subscriptions/presentation/card/subscription_card_screen.dart';
 import '../features/tools/tools_screen.dart';
 import '../features/units/units_screen.dart';
+import 'package:tayssir/features/streaks/presentation/streak_screen.dart';
 import 'bottom_navigation/main_scaffold.dart';
 import 'not_found_screen.dart';
 import 'routes_service.dart';
@@ -86,6 +87,7 @@ enum AppRoutes {
   subscriptionPaper,
   chargilyWebView,
   chargilyInit,
+  streak,
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -523,6 +525,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
           return ChargilyInitScreen(
             subscription: subscription,
+          );
+        },
+        transitionType: TransitionType.sharedAxis,
+        duration: const Duration(milliseconds: 300),
+      ),
+      TayssirCustomGoRoute(
+        name: AppRoutes.streak.name,
+        path: '/streak',
+        pageBuilder: (context, state) {
+          final data = state.extra! as Map<String, dynamic>;
+          final streak = data['streak'];
+          final unitId = data['unitId'] as int;
+
+          return StreakScreen(
+            streak: streak,
+            unitId: unitId,
           );
         },
         transitionType: TransitionType.sharedAxis,

@@ -40,12 +40,65 @@ class FCMService {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       AppLogger.logInfo("Message received in foreground: ${message.notification?.title}");
       if (message.notification != null) {
+        String? imageUrl = message.notification?.android?.imageUrl ?? message.notification?.apple?.imageUrl ?? message.data['image'];
+        
         toastification.show(
-          title: Text(message.notification!.title ?? 'إشعار جديد'),
-          description: Text(message.notification!.body ?? ''),
+          title: Text(
+            message.notification!.title ?? 'إشعار جديد',
+            style: const TextStyle(
+              fontSize: 14,
+              fontFamily: 'SomarSans',
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          description: Text(
+            message.notification!.body ?? '',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 12,
+              fontFamily: 'SomarSans',
+              color: Colors.black87,
+            ),
+          ),
           autoCloseDuration: const Duration(seconds: 5),
-          type: ToastificationType.success,
-          style: ToastificationStyle.flatColored,
+          type: ToastificationType.info,
+          style: ToastificationStyle.fillColored,
+          alignment: Alignment.topRight,
+          direction: TextDirection.ltr,
+          icon: imageUrl != null 
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: Image.network(
+                    imageUrl, 
+                    width: 40, 
+                    height: 40, 
+                    fit: BoxFit.cover,
+                  ),
+                )
+              : const Icon(
+                  Icons.notifications_active_rounded,
+                  color: Color(0xff00C4F6),
+                  size: 30,
+                ),
+          showIcon: true,
+          primaryColor: const Color(0xff00C4F6),
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          borderRadius: BorderRadius.circular(12),
+          closeButton: ToastCloseButton(
+            showType: CloseButtonShowType.always,
+            buttonBuilder: (context, onClose) {
+              return const Icon(
+                Icons.close,
+                color: Colors.grey,
+              );
+            },
+          ),
+          closeOnClick: true,
         );
       }
     });
