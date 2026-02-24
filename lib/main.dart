@@ -11,6 +11,7 @@ import 'package:tayssir/utils/svg_utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:toastification/toastification.dart';
 
+import 'firebase_options.dart';
 import 'app.dart';
 import 'package:tayssir/services/fcm_service.dart';
 
@@ -29,7 +30,9 @@ preserveSvgCache() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await FCMService.initialize();
   await initBox();
   await preserveSvgCache();
