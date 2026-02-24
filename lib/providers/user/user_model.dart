@@ -122,9 +122,9 @@ class UserModel extends Equatable {
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
-      id: map['id'] as int,
-      email: map['email'] as String,
-      name: map['name'] as String,
+      id: (map['id'] as int?) ?? 0,
+      email: (map['email'] as String?) ?? '',
+      name: (map['name'] as String?) ?? '',
       phoneNumber: map['phone_number'] as String?,
       profilePicture: map['image_url'] as String?,
       wilaya: map['wilaya'] == null
@@ -133,15 +133,18 @@ class UserModel extends Equatable {
       commune: map['commune'] == null
           ? null
           : Commune.fromMap(map['commune'] as Map<String, dynamic>),
-      subscriptions: (map['subscriptions'] as List)
-          .map((e) => SubscriptionModel.fromMap(e as Map<String, dynamic>))
-          .toList(),
+      subscriptions: (map['subscriptions'] as List?)
+              ?.map((e) => SubscriptionModel.fromMap(e as Map<String, dynamic>))
+              .toList() ??
+          [],
       division: map['division'] == null
           ? null
           : DivisionModel.fromMap(map['division'] as Map<String, dynamic>),
-      age: map['age'] is String
-          ? int.parse(map['age'] as String)
-          : map['age'] as int,
+      age: map['age'] == null
+          ? 0
+          : map['age'] is String
+              ? int.tryParse(map['age'] as String) ?? 0
+              : map['age'] as int,
       points: map['points'] == null ? 0 : int.parse(map['points'].toString()),
       isEmailVerified: map['email_verified'] as bool? ?? false,
       hasNewNotifications: map['has_new_notifications'] as bool? ?? false,

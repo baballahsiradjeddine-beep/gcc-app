@@ -59,6 +59,9 @@ class UserNotifier extends StateNotifier<AsyncValue<UserModel?>> {
       if (e.response!.isUnauthorized) {
         clearUser();
       }
+    } catch (e, st) {
+      AppLogger.logError('Error getting user: $e');
+      state = AsyncValue.error(e, st);
     }
   }
 
