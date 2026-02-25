@@ -80,18 +80,21 @@ class StreakShareUtils {
               ),
 
               // 2. Central Minimalist UI
-              Center(
+              // 2. Central Minimalist UI - Shifted Upwards
+              Align(
+                alignment: const Alignment(0, -0.2), // Slightly above center
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     // Glassmorphism Achievement Card
                     ClipRRect(
                       borderRadius: BorderRadius.circular(20),
                       child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0), // Adjust if you want actual blur
+                        filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
                         child: Container(
                           width: 280,
-                          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 30, horizontal: 20), // Shrunk height
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(20),
@@ -119,15 +122,16 @@ class StreakShareUtils {
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              
+
                               // "ايام دراسية دون انقطاع" Label
                               SvgPicture.string(daysLabelSvg, width: 220),
-                              
+
                               const SizedBox(height: 30),
-                              
+
                               // Dynamic Date Styled as the SVG
                               Text(
-                                DateFormat('dd MMMM yyyy', 'ar').format(DateTime.now()),
+                                DateFormat('dd MMMM yyyy', 'ar')
+                                    .format(DateTime.now()),
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
