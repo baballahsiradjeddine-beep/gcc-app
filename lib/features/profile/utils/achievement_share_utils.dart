@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:screenshot/screenshot.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,108 +19,153 @@ class AchievementShareUtils {
     int? completedLessons,
     int? perfectResults,
   }) async {
-    // This could involve generating a screenshot or sharing textual data
-  }
+    final screenshotController = ScreenshotController();
 
-  final ScreenshotController screenshotController = ScreenshotController();
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('جاري تجهيز صورة الإنجازات...'),
+          duration: Duration(milliseconds: 800),
+        ),
+      );
+    }
 
-  Future<String?> captureAchievementImage(dynamic user) async {
-    final image = await screenshotController.captureFromWidget(
-      Material(
-        child: _AchievementShareDesign(user: user),
-      ),
-      delay: const Duration(milliseconds: 100),
-    );
+    try {
+      final imageBytes = await screenshotController.captureFromWidget(
+        _AchievementShareDesign(
+          user: user,
+          streak: streak,
+          completedLessons: completedLessons ?? 0,
+          perfectResults: perfectResults ?? 0,
+        ),
+        delay: const Duration(milliseconds: 600),
+        pixelRatio: 3.0,
+      );
 
-    final directory = await getTemporaryDirectory();
-    final imagePath = '${directory.path}/achievement_${DateTime.now().millisecondsSinceEpoch}.png';
-    final imageFile = File(imagePath);
-    await imageFile.writeAsBytes(image);
-    return imagePath;
+      final directory = await getTemporaryDirectory();
+      final imagePath = '${directory.path}/achievement_log_share.png';
+      final file = File(imagePath);
+      await file.writeAsBytes(imageBytes);
+
+      await Share.shareXFiles([XFile(imagePath)]);
+    } catch (e) {
+      debugPrint('Error generating achievement share: $e');
+    }
   }
 }
 
 class _AchievementShareDesign extends StatelessWidget {
   final dynamic user;
+  final StreakModel? streak;
+  final int completedLessons;
+  final int perfectResults;
 
-  const _AchievementShareDesign({required this.user});
+  const _AchievementShareDesign({
+    required this.user,
+    required this.streak,
+    required this.completedLessons,
+    required this.perfectResults,
+  });
 
   @override
   Widget build(BuildContext context) {
+    String rank = "مبتدئ";
+    if (user.points >= 10000) {
+      rank = "أسطورة";
+    } else if (user.points >= 6000) {
+      rank = "متميز";
+    } else if (user.points >= 3000) {
+      rank = "مثابر";
+    } else if (user.points >= 1500) {
+      rank = "مستكشف";
+    } else if (user.points >= 500) {
+      rank = "ناشئ";
+    }
+
     final badgeColor = user.badge?.color;
     final themeColor = badgeColor != null
         ? Color(int.parse(badgeColor.replaceAll('#', '0xFF')))
         : const Color(0xFF2DD4BF);
-    final badgeIconUrl = user.badge?.iconUrl;
 
-    return Container(
-      width: 400,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            themeColor,
-            themeColor.withValues(alpha: 0.8),
-            themeColor.withValues(alpha: 0.6),
-          ],
+    return Material(
+      color: Colors.transparent,
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Container(
+          width: 360,
+          height: 640,
+          color: Colors.transparent,
+          child: Stack(
+            children: [
+              // Background Image
+              Positioned.fill(
+                child: Image.asset(
+                  'assets/images/achievement_share_bg.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+              // Main Content
+              Column(
+                children: [
+                  const SizedBox(height: 100),
+
+                  // Shield
+                  _buildShield(
+                    context,
+                    user.points,
+                    rank,
+                    badgeIconUrl: user.badge?.iconUrl,
+                    themeColor: themeColor,
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  // Achievement Rows
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: Column(
+                      children: [
+                        _buildAchievementRow(
+                          icon: SVGs.icStreakAchievement,
+                          title: "عدد أيام الدراسة :",
+                          value: "${streak?.currentStreak ?? 0} أيام متواصلة",
+                          themeColor: const Color(0xFFF97316),
+                        ),
+                        _buildAchievementRow(
+                          icon: SVGs.icPointsAchievement,
+                          title: "إجمالي النقاط :",
+                          value: "${user.points} نقطة",
+                          themeColor: const Color(0xFF00C4F6),
+                        ),
+                        _buildAchievementRow(
+                          icon: SVGs.icLessonsAchievement,
+                          title: "الدروس المكتملة :",
+                          value: "$completedLessons درس",
+                          themeColor: const Color(0xFF22C55E),
+                        ),
+                        _buildAchievementRow(
+                          icon: SVGs.icPerfectAchievement,
+                          title: "النتائج المثالية :",
+                          value: "$perfectResults درس",
+                          themeColor: const Color(0xFFD946EF),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            'تيسير - إنجاز جديد! 🏆',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              fontFamily: 'SomarSans',
-            ),
-          ),
-          const SizedBox(height: 20),
-          _ShieldWidget(
-            user: user,
-            badgeIconUrl: badgeIconUrl,
-            themeColor: themeColor,
-          ),
-          const SizedBox(height: 20),
-          _buildAchievementRow(
-            icon: SVGs.icPoints,
-            title: 'النقاط',
-            value: '${user.points}',
-            themeColor: themeColor,
-          ),
-          _buildAchievementRow(
-            icon: SVGs.icRank,
-            title: 'الرتبة',
-            value: user.rank,
-            themeColor: themeColor,
-          ),
-          _buildAchievementRow(
-            icon: SVGs.icLevel,
-            title: 'المستوى',
-            value: '${user.level}',
-            themeColor: themeColor,
-          ),
-          const SizedBox(height: 15),
-          const Text(
-            'تعلم بذكاء مع تيسير',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.white70,
-              fontFamily: 'SomarSans',
-            ),
-          ),
-        ],
       ),
     );
   }
 
-  Widget _ShieldWidget({
-    required dynamic user,
-    required String? badgeIconUrl,
+  Widget _buildShield(
+    BuildContext context,
+    int points,
+    String rank, {
+    String? badgeIconUrl,
     required Color themeColor,
   }) {
     return SizedBox(
@@ -135,7 +181,7 @@ class _AchievementShareDesign extends StatelessWidget {
             width: 110,
             height: 130,
             avatarPaddingTop: 28,
-            avatarSize: 100,
+            avatarSize: 98,
           ),
 
           // Stars (Fallback Only)
@@ -155,7 +201,7 @@ class _AchievementShareDesign extends StatelessWidget {
           // Rank Label (Badge in Top)
           // Level Number (Custom Styled Dynamic Number)
           Positioned(
-            bottom: 22,
+            bottom: 18,
             child: Builder(
               builder: (context) {
                 final shadowColor = Color.alphaBlend(Colors.black.withValues(alpha: 0.25), themeColor);
@@ -163,26 +209,26 @@ class _AchievementShareDesign extends StatelessWidget {
                   fontSize: 28,
                   fontWeight: FontWeight.w900,
                 );
-                final points = user.points.toString();
+                final pointsStr = points.toString();
 
                 return Stack(
                   alignment: Alignment.center,
                   children: [
                     // Bottom Shadow Layer (3D effect)
                     Text(
-                      points,
+                      pointsStr,
                       style: textStyle.copyWith(
                         foreground: Paint()
                           ..style = PaintingStyle.stroke
-                          ..strokeWidth = 8
-                          ..color = shadowColor,
+                          ..strokeWidth = 6,
+                          color: shadowColor,
                       ),
                     ),
                     // Offset Shadow
                     Transform.translate(
                       offset: const Offset(0, 2),
                       child: Text(
-                        points,
+                        pointsStr,
                         style: textStyle.copyWith(
                           color: shadowColor,
                         ),
@@ -190,17 +236,17 @@ class _AchievementShareDesign extends StatelessWidget {
                     ),
                     // Stroke Layer
                     Text(
-                      points,
+                      pointsStr,
                       style: textStyle.copyWith(
                         foreground: Paint()
                           ..style = PaintingStyle.stroke
-                          ..strokeWidth = 5
+                          ..strokeWidth = 4
                           ..color = themeColor,
                       ),
                     ),
                     // Fill Layer (Top)
                     Text(
-                      points,
+                      pointsStr,
                       style: textStyle.copyWith(
                         color: const Color(0xFFFBF0FC),
                       ),

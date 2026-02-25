@@ -5,7 +5,6 @@ import 'package:tayssir/common/core/shield_badge.dart';
 import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';
 import 'package:tayssir/router/app_router.dart';
-import 'package:tayssir/services/actions/special_effect_service.dart';
 
 class ProfileButton extends ConsumerWidget {
   const ProfileButton({super.key});
@@ -32,8 +31,9 @@ class ProfileButton extends ConsumerWidget {
         themeColor: themeColor,
         width: 72,
         height: 90,
-        avatarPaddingTop: 18,
+        avatarPaddingTop: 20,
         avatarSize: 60,
+        avatarOffsetX: -1.5,
       ),
     );
   }
