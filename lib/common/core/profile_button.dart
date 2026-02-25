@@ -36,13 +36,19 @@ class ProfileButton extends ConsumerWidget {
           alignment: Alignment.topCenter,
           children: [
             // User Avatar (Bottom Layer)
-            Positioned(
-              top: 18,
-              child: ClipPath(
-                clipper: _ShieldClipper(),
+            // We wrap the ClipPath in a container that matches the badge image size
+            // to ensure the clipper path aligns perfectly with the PNG.
+            ClipPath(
+              clipper: _ShieldClipper(),
+              child: Container(
+                width: 68, // Matches badge image width
+                height: 85, // Matches badge image height
+                color: Colors.white, // White background for the shield area
+                alignment: Alignment.topCenter,
+                padding: const EdgeInsets.only(top: 18), // Adjusted padding for avatar
                 child: Container(
-                  width: 48,
-                  height: 48,
+                  width: 60, // Optimized to match log screen proportion (89%)
+                  height: 60,
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.circle,
@@ -59,14 +65,11 @@ class ProfileButton extends ConsumerWidget {
 
             // Badge Design (Top Layer)
             if (badgeIconUrl != null)
-              Positioned(
-                top: 0,
-                child: CachedNetworkImage(
-                  imageUrl: badgeIconUrl,
-                  width: 68,
-                  height: 85,
-                  fit: BoxFit.contain,
-                ),
+              CachedNetworkImage(
+                imageUrl: badgeIconUrl,
+                width: 68,
+                height: 85,
+                fit: BoxFit.contain,
               )
             else
               // Mini Shield Fallback

@@ -183,20 +183,27 @@ class _AchievementShareDesign extends StatelessWidget {
 
           // User Avatar (Bottom Layer)
           Positioned(
-            top: 28,
+            top: 0,
             child: ClipPath(
               clipper: _ShieldClipper(),
               child: Container(
-                width: 100,
-                height: 100,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: ClipOval(
-                  child: CachedNetworkImage(
-                    imageUrl: user.completeProfilePic,
-                    fit: BoxFit.cover,
+                width: 110,
+                height: 130,
+                color: Colors.white,
+                alignment: Alignment.topCenter,
+                padding: const EdgeInsets.only(top: 28),
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: user.completeProfilePic,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),

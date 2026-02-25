@@ -208,21 +208,29 @@ class _ShieldWidget extends StatelessWidget {
             ),
 
           // User Avatar (Bottom Layer)
+          // Clipped to the exact shield shape to prevent bleed
           Positioned(
-            top: 40.h,
+            top: 0,
             child: ClipPath(
               clipper: _ShieldClipper(),
               child: Container(
-                width: 125.w,
-                height: 125.w,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: ClipOval(
-                  child: CachedNetworkImage(
-                    imageUrl: userAvatarUrl,
-                    fit: BoxFit.cover,
+                width: 140.w,
+                height: 165.h,
+                color: Colors.white,
+                alignment: Alignment.topCenter,
+                padding: EdgeInsets.only(top: 40.h),
+                child: Container(
+                  width: 125.w,
+                  height: 125.w,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: userAvatarUrl,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
