@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
@@ -6,195 +7,151 @@ import 'package:path_provider/path_provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:tayssir/features/streaks/data/streak_model.dart';
 import 'package:intl/intl.dart' hide TextDirection;
-import 'package:tayssir/resources/resources.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class StreakShareUtils {
   static Future<void> shareStreak(
       BuildContext context, StreakModel streak) async {
-    // Initialize date formatting for Arabic to avoid LocaleDataException
     await initializeDateFormatting('ar');
-    
     final screenshotController = ScreenshotController();
 
-    // Show a small loading indicator
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-          content: Text('جاري تجهيز الصورة للمشاركة...'),
-          duration: Duration(milliseconds: 700)),
-    );
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('جاري تجهيز الستوري...'),
+            duration: Duration(milliseconds: 800)),
+      );
+    }
 
     try {
       final imageBytes = await screenshotController.captureFromWidget(
         _buildShareDesign(streak),
-        delay: const Duration(milliseconds: 300), // More delay for assets
-        pixelRatio: 3.0,
+        delay: const Duration(milliseconds: 600),
+        pixelRatio: 3.0, // High quality for 1080x1920
       );
 
       final directory = await getTemporaryDirectory();
-      final imagePath = '${directory.path}/streak_share.png';
+      final imagePath = '${directory.path}/streak_story.png';
       final file = File(imagePath);
       await file.writeAsBytes(imageBytes);
 
-      await Share.shareXFiles(
-        [XFile(imagePath)],
-        text:
-            'أنا في حماس دراسي متواصل لمدة ${streak.currentStreak} أيام على منصة Bayan! 🔥🚀 شاركني التحدي!',
-      );
+      await Share.shareXFiles([XFile(imagePath)]);
     } catch (e) {
-      debugPrint('Error generating share image: $e');
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('حدث خطأ أثناء إنشاء الصورة: $e')),
-        );
-      }
+      debugPrint('Error generating story: $e');
     }
   }
 
   static Widget _buildShareDesign(StreakModel streak) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Container(
-        width: 360,
-        height: 720, // Increased height to prevent overflow
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/streak_share_bg.png'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Stack(
-          children: [
-            // Safe overlay
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.15),
+    // SVG for "ايام دراسية دون انقطاع" as provided by user
+    const String daysLabelSvg = '''<svg width="235" height="39" viewBox="0 0 235 39" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_d_262_2720)">
+<path d="M6.54393 23.5823C4.58069 23.5823 3.13164 24.6106 3.13164 26.6206C3.13164 29.472 7.29184 30.8509 11.1716 29.1448V32.0195C5.81941 34.6138 -0.000197679 31.9027 -0.000197679 26.6206C-0.000197679 24.1198 1.26188 22.2267 3.17838 21.2451C1.9163 20.2868 1.28526 18.9079 1.28526 17.2485C1.28526 11.5224 6.94126 9.93308 11.5923 11.686V14.5841C8.13322 13.1818 4.7443 14.14 4.7443 17.3186C4.7443 19.7025 6.21673 20.4271 8.1566 20.4271H11.639V23.5823H6.54393ZM14.616 7.31543H17.7245V19.4454C17.7245 20.17 18.262 20.4504 18.6593 20.4504H19.8046V23.5823H17.6076C15.9482 23.5823 14.616 22.2734 14.616 20.5907V7.31543ZM37.9715 20.4504H40.4255V23.5823H19.5778V23.5589L18.2456 23.0915V20.9646L19.5778 20.4738V20.4504H22.0786V7.31543H25.187V15.3554C26.9867 13.3454 29.1836 11.6626 31.7779 11.6626C35.9381 11.6626 37.9715 14.0699 37.9715 18.9546V20.4504ZM34.9565 20.4504V18.9546C34.9565 16.0565 33.4841 14.7243 31.3806 14.7243C29.2771 14.7243 27.2671 15.8695 25.187 18.347V20.4504H34.9565ZM44.3215 10.0266C43.3399 10.0266 42.4751 9.18518 42.4751 8.18019C42.4751 7.19857 43.3399 6.33381 44.3215 6.33381C45.3265 6.33381 46.1679 7.19857 46.1679 8.18019C46.1679 9.18518 45.3265 10.0266 44.3215 10.0266ZM49.3231 10.0266C48.3181 10.0266 47.4767 9.18518 47.4767 8.18019C47.4767 7.19857 48.3181 6.33381 49.3231 6.33381C50.3281 6.33381 51.1695 7.19857 51.1695 8.18019C51.1695 9.18518 50.3281 10.0266 49.3231 10.0266ZM51.8473 20.4504H54.0676V23.5823H40.2782L38.9226 23.0915V20.9413L40.2782 20.4504H42.5452C42.1246 19.8428 41.8441 19.0949 41.8441 18.2301V16.8979C41.8441 13.8596 44.041 11.5691 47.1963 11.5691C50.3748 11.5691 52.5718 13.8362 52.5718 16.8979V18.2301C52.5718 19.0949 52.2913 19.8428 51.8473 20.4504ZM49.44 18.2301V16.8979C49.44 15.5657 48.6219 14.701 47.2196 14.701C45.7939 14.701 44.9526 15.5423 44.9526 16.8979V18.2301C44.9526 19.4688 46.0978 20.4504 47.2664 20.4504C48.5752 20.4504 49.44 19.4688 49.44 18.2301ZM58.0399 10.9848C57.0349 10.9848 56.1935 10.1668 56.1935 9.13844C56.1935 8.15682 57.0349 7.31543 58.0399 7.31543C59.0449 7.31543 59.8863 8.15682 59.8863 9.13844C59.8863 10.1668 59.0449 10.9848 58.0399 10.9848ZM53.646 23.5823V20.4504H55.8196C56.2169 20.4504 56.7311 20.17 56.7311 19.4454V12.504H59.8629V20.5907C59.8629 22.2734 58.5307 23.5823 56.8713 23.5823H53.646ZM65.9078 23.5823H62.776V7.31543H65.9078V23.5823ZM79.4805 13.5791C78.4989 13.5791 77.6341 12.7611 77.6341 11.7327C77.6341 10.7511 78.4989 9.90971 79.4805 9.90971C80.4855 9.90971 81.3269 10.7511 81.3269 11.7327C81.3269 12.7611 80.4855 13.5791 79.4805 13.5791ZM73.3337 18.5339H76.4655V23.0213C76.4655 25.3352 78.0315 26.9011 80.3219 26.9011H80.4855C82.776 26.9011 84.3652 25.3352 84.3652 23.0213V12.3638H87.4737V23.0213C87.4737 27.0413 84.4821 30.0329 80.4855 30.0329H80.3219C76.3019 30.0329 73.3337 27.0413 73.3337 23.0213V18.5339ZM95.5328 11.5457C98.5478 11.5457 100.815 13.8362 100.815 16.8512V24.634C100.815 27.9294 97.5428 30.1965 91.6531 28.6306V25.7325C96.3508 26.6674 97.683 25.5455 97.683 23.8627V23.5355H95.1121C92.2841 23.5122 89.9937 21.1282 89.9937 18.2301V16.8512C89.9937 13.8362 92.2607 11.5457 95.2991 11.5457H95.5328ZM97.683 20.4271V16.8512C97.683 15.5423 96.8183 14.6542 95.5328 14.6542H95.2991C93.9903 14.6542 93.1021 15.5423 93.1021 16.8512V18.2301C93.1021 19.4221 94.0604 20.4271 95.1589 20.4271H97.683ZM103.163 23.5823V20.4504H107.58C108.749 20.4504 109.707 19.4922 109.707 18.3236V17.0148C109.707 15.7527 108.656 14.7243 107.394 14.7243H104.752V11.5925H107.394C110.385 11.5925 112.816 14.0232 112.816 17.0148V18.8612C112.816 21.4788 110.712 23.5823 108.095 23.5823H103.163ZM123.47 9.8396C122.465 9.8396 121.623 8.99821 121.623 7.99322C121.623 7.0116 122.465 6.14684 123.47 6.14684C124.475 6.14684 125.316 7.0116 125.316 7.99322C125.316 8.99821 124.475 9.8396 123.47 9.8396ZM128.471 9.8396C127.466 9.8396 126.625 8.99821 126.625 7.99322C126.625 7.0116 127.466 6.14684 128.471 6.14684C129.453 6.14684 130.294 7.0116 130.294 7.99322C130.294 8.99821 129.453 9.8396 128.471 9.8396ZM132.211 20.4504H133.029V23.5823H132.211C130.832 23.5823 129.663 23.0213 128.869 22.1098C128.027 22.9746 126.882 23.5122 125.269 23.5122C122.418 23.5122 120.104 21.1049 120.104 18.1834V16.8512C120.104 13.8128 122.371 11.5224 125.386 11.5224H130.949V19.165C130.949 19.9363 131.44 20.4504 132.211 20.4504ZM127.817 19.2351V14.6542H125.386C124.101 14.6542 123.236 15.519 123.236 16.8512V18.1834C123.236 19.3987 124.171 20.3803 125.269 20.3803C126.298 20.3803 127.233 19.983 127.817 19.2351ZM141.921 20.4504H144.188V23.5823H141.477C140.379 23.5823 139.397 23.0447 138.626 22.2734C137.901 23.0447 136.826 23.5823 135.283 23.5823H132.806L131.45 23.0915V20.9646L132.806 20.4504H135.307C136.733 20.4504 137.036 19.5857 137.036 18.5573V15.6358L137.013 12.504H140.168V17.2952C140.168 17.529 140.168 17.7627 140.145 18.0431V18.5573C140.145 19.5857 140.495 20.4504 141.921 20.4504ZM135.587 25.7792C136.569 25.7792 137.41 26.6206 137.41 27.6022C137.41 28.6306 136.569 29.4486 135.587 29.4486C134.582 29.4486 133.741 28.6306 133.741 27.6022C133.741 26.6206 134.582 25.7792 135.587 25.7792ZM140.566 25.7792C141.571 25.7792 142.412 26.6206 142.412 27.6022C142.412 28.6306 141.571 29.4486 140.566 29.4486C139.561 29.4486 138.719 28.6306 138.719 27.6022C138.719 26.6206 139.561 25.7792 140.566 25.7792ZM159.069 11.8028H162.2V18.9079C162.2 21.4788 160.097 23.5823 157.526 23.5823C156.17 23.5823 155.072 23.1382 154.301 22.3903C153.389 23.2317 152.244 23.629 151.052 23.629C149.837 23.629 148.855 23.185 147.99 22.3903C147.196 23.1148 146.121 23.5823 144.905 23.5823H143.9L142.545 23.0915V20.9413L143.9 20.4504H144.929C145.84 20.4504 146.448 19.8428 146.448 18.9546V14.2335H149.556V18.9546C149.556 19.9363 150.117 20.5206 151.122 20.5206C152.08 20.5439 152.758 19.9596 152.758 18.9546V14.2335H155.867V18.9546C155.867 19.8895 156.498 20.4504 157.526 20.4504C158.391 20.4504 159.069 19.7727 159.069 18.9079V11.8028ZM168.753 23.5823H165.621V7.31543H168.753V23.5823ZM169.886 28.9578V25.826H171.055C172.27 25.826 173.135 24.9846 173.135 23.7459V12.2936H176.266V23.7459C176.266 26.7141 174.023 28.9578 171.055 28.9578H169.886ZM178.825 23.5823V20.4504H183.242C184.411 20.4504 185.369 19.4922 185.369 18.3236V17.0148C185.369 15.7527 184.318 14.7243 183.055 14.7243H180.414V11.5925H183.055C186.047 11.5925 188.478 14.0232 188.478 17.0148V18.8612C188.478 21.4788 186.374 23.5823 183.757 23.5823H178.825ZM204.554 24.2834C203.011 24.2834 201.048 23.7693 199.926 22.6474C199.132 22.7876 198.664 23.3719 198.664 24.1899V30.8509H195.439V24.1899C195.439 21.9229 196.865 20.0999 198.921 19.5857V16.9447C198.921 13.8362 201.259 11.4523 204.414 11.4523C207.522 11.4523 209.906 13.8128 209.906 16.9447V18.5106C209.906 22.6708 207.499 24.2834 204.554 24.2834ZM204.414 21.0581C205.769 21.0581 206.681 20.1466 206.681 18.791V16.9447C206.681 15.5891 205.769 14.6776 204.414 14.6776C203.058 14.6776 202.147 15.5891 202.147 16.9447V20.3336C202.661 20.8478 203.292 21.0581 204.414 21.0581ZM213.186 7.31543H216.294V19.4454C216.294 20.17 216.832 20.4504 217.229 20.4504H218.374V23.5823H216.177C214.518 23.5823 213.186 22.2734 213.186 20.5907V7.31543ZM217.914 23.5823V20.4504H222.565C222.962 20.4504 223.476 20.17 223.476 19.4454V12.504H226.608V20.5907C226.608 22.2734 225.276 23.5823 223.617 23.5823H217.914ZM220.438 29.4954C219.456 29.4954 218.592 28.654 218.592 27.649C218.592 26.6674 219.456 25.8026 220.438 25.8026C221.443 25.8026 222.284 26.6674 222.284 27.649C222.284 28.654 221.443 29.4954 220.438 29.4954ZM225.44 29.4954C224.435 29.4954 223.593 28.654 223.593 27.649C223.593 26.6674 224.435 25.8026 225.44 25.8026C226.445 25.8026 227.286 26.6674 227.286 27.649C227.286 28.654 226.445 29.4954 225.44 29.4954ZM231.758 3.7629H234.329V5.49242H229.024V3.7629H229.865C229.538 3.38895 229.304 2.89814 229.304 2.2671C229.304 0.958274 230.169 2.6256e-05 231.665 2.6256e-05C233.137 2.6256e-05 234.096 0.934903 234.189 2.64105H232.623C232.553 2.05675 232.179 1.70618 231.712 1.70618C231.244 1.70618 230.917 1.96327 230.917 2.47745C230.917 2.80465 231.104 3.36558 231.758 3.7629ZM230.122 23.5823V7.31543H233.254V23.5823H230.122Z" fill="white"/>
+</g>
+<defs>
+<filter id="filter0_d_262_2720" x="0" y="0" width="234.33" height="38.0603" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="3.44651"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.462745 0 0 0 0 0.133333 0 0 0 0 0.027451 0 0 0 0.7 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_262_2720"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_262_2720" result="shape"/>
+</filter>
+</defs>
+</svg>''';
+
+    return Material(
+      color: Colors.transparent,
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Container(
+          width: 360,
+          height: 640,
+          clipBehavior: Clip.antiAlias,
+          decoration: const BoxDecoration(color: Color(0xFF1B365D)),
+          child: Stack(
+            children: [
+              // 1. Background Image (The brand story background)
+              Positioned.fill(
+                child: Image.asset(
+                  'assets/images/streak_share_bg.png',
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 35),
-              child: Column(
-                children: [
-                  // App Branding
-                  const Text(
-                    'Bayan',
-                    style: TextStyle(
-                      fontSize: 34,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                      fontFamily: 'SomarSans',
-                      letterSpacing: 1.5,
-                      shadows: [Shadow(color: Colors.black38, blurRadius: 12)],
-                    ),
-                  ),
-                  
-                  const Spacer(flex: 1),
 
-                  // Achievement Card
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.98),
-                      borderRadius: BorderRadius.circular(30),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text("🔥", style: TextStyle(fontSize: 50)),
-                        const SizedBox(height: 8),
-                        Text(
-                          "${streak.currentStreak}",
-                          style: const TextStyle(
-                            fontSize: 75,
-                            fontWeight: FontWeight.w900,
-                            color: Color(0xFFF28F3B),
-                            height: 1.0,
-                            fontFamily: 'SomarSans',
-                          ),
-                        ),
-                        const Text(
-                          'أيام دراسية متواصلة',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF1B365D),
-                            fontFamily: 'SomarSans',
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Container(height: 1, width: 80, color: const Color(0xFFEEEEEE)),
-                        const SizedBox(height: 10),
-                        Text(
-                          DateFormat('dd MMMM yyyy', 'ar').format(DateTime.now()),
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF1B365D).withValues(alpha: 0.5),
-                            fontFamily: 'SomarSans',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const Spacer(flex: 2),
-
-                  // Mascot
-                  SizedBox(
-                    height: 120,
-                    child: SvgPicture.asset(
-                      SVGs.titoGood,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-
-                  const Spacer(flex: 1),
-
-                  // Motivational Footer
-                  const Text(
-                    'الباكالوريا في الجيب مع بيان! 🚀',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                      fontFamily: 'SomarSans',
-                      shadows: [Shadow(color: Colors.black38, blurRadius: 8)],
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 15),
-
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF28F3B),
+              // 2. Central Minimalist UI
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Glassmorphism Achievement Card
+                    ClipRRect(
                       borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Text(
-                      'بكالوريا 2025',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontFamily: 'SomarSans',
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0), // Adjust if you want actual blur
+                        child: Container(
+                          width: 280,
+                          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.white, width: 1.5),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // The Big Number
+                              Text(
+                                "${streak.currentStreak}",
+                                style: const TextStyle(
+                                  fontSize: 110,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  height: 1.0,
+                                  fontFamily: 'SomarSans',
+                                  shadows: [
+                                    Shadow(
+                                      color: Color(0x80000000),
+                                      offset: Offset(0, 4),
+                                      blurRadius: 10,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              
+                              // "ايام دراسية دون انقطاع" Label
+                              SvgPicture.string(daysLabelSvg, width: 220),
+                              
+                              const SizedBox(height: 30),
+                              
+                              // Dynamic Date Styled as the SVG
+                              Text(
+                                DateFormat('dd MMMM yyyy', 'ar').format(DateTime.now()),
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontFamily: 'SomarSans',
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.black45,
+                                      offset: Offset(0, 2),
+                                      blurRadius: 4,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
