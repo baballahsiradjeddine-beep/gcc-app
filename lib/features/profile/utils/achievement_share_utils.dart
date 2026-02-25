@@ -187,8 +187,8 @@ class _AchievementShareDesign extends StatelessWidget {
             child: ClipPath(
               clipper: _ShieldClipper(),
               child: Container(
-                width: 110,
-                height: 110,
+                width: 100,
+                height: 100,
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,

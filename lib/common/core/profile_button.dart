@@ -41,8 +41,8 @@ class ProfileButton extends ConsumerWidget {
               child: ClipPath(
                 clipper: _ShieldClipper(),
                 child: Container(
-                  width: 52,
-                  height: 52,
+                  width: 48,
+                  height: 48,
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.circle,

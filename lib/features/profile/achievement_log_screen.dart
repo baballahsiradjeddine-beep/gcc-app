@@ -213,8 +213,8 @@ class _ShieldWidget extends StatelessWidget {
             child: ClipPath(
               clipper: _ShieldClipper(),
               child: Container(
-                width: 135.w,
-                height: 135.w,
+                width: 125.w,
+                height: 125.w,
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
