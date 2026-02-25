@@ -49,8 +49,8 @@ class StreakScreen extends StatelessWidget {
                   fontFamily: 'SomarSans',
                 ),
               ),
-              
-              SizedBox(height: 10.h), // Further reduced spacing
+
+              SizedBox(height: 10.h),
 
               // Responsive Fire Emoji
               Container(
@@ -65,9 +65,9 @@ class StreakScreen extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 10.h), // Further reduced spacing
+              SizedBox(height: 10.h),
 
-              // Card Section - Optimized for space
+              // Card Section
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
@@ -195,32 +195,6 @@ class StreakScreen extends StatelessWidget {
               ),
             ),
             child: isCompleted
-                ? Icon(
-                    Icons.check,
-                    color: Colors.white,
-                    size: 18.sp,
-                  )
-                : null,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-          SizedBox(height: 8.h),
-          Container(
-            width: 32.w,
-            height: 32.w,
-            decoration: BoxDecoration(
-              color: day.studied ? const Color(0xFF00C4F6) : Colors.white,
-              borderRadius: BorderRadius.circular(10.r),
-              border: Border.all(
-                color: const Color(0xFF00C4F6).withValues(alpha: day.studied ? 1 : 0.3),
-                width: 2,
-              ),
-            ),
-            child: day.studied
                 ? Icon(
                     Icons.check,
                     color: Colors.white,
