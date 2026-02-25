@@ -5,6 +5,7 @@ import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:tayssir/resources/resources.dart';
 import 'package:tayssir/features/streaks/data/streak_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -229,61 +230,58 @@ class _AchievementShareDesign extends StatelessWidget {
           // Level Number (Custom Styled Dynamic Number)
           Positioned(
             bottom: 22,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // Bottom Shadow Layer (3D effect)
-                Text(
-                  "$level",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w900,
-                    fontFamily: 'SomarSans',
-                    foreground: Paint()
-                      ..style = PaintingStyle.stroke
-                      ..strokeWidth = 8
-                      ..color = themeColor.withValues(alpha: 0.8),
-                  ),
-                ),
-                // Offset Shadow
-                Transform.translate(
-                  offset: const Offset(0, 2),
-                  child: Text(
-                    "$level",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'SomarSans',
-                      foreground: Paint()
-                        ..style = PaintingStyle.fill
-                        ..color = themeColor,
+            child: Builder(
+              builder: (context) {
+                final shadowColor = Color.alphaBlend(Colors.black.withValues(alpha: 0.45), themeColor);
+                final textStyle = GoogleFonts.balooDa2(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w900,
+                );
+                final points = user.points.toString();
+
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Bottom Shadow Layer (3D effect)
+                    Text(
+                      points,
+                      style: textStyle.copyWith(
+                        foreground: Paint()
+                          ..style = PaintingStyle.stroke
+                          ..strokeWidth = 8
+                          ..color = shadowColor,
+                      ),
                     ),
-                  ),
-                ),
-                // Stroke Layer
-                Text(
-                  "$level",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w900,
-                    fontFamily: 'SomarSans',
-                    foreground: Paint()
-                      ..style = PaintingStyle.stroke
-                      ..strokeWidth = 5
-                      ..color = themeColor,
-                  ),
-                ),
-                // Fill Layer (Top)
-                Text(
-                  "$level",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w900,
-                    fontFamily: 'SomarSans',
-                    color: const Color(0xFFFBF0FC),
-                  ),
-                ),
-              ],
+                    // Offset Shadow
+                    Transform.translate(
+                      offset: const Offset(0, 2),
+                      child: Text(
+                        points,
+                        style: textStyle.copyWith(
+                          color: shadowColor,
+                        ),
+                      ),
+                    ),
+                    // Stroke Layer
+                    Text(
+                      points,
+                      style: textStyle.copyWith(
+                        foreground: Paint()
+                          ..style = PaintingStyle.stroke
+                          ..strokeWidth = 5
+                          ..color = themeColor,
+                      ),
+                    ),
+                    // Fill Layer (Top)
+                    Text(
+                      points,
+                      style: textStyle.copyWith(
+                        color: const Color(0xFFFBF0FC),
+                      ),
+                    ),
+                  ],
+                );
+              }
             ),
           ),
         ],

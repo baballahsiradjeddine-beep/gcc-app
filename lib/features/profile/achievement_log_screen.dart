@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:tayssir/common/core/app_scaffold.dart';
 import 'package:tayssir/features/streaks/presentation/streak_notifier.dart';
@@ -273,20 +274,23 @@ class _LevelNumber extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final shadowColor = Color.alphaBlend(Colors.black.withValues(alpha: 0.45), themeColor);
+    final textStyle = GoogleFonts.balooDa2(
+      fontSize: 32.sp,
+      fontWeight: FontWeight.w900,
+    );
+
     return Stack(
       alignment: Alignment.center,
       children: [
         // Bottom Shadow Layer (3D effect)
         Text(
           number,
-          style: TextStyle(
-            fontSize: 32.sp,
-            fontWeight: FontWeight.w900,
-            fontFamily: 'SomarSans',
+          style: textStyle.copyWith(
             foreground: Paint()
               ..style = PaintingStyle.stroke
               ..strokeWidth = 10
-              ..color = themeColor.withValues(alpha: 0.8),
+              ..color = shadowColor,
           ),
         ),
         // Offset Shadow
@@ -294,23 +298,15 @@ class _LevelNumber extends StatelessWidget {
           offset: const Offset(0, 3),
           child: Text(
             number,
-            style: TextStyle(
-              fontSize: 32.sp,
-              fontWeight: FontWeight.w900,
-              fontFamily: 'SomarSans',
-              foreground: Paint()
-                ..style = PaintingStyle.fill
-                ..color = themeColor,
+            style: textStyle.copyWith(
+              color: shadowColor,
             ),
           ),
         ),
         // Stroke Layer
         Text(
           number,
-          style: TextStyle(
-            fontSize: 32.sp,
-            fontWeight: FontWeight.w900,
-            fontFamily: 'SomarSans',
+          style: textStyle.copyWith(
             foreground: Paint()
               ..style = PaintingStyle.stroke
               ..strokeWidth = 6
@@ -320,10 +316,7 @@ class _LevelNumber extends StatelessWidget {
         // Fill Layer (Top)
         Text(
           number,
-          style: TextStyle(
-            fontSize: 32.sp,
-            fontWeight: FontWeight.w900,
-            fontFamily: 'SomarSans',
+          style: textStyle.copyWith(
             color: const Color(0xFFFBF0FC),
           ),
         ),
