@@ -53,177 +53,162 @@ class StreakShareUtils {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Container(
-        width: 1080 /
-            3, // Roughly mobile size, rendered at 3.0 pixelRatio -> 1080px
-        height: 1920 / 3,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/streak_share_bg.png'),
-            fit: BoxFit.cover,
+        width: 360, // Standard mobile width
+        height: 640, // Standard mobile height
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              const Color(0xFF1B365D), // Deep Bayan Blue
+              const Color(0xFF2E5A9E), // Lighter Blue
+            ],
           ),
         ),
         child: Stack(
           children: [
-            // Safe Area Padding
-            Positioned.fill(
-              top: 50,
-              bottom: 40,
-              left: 20,
-              right: 20,
+            // Abstract Background Patterns (Circles)
+            Positioned(
+              top: -50,
+              right: -50,
+              child: Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.05),
+                ),
+              ),
+            ),
+            
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
               child: Column(
                 children: [
-                  const SizedBox(height: 40),
-                  // Alhamdulillah
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Text(
-                        '🙏 الحمد لله',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(
-                                color: Colors.black26,
-                                offset: Offset(0, 2),
-                                blurRadius: 4),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-
-                  // The Box
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 30, horizontal: 20),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE97A2E)
-                          .withValues(alpha: 0.95), // Adjust to match
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white, width: 2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          streak.currentStreak.toString().padLeft(2, '0'),
-                          style: const TextStyle(
-                            fontSize: 100,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                            height: 1.0,
-                            shadows: [
-                              Shadow(
-                                  color: Color(0xFFB54C0A),
-                                  offset: Offset(4, 4),
-                                  blurRadius: 0),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'أيام دراسية دون انقطاع',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Container(
-                          height: 1.5,
-                          width: double.infinity,
-                          color: Colors.white.withValues(alpha: 0.5),
-                        ),
-                        const SizedBox(height: 15),
-                        Text(
-                          DateFormat('dd MMMM yyyy', 'ar').format(DateTime
-                              .now()), // Assuming arabic locale or just use simple format
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const Spacer(),
-
-                  // Text below
-                  const Text(
-                    'مع منصة Bayan',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  const Text(
-                    'الباك في الجيب Sur! 🚀✨',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 12, horizontal: 40),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFD65C13), // darker orange
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: const Text(
-                      'بكالوريا 2025',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  // Logo Placeholder (Text for now or logo if you have an asset!)
-                  /*
-                  Image.asset(
-                    'assets/images/logo.png', // Or bayan logo
-                    height: 50,
-                  ),
-                  */
+                  // App Branding
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
                         'Bayan',
                         style: TextStyle(
-                          fontSize: 40,
+                          fontSize: 28,
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
-                          letterSpacing: 1.5,
+                          fontFamily: 'SomarSans',
+                          letterSpacing: 1.2,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  
+                  const Spacer(flex: 1),
+
+                  // The Achievement Box
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 15,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        const Text(
+                          "🔥",
+                          style: TextStyle(fontSize: 50),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          "${streak.currentStreak}",
+                          style: const TextStyle(
+                            fontSize: 80,
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFFF28F3B),
+                            height: 1.0,
+                            fontFamily: 'SomarSans',
+                          ),
+                        ),
+                        const Text(
+                          'أيام دراسية متواصلة',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF1B365D),
+                            fontFamily: 'SomarSans',
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        Container(
+                          height: 1,
+                          width: 100,
+                          color: const Color(0xFFEEEEEE),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          DateFormat('dd MMMM yyyy', 'ar').format(DateTime.now()),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF1B365D).withValues(alpha: 0.6),
+                            fontFamily: 'SomarSans',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const Spacer(flex: 1),
+
+                  // Tito Mascot Cheering
+                  SizedBox(
+                    height: 120,
+                    child: SvgPicture.asset(
+                      SVGs.titoPerfect, // Best Tito for achievements
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+
+                  const Spacer(flex: 1),
+
+                  // Motivational Text
+                  const Text(
+                    'الباكالوريا في الجيب مع بيان! 🚀',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      fontFamily: 'SomarSans',
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 15),
+
+                  // Bottom Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF28F3B),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Text(
+                      'بكالوريا 2025',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontFamily: 'SomarSans',
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
