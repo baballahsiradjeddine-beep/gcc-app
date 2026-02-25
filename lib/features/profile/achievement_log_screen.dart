@@ -209,12 +209,12 @@ class _ShieldWidget extends StatelessWidget {
 
           // User Avatar (Bottom Layer)
           Positioned(
-            top: 42.h,
+            top: 40.h,
             child: ClipPath(
               clipper: _ShieldClipper(),
               child: Container(
-                width: 130.w,
-                height: 130.w,
+                width: 135.w,
+                height: 135.w,
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
@@ -435,11 +435,11 @@ class _ShieldClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
-    // A more precise curved shield path to match the PNG shape
-    path.moveTo(size.width * 0.1, size.height * 0.08); // Top left corner
-    path.quadraticBezierTo(size.width * 0.5, 0, size.width * 0.9, size.height * 0.08); // Curved Top
-    path.lineTo(size.width * 0.98, size.height * 0.7); // Right side
-    path.quadraticBezierTo(size.width * 0.5, size.height * 1.0, size.width * 0.02, size.height * 0.7); // Curved Bottom Tip
+    // Tighter curved shield path to hide circle edges
+    path.moveTo(size.width * 0.12, size.height * 0.08); 
+    path.quadraticBezierTo(size.width * 0.5, 0, size.width * 0.88, size.height * 0.08);
+    path.lineTo(size.width * 0.95, size.height * 0.7);
+    path.quadraticBezierTo(size.width * 0.5, size.height * 0.98, size.width * 0.05, size.height * 0.7);
     path.close();
     return path;
   }

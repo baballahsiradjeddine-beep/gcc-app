@@ -30,19 +30,19 @@ class ProfileButton extends ConsumerWidget {
         context.pushNamed(AppRoutes.achievementLog.name);
       },
       child: SizedBox(
-        width: 64,
-        height: 80,
+        width: 72,
+        height: 90,
         child: Stack(
           alignment: Alignment.topCenter,
           children: [
             // User Avatar (Bottom Layer)
             Positioned(
-              top: 20,
+              top: 18,
               child: ClipPath(
                 clipper: _ShieldClipper(),
                 child: Container(
-                  width: 54,
-                  height: 54,
+                  width: 52,
+                  height: 52,
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.circle,
@@ -63,8 +63,8 @@ class ProfileButton extends ConsumerWidget {
                 top: 0,
                 child: CachedNetworkImage(
                   imageUrl: badgeIconUrl,
-                  width: 60,
-                  height: 75,
+                  width: 68,
+                  height: 85,
                   fit: BoxFit.contain,
                 ),
               )
@@ -72,7 +72,7 @@ class ProfileButton extends ConsumerWidget {
               // Mini Shield Fallback
               Center(
                 child: CustomPaint(
-                  size: const Size(56, 65),
+                  size: const Size(64, 75),
                   painter: _MiniShieldPainter(color: themeColor),
                 ),
               ),
@@ -116,10 +116,11 @@ class _ShieldClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
-    path.moveTo(size.width * 0.1, size.height * 0.08); // Top left corner
-    path.quadraticBezierTo(size.width * 0.5, 0, size.width * 0.9, size.height * 0.08); // Curved Top
-    path.lineTo(size.width * 0.98, size.height * 0.7); // Right side
-    path.quadraticBezierTo(size.width * 0.5, size.height * 1.0, size.width * 0.02, size.height * 0.7); // Curved Bottom Tip
+    // Tighter curved shield path to hide circle edges
+    path.moveTo(size.width * 0.12, size.height * 0.08); 
+    path.quadraticBezierTo(size.width * 0.5, 0, size.width * 0.88, size.height * 0.08);
+    path.lineTo(size.width * 0.95, size.height * 0.7);
+    path.quadraticBezierTo(size.width * 0.5, size.height * 0.98, size.width * 0.05, size.height * 0.7);
     path.close();
     return path;
   }
