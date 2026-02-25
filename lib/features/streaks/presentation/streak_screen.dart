@@ -18,149 +18,141 @@ class StreakScreen extends StatelessWidget {
     return AppScaffold(
       onPopScope: () {},
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        children: [
-                          SizedBox(height: 10.h),
-                          Text(
-                            "مبارك لك 🎉",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 22.sp,
-                              color: const Color(0xFFF28F3B),
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'SomarSans',
-                            ),
-                          ),
-                          SizedBox(height: 5.h),
-                          Text(
-                            "${streak.currentStreak} أيام متواصلة",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 28.sp,
-                              color: const Color(0xFFF28F3B),
-                              fontWeight: FontWeight.w900,
-                              fontFamily: 'SomarSans',
-                            ),
-                          ),
-                          SizedBox(height: 25.h),
-                          // Premium Fire Emoji Container
-                          Container(
-                            padding: EdgeInsets.all(20.w),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: const Color(0xFFFFB74D).withValues(alpha: 0.1),
-                            ),
-                            child: Text(
-                              "🔥",
-                              style: TextStyle(fontSize: 100.sp),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 25.h),
-                      // Card Section
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(18.w),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(24.r),
-                          border: Border.all(color: const Color(0xFFE0E0E0), width: 1.2),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 15,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: streak.history
-                                  .map((day) => _buildDayItem(day))
-                                  .toList(),
-                            ),
-                            SizedBox(height: 20.h),
-                            const Divider(color: Color(0xFFEEEEEE), thickness: 1.5),
-                            SizedBox(height: 15.h),
-                            Text(
-                              "سلسلتك تكبر مع كل يوم دراسي، لكن إذا توقفت ليوم واحد فقط، تبدأ من الصفر!\nحافظ على استمراريتك وحقق التقدم!",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                color: const Color(0xFF1B365D),
-                                height: 1.5,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: 'SomarSans',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 25.h),
-                      Column(
-                        children: [
-                          Text(
-                            "لا تتوقف... كل يوم يصنع فارقاً!",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              color: const Color(0xFF1B365D),
-                              fontWeight: FontWeight.w800,
-                              fontFamily: 'SomarSans',
-                            ),
-                          ),
-                          SizedBox(height: 25.h),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: BigButton(
-                                  text: "تابع",
-                                  buttonType: ButtonType.secondary,
-                                  onPressed: () {
-                                    context.pushReplacementNamed(
-                                      AppRoutes.chapters.name,
-                                      pathParameters: {
-                                        'unitId': unitId.toString(),
-                                      },
-                                    );
-                                  },
-                                ),
-                              ),
-                              SizedBox(width: 12.w),
-                              Expanded(
-                                child: BigButton(
-                                  text: "مشاركة",
-                                  buttonType: ButtonType.primary,
-                                  onPressed: () {
-                                    StreakShareUtils.shareStreak(context, streak);
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10.h),
-                    ],
-                  ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+          child: Column(
+            children: [
+              // Header Section
+              SizedBox(height: 10.h),
+              Text(
+                "مبارك لك 🎉",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20.sp,
+                  color: const Color(0xFFF28F3B),
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'SomarSans',
                 ),
               ),
-            );
-          },
+              SizedBox(height: 2.h),
+              Text(
+                "${streak.currentStreak} أيام متواصلة",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 26.sp,
+                  color: const Color(0xFFF28F3B),
+                  fontWeight: FontWeight.w900,
+                  fontFamily: 'SomarSans',
+                ),
+              ),
+              
+              const Spacer(flex: 1),
+
+              // Responsive Fire Emoji
+              Container(
+                padding: EdgeInsets.all(16.w),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFFFFB74D).withValues(alpha: 0.1),
+                ),
+                child: Text(
+                  "🔥",
+                  style: TextStyle(fontSize: 80.sp),
+                ),
+              ),
+
+              const Spacer(flex: 1),
+
+              // Card Section - Optimized for space
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20.r),
+                  border: Border.all(color: const Color(0xFFE0E0E0), width: 1.2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: streak.history
+                          .map((day) => _buildDayItem(day))
+                          .toList(),
+                    ),
+                    SizedBox(height: 14.h),
+                    const Divider(color: Color(0xFFEEEEEE), thickness: 1.2),
+                    SizedBox(height: 10.h),
+                    Text(
+                      "سلسلتك تكبر مع كل يوم دراسي، لكن إذا توقفت ليوم واحد فقط، تبدأ من الصفر!",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        color: const Color(0xFF1B365D),
+                        height: 1.4,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'SomarSans',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const Spacer(flex: 1),
+
+              // Footer Section
+              Text(
+                "لا تتوقف... كل يوم يصنع فارقاً!",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 15.sp,
+                  color: const Color(0xFF1B365D),
+                  fontWeight: FontWeight.w800,
+                  fontFamily: 'SomarSans',
+                ),
+              ),
+
+              SizedBox(height: 20.h),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: BigButton(
+                      text: "تابع",
+                      buttonType: ButtonType.secondary,
+                      onPressed: () {
+                        context.pushReplacementNamed(
+                          AppRoutes.chapters.name,
+                          pathParameters: {
+                            'unitId': unitId.toString(),
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: BigButton(
+                      text: "مشاركة",
+                      buttonType: ButtonType.primary,
+                      onPressed: () {
+                        StreakShareUtils.shareStreak(context, streak);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8.h),
+            ],
+          ),
         ),
       ),
     );
