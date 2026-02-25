@@ -111,7 +111,7 @@ class _AchievementShareDesign extends StatelessWidget {
                   // Shield
                   _buildShield(
                     context,
-                    level,
+                    user.points,
                     rank,
                     badgeIconUrl: user.badge?.iconUrl,
                     themeColor: themeColor,

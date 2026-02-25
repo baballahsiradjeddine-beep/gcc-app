@@ -112,7 +112,7 @@ class _AchievementLogScreenState extends ConsumerState<AchievementLogScreen> {
                     // Shield Section
                     _ShieldWidget(
                       userAvatarUrl: user.completeProfilePic,
-                      level: level,
+                      level: user.points,
                       rank: rank,
                       badgeIconUrl: user.badge?.iconUrl,
                       badgeColor: user.badge?.color,
