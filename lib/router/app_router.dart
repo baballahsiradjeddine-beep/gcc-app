@@ -44,6 +44,9 @@ import '../features/subscriptions/presentation/card/subscription_card_screen.dar
 import '../features/tools/tools_screen.dart';
 import '../features/units/units_screen.dart';
 import 'package:tayssir/features/streaks/presentation/streak_screen.dart';
+import 'package:tayssir/features/challanges/challenges_screen.dart';
+import 'package:tayssir/features/challanges/presentation/matchmaking_screen.dart';
+import 'package:tayssir/features/challanges/presentation/arena_screen.dart';
 import 'bottom_navigation/main_scaffold.dart';
 import 'not_found_screen.dart';
 import 'routes_service.dart';
@@ -58,6 +61,8 @@ enum AppRoutes {
   tools,
   leaderboard,
   challanges,
+  challengeMatchmaking,
+  challengeArena,
   settings,
   register,
   welcome,
@@ -259,10 +264,40 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: <RouteBase>[
               GoRoute(
                 path: '/challanges',
+                name: AppRoutes.challanges.name,
                 pageBuilder: (context, state) => CupertinoPage(
                   key: state.pageKey,
-                  child: const ComingSoonScreen(),
+                  child: const ChallengesScreen(),
                 ),
+                routes: [
+                  TayssirCustomGoRoute(
+                    name: AppRoutes.challengeMatchmaking.name,
+                    path: 'matchmaking',
+                    pageBuilder: (context, state) {
+                      final data = state.extra! as Map<String, dynamic>;
+                      return MatchmakingScreen(
+                        unitId: data['unitId'] as int,
+                        courseTitle: data['courseTitle'] as String,
+                      );
+                    },
+                    transitionType: TransitionType.sharedAxis,
+                    duration: const Duration(milliseconds: 300),
+                  ),
+                  TayssirCustomGoRoute(
+                    name: AppRoutes.challengeArena.name,
+                    path: 'arena',
+                    pageBuilder: (context, state) {
+                      final data = state.extra! as Map<String, dynamic>;
+                      return ArenaScreen(
+                        matchId: data['matchId'] as String,
+                        unitId: data['unitId'] as int,
+                        courseTitle: data['courseTitle'] as String,
+                      );
+                    },
+                    transitionType: TransitionType.sharedAxis,
+                    duration: const Duration(milliseconds: 300),
+                  ),
+                ],
                 // TayssirCustomGoRoute(
                 // path: '/challanges',
                 // name: AppRoutes.challanges.name,

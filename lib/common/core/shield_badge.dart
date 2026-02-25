@@ -104,11 +104,11 @@ class _ShieldClipper extends CustomClipper<Path> {
         size.width * 0.5, size.height * 0.15, size.width * 0.75, size.height * 0.18);
     
     // Spreads outwards to safely cover the full width of the circular avatar hole
-    path.lineTo(size.width * 0.91, size.height * 0.60);
+    path.lineTo(size.width * 0.86, size.height * 0.60);
     
     // Curves to fill the bottom, staying safely above the pointy tip to avoid leaking 
     path.quadraticBezierTo(
-        size.width * 0.5, size.height * 0.95, size.width * 0.09, size.height * 0.60);
+        size.width * 0.5, size.height * 0.95, size.width * 0.14, size.height * 0.60);
     
     path.close();
     return path;

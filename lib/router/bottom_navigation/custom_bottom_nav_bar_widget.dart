@@ -26,7 +26,7 @@ final navItemsProvider = Provider<List<NavItemModel>>((ref) {
         index: 3,
         icon: SVGs.icRace,
         label: 'تحديات',
-        page: const ChallengesPage()),
+        page: const ChallengesScreen()),
     NavItemModel(
         index: 4,
         icon: SVGs.icSettings,
