@@ -145,7 +145,12 @@ class ExerciceResultScreen extends HookConsumerWidget {
                   );
 
                   if (context.mounted) {
-                    if (didStreakIncrease) {
+                  final bool hasStudiedToday = streakState?.history
+                          .any((day) => day.isToday && day.studied) ??
+                      false;
+
+                  if (context.mounted) {
+                    if (didStreakIncrease || hasStudiedToday) {
                       context.pushReplacementNamed(
                         AppRoutes.streak.name,
                         extra: {
@@ -161,6 +166,7 @@ class ExerciceResultScreen extends HookConsumerWidget {
                         },
                       );
                     }
+                  }
                   }
                 }
               },
