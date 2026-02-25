@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:tayssir/common/core/app_scaffold.dart';
 import 'package:tayssir/features/streaks/data/streak_model.dart';
 import 'package:tayssir/features/streaks/utils/streak_share_utils.dart';
-import 'package:tayssir/resources/colors/app_colors.dart';
 import 'package:tayssir/router/app_router.dart';
 
 class StreakScreen extends StatelessWidget {
@@ -19,44 +18,55 @@ class StreakScreen extends StatelessWidget {
       onPopScope: () {},
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Spacer(flex: 1),
-              const Text(
+              SizedBox(height: 30.h),
+              Text(
                 "مبارك لك 🎉",
                 style: TextStyle(
-                  fontSize: 26,
-                  color: Color(0xFFF28F3B),
+                  fontSize: 28.sp,
+                  color: const Color(0xFFF28F3B),
                   fontWeight: FontWeight.bold,
+                  fontFamily: 'SomarSans',
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 5.h),
               Text(
                 "${streak.currentStreak} أيام متواصلة",
-                style: const TextStyle(
-                  fontSize: 32,
-                  color: Color(0xFFF28F3B),
+                style: TextStyle(
+                  fontSize: 34.sp,
+                  color: const Color(0xFFF28F3B),
                   fontWeight: FontWeight.w900,
+                  fontFamily: 'SomarSans',
                 ),
               ),
-              const SizedBox(height: 30),
+              const Spacer(flex: 1),
 
-              // The Fire Emoji
-              const Text(
+              // The Fire Emoji / Image
+              Text(
                 "🔥",
-                style: TextStyle(fontSize: 140),
+                style: TextStyle(fontSize: 150.sp),
               ),
 
-              const SizedBox(height: 40),
+              const Spacer(flex: 1),
 
-              // The 7 days widget Container
+              // The 7 days widget Card
               Container(
-                padding: const EdgeInsets.all(20.0),
+                width: double.infinity,
+                padding: EdgeInsets.all(20.w),
                 decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.borderColor, width: 2),
-                  borderRadius: BorderRadius.circular(24.0),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24.r),
+                  border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Column(
                   children: [
@@ -66,15 +76,18 @@ class StreakScreen extends StatelessWidget {
                           .map((day) => _buildDayItem(day))
                           .toList(),
                     ),
-                    const SizedBox(height: 25),
+                    SizedBox(height: 20.h),
+                    const Divider(color: Color(0xFFEEEEEE), thickness: 1.5),
+                    SizedBox(height: 15.h),
                     Text(
                       "سلسلتك تكبر مع كل يوم دراسي، لكن إذا توقفت ليوم واحد فقط، تبدأ من الصفر!\nحافظ على استمراريتك وحقق التقدم!",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textBlack.withOpacity(0.8),
-                        height: 1.5,
+                        fontSize: 16.sp,
+                        color: const Color(0xFF1B365D),
+                        height: 1.6,
                         fontWeight: FontWeight.w600,
+                        fontFamily: 'SomarSans',
                       ),
                     ),
                   ],
@@ -83,47 +96,28 @@ class StreakScreen extends StatelessWidget {
 
               const Spacer(flex: 2),
 
-              const Text(
+              Text(
                 "لا تتوقف... كل يوم يصنع فارقاً!",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 18,
-                  color: AppColors.darkColor,
+                  fontSize: 18.sp,
+                  color: const Color(0xFF1B365D),
                   fontWeight: FontWeight.w800,
+                  fontFamily: 'SomarSans',
                 ),
               ),
 
-              const SizedBox(height: 30),
+              SizedBox(height: 40.h),
 
-              // Actions - Fixed for RTL
+              // Actions
               Row(
                 children: [
+                  // Continue Button (Light Blue)
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        StreakShareUtils.shareStreak(context, streak);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: AppColors.primaryColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      child: const Text(
-                        "مشاركة",
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: OutlinedButton(
+                    child: _buildCustomButton(
+                      text: "تابع",
+                      backgroundColor: const Color(0xFFECF6FF),
+                      textColor: const Color(0xFF00C4F6),
                       onPressed: () {
                         context.pushReplacementNamed(
                           AppRoutes.chapters.name,
@@ -132,29 +126,68 @@ class StreakScreen extends StatelessWidget {
                           },
                         );
                       },
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        side: const BorderSide(
-                            color: AppColors.primaryColor, width: 2),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        backgroundColor: Colors.white,
-                      ),
-                      child: const Text(
-                        "تابع",
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: AppColors.primaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      hasShadow: true,
+                      shadowColor: const Color(0x99C4F6F6),
+                    ),
+                  ),
+                  SizedBox(width: 15.w),
+                  // Share Button (Filled Cyan)
+                  Expanded(
+                    child: _buildCustomButton(
+                      text: "مشاركة",
+                      backgroundColor: const Color(0xFF00C4F6),
+                      textColor: Colors.white,
+                      onPressed: () {
+                        StreakShareUtils.shareStreak(context, streak);
+                      },
+                      hasShadow: true,
+                      shadowColor: const Color(0x9900C4F6),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 10.h),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomButton({
+    required String text,
+    required Color backgroundColor,
+    required Color textColor,
+    required VoidCallback onPressed,
+    bool hasShadow = false,
+    Color? shadowColor,
+  }) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        height: 50.h,
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(25.r),
+          boxShadow: hasShadow
+              ? [
+                  BoxShadow(
+                    color: shadowColor ?? textColor.withValues(alpha: 0.3),
+                    blurRadius: 0,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
+        ),
+        child: Center(
+          child: Text(
+            text,
+            style: TextStyle(
+              color: textColor,
+              fontSize: 20.sp,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'SomarSans',
+            ),
           ),
         ),
       ),
@@ -167,30 +200,29 @@ class StreakScreen extends StatelessWidget {
         Text(
           day.dayName,
           style: TextStyle(
-            fontSize: 11, // Small text for days
-            color: day.isToday ? AppColors.darkColor : AppColors.textBlack,
-            fontWeight: day.isToday ? FontWeight.bold : FontWeight.normal,
+            fontSize: 12.sp,
+            color: const Color(0xFF1B365D),
+            fontWeight: day.isToday ? FontWeight.bold : FontWeight.w500,
+            fontFamily: 'SomarSans',
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10.h),
         Container(
-          width: 36,
-          height: 36,
+          width: 38.w,
+          height: 38.w,
           decoration: BoxDecoration(
-            color: day.studied ? AppColors.primaryColor : Colors.white,
-            borderRadius: BorderRadius.circular(10),
+            color: day.studied ? const Color(0xFF00C4F6) : Colors.white,
+            borderRadius: BorderRadius.circular(10.r),
             border: Border.all(
-              color: day.studied
-                  ? AppColors.primaryColor
-                  : AppColors.primaryColor.withOpacity(0.5),
-              width: 1.5,
+              color: const Color(0xFF00C4F6),
+              width: 2,
             ),
           ),
           child: day.studied
-              ? const Icon(
+              ? Icon(
                   Icons.check,
                   color: Colors.white,
-                  size: 24,
+                  size: 24.sp,
                 )
               : null,
         ),
