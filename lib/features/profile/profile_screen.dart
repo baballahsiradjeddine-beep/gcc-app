@@ -1,11 +1,11 @@
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:tayssir/common/core/shield_badge.dart';
 import 'package:tayssir/common/app_buttons/big_button.dart';
 import 'package:tayssir/common/sliver_scrolling_widget.dart';
 import 'package:tayssir/providers/divisions/division_model.dart';
@@ -134,64 +134,67 @@ class ProfileScreen extends HookConsumerWidget {
             ],
           ),
           10.verticalSpace,
-          Stack(
-            children: [
-              PushableImageButton(
-                image: localImage.value != null
-                    ? FileImage(localImage.value!)
-                    : CachedNetworkImageProvider(user.completeProfilePic ??
-                        'https://picsum.photos/200/300'),
-                size: 100,
-                borderRadius: 30,
-                topColor: Colors.blue,
-                bottomColor: const Color.fromRGBO(25, 118, 210, 1),
-                elevation: 8,
-                borderWidth: 3,
-                borderColor: Colors.blue,
-                onPressed: () {},
-              ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: GestureDetector(
-                  onTap: () async {
-                    final resultImage = await ImagePickerService.pickImage();
-                    if (resultImage != null) {
-                      localImage.value = resultImage;
-                      isShowOverlay.value = true;
-                    } else {
-                      print('no image selected');
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: const BoxDecoration(
-                        color: Colors.pink,
-                        borderRadius: BorderRadius.all(Radius.circular(4))),
-                    child:
-                        const Icon(Icons.edit, color: Colors.white, size: 10),
+          Builder(
+            builder: (context) {
+              final badgeIconUrl = user.badge?.iconUrl;
+              final badgeColor = user.badge?.color;
+              final themeColor = badgeColor != null
+                  ? Color(int.parse(badgeColor.replaceAll('#', '0xFF')))
+                  : const Color(0xFF2DD4BF);
+
+              return Stack(
+                children: [
+                  ShieldBadge(
+                    localAvatarImage: localImage.value != null ? FileImage(localImage.value!) : null,
+                    userAvatarUrl: localImage.value == null ? user.completeProfilePic : null,
+                    badgeIconUrl: badgeIconUrl,
+                    themeColor: themeColor,
+                    width: 100,
+                    height: 125,
+                    avatarPaddingTop: 25,
+                    avatarSize: 85,
                   ),
-                ),
-              ),
-              if (localImage.value != null)
-                Positioned(
-                  top: 0,
-                  right: 0,
-                  child: GestureDetector(
-                    onTap: () {
-                      localImage.value = null;
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(5),
-                      decoration: const BoxDecoration(
-                          color: Colors.pink,
-                          borderRadius: BorderRadius.all(Radius.circular(4))),
-                      child: const Icon(Icons.cancel,
-                          color: Colors.white, size: 10),
+                  Positioned(
+                    bottom: 10,
+                    right: 15,
+                    child: GestureDetector(
+                      onTap: () async {
+                        final resultImage = await ImagePickerService.pickImage();
+                        if (resultImage != null) {
+                          localImage.value = resultImage;
+                          isShowOverlay.value = true;
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: const BoxDecoration(
+                            color: Colors.pink,
+                            borderRadius: BorderRadius.all(Radius.circular(4))),
+                        child: const Icon(Icons.edit, color: Colors.white, size: 10),
+                      ),
                     ),
                   ),
-                ),
-            ],
+                  if (localImage.value != null)
+                    Positioned(
+                      top: 5,
+                      right: 15,
+                      child: GestureDetector(
+                        onTap: () {
+                          localImage.value = null;
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: const BoxDecoration(
+                              color: Colors.pink,
+                              borderRadius: BorderRadius.all(Radius.circular(4))),
+                          child: const Icon(Icons.cancel,
+                              color: Colors.white, size: 10),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            }
           ),
           // 10.verticalSpace,
           //iser points

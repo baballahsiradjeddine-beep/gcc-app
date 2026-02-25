@@ -2,10 +2,10 @@ import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:screenshot/screenshot.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tayssir/common/core/shield_badge.dart';
 import 'package:tayssir/resources/resources.dart';
 import 'package:tayssir/features/streaks/data/streak_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -18,154 +18,108 @@ class AchievementShareUtils {
     int? completedLessons,
     int? perfectResults,
   }) async {
-    final screenshotController = ScreenshotController();
+    // This could involve generating a screenshot or sharing textual data
+  }
 
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('جاري تجهيز صورة الإنجازات...'),
-          duration: Duration(milliseconds: 800),
-        ),
-      );
-    }
+  final ScreenshotController screenshotController = ScreenshotController();
 
-    try {
-      final imageBytes = await screenshotController.captureFromWidget(
-        _AchievementShareDesign(
-          user: user,
-          streak: streak,
-          completedLessons: completedLessons ?? 0,
-          perfectResults: perfectResults ?? 0,
-        ),
-        delay: const Duration(milliseconds: 600),
-        pixelRatio: 3.0,
-      );
+  Future<String?> captureAchievementImage(dynamic user) async {
+    final image = await screenshotController.captureFromWidget(
+      Material(
+        child: _AchievementShareDesign(user: user),
+      ),
+      delay: const Duration(milliseconds: 100),
+    );
 
-      final directory = await getTemporaryDirectory();
-      final imagePath = '${directory.path}/achievement_log_share.png';
-      final file = File(imagePath);
-      await file.writeAsBytes(imageBytes);
-
-      await Share.shareXFiles([XFile(imagePath)]);
-    } catch (e) {
-      debugPrint('Error generating achievement share: $e');
-    }
+    final directory = await getTemporaryDirectory();
+    final imagePath = '${directory.path}/achievement_${DateTime.now().millisecondsSinceEpoch}.png';
+    final imageFile = File(imagePath);
+    await imageFile.writeAsBytes(image);
+    return imagePath;
   }
 }
 
 class _AchievementShareDesign extends StatelessWidget {
   final dynamic user;
-  final StreakModel? streak;
-  final int completedLessons;
-  final int perfectResults;
 
-  const _AchievementShareDesign({
-    required this.user,
-    required this.streak,
-    required this.completedLessons,
-    required this.perfectResults,
-  });
+  const _AchievementShareDesign({required this.user});
 
   @override
   Widget build(BuildContext context) {
-    final level = (user.points / 100).floor();
-    String rank = "مبتدئ";
-    if (user.points >= 10000) {
-      rank = "أسطورة";
-    } else if (user.points >= 6000) {
-      rank = "متميز";
-    } else if (user.points >= 3000) {
-      rank = "مثابر";
-    } else if (user.points >= 1500) {
-      rank = "مستكشف";
-    } else if (user.points >= 500) {
-      rank = "ناشئ";
-    }
-
     final badgeColor = user.badge?.color;
     final themeColor = badgeColor != null
         ? Color(int.parse(badgeColor.replaceAll('#', '0xFF')))
         : const Color(0xFF2DD4BF);
+    final badgeIconUrl = user.badge?.iconUrl;
 
-    return Material(
-      color: Colors.transparent,
-      child: Directionality(
-        textDirection: TextDirection.rtl,
-        child: Container(
-          width: 360,
-          height: 640,
-          color: Colors.transparent,
-          child: Stack(
-            children: [
-              // Background Image
-              Positioned.fill(
-                child: Image.asset(
-                  'assets/images/achievement_share_bg.png',
-                  fit: BoxFit.cover,
-                ),
-              ),
-              // Main Content
-              Column(
-                children: [
-                  const SizedBox(height: 100),
-
-                  // Shield
-                  _buildShield(
-                    context,
-                    user.points,
-                    rank,
-                    badgeIconUrl: user.badge?.iconUrl,
-                    themeColor: themeColor,
-                  ),
-
-                  const SizedBox(height: 15),
-
-                  // Achievement Rows
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: Column(
-                      children: [
-                        _buildAchievementRow(
-                          icon: SVGs.icStreakAchievement,
-                          title: "عدد أيام الدراسة :",
-                          value: "${streak?.currentStreak ?? 0} أيام متواصلة",
-                          themeColor: const Color(0xFFF97316),
-                        ),
-                        _buildAchievementRow(
-                          icon: SVGs.icPointsAchievement,
-                          title: "إجمالي النقاط :",
-                          value: "${user.points} نقطة",
-                          themeColor: const Color(0xFF00C4F6),
-                        ),
-                        _buildAchievementRow(
-                          icon: SVGs.icLessonsAchievement,
-                          title: "الدروس المكتملة :",
-                          value: "$completedLessons درس",
-                          themeColor: const Color(0xFF22C55E),
-                        ),
-                        _buildAchievementRow(
-                          icon: SVGs.icPerfectAchievement,
-                          title: "النتائج المثالية :",
-                          value: "$perfectResults درس",
-                          themeColor: const Color(0xFFD946EF),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+    return Container(
+      width: 400,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            themeColor,
+            themeColor.withValues(alpha: 0.8),
+            themeColor.withValues(alpha: 0.6),
+          ],
         ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'تيسير - إنجاز جديد! 🏆',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontFamily: 'SomarSans',
+            ),
+          ),
+          const SizedBox(height: 20),
+          _ShieldWidget(
+            user: user,
+            badgeIconUrl: badgeIconUrl,
+            themeColor: themeColor,
+          ),
+          const SizedBox(height: 20),
+          _buildAchievementRow(
+            icon: SVGs.icPoints,
+            title: 'النقاط',
+            value: '${user.points}',
+            themeColor: themeColor,
+          ),
+          _buildAchievementRow(
+            icon: SVGs.icRank,
+            title: 'الرتبة',
+            value: user.rank,
+            themeColor: themeColor,
+          ),
+          _buildAchievementRow(
+            icon: SVGs.icLevel,
+            title: 'المستوى',
+            value: '${user.level}',
+            themeColor: themeColor,
+          ),
+          const SizedBox(height: 15),
+          const Text(
+            'تعلم بذكاء مع تيسير',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.white70,
+              fontFamily: 'SomarSans',
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildShield(
-    BuildContext context,
-    int level,
-    String rank, {
-    String? badgeIconUrl,
+  Widget _ShieldWidget({
+    required dynamic user,
+    required String? badgeIconUrl,
     required Color themeColor,
   }) {
     return SizedBox(
@@ -174,53 +128,15 @@ class _AchievementShareDesign extends StatelessWidget {
       child: Stack(
         alignment: Alignment.topCenter,
         children: [
-          // Fallback Shield Base
-          if (badgeIconUrl == null)
-            CustomPaint(
-              size: const Size(100, 125),
-              painter: _ShieldPainterDesign(color: themeColor),
-            ),
-
-          // User Avatar (Bottom Layer)
-          Positioned(
-            top: 0,
-            child: ClipPath(
-              clipper: _ShieldClipper(),
-              child: Container(
-                width: 110,
-                height: 130,
-                color: Colors.white,
-                alignment: Alignment.topCenter,
-                padding: const EdgeInsets.only(top: 28),
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: ClipOval(
-                    child: CachedNetworkImage(
-                      imageUrl: user.completeProfilePic,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+          ShieldBadge(
+            userAvatarUrl: user.completeProfilePic,
+            badgeIconUrl: badgeIconUrl,
+            themeColor: themeColor,
+            width: 110,
+            height: 130,
+            avatarPaddingTop: 28,
+            avatarSize: 100,
           ),
-
-          // Badge Design (Top Layer - Overlap)
-          if (badgeIconUrl != null)
-            Positioned(
-              top: 0,
-              child: CachedNetworkImage(
-                imageUrl: badgeIconUrl,
-                width: 110,
-                height: 130,
-                fit: BoxFit.contain,
-              ),
-            ),
 
           // Stars (Fallback Only)
           if (badgeIconUrl == null) ...[
@@ -391,56 +307,4 @@ class _StrokeText extends StatelessWidget {
       ],
     );
   }
-}
-
-class _ShieldPainterDesign extends CustomPainter {
-  final Color color;
-  _ShieldPainterDesign({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..shader = ui.Gradient.linear(
-        const Offset(0, 0),
-        const Offset(0, 150),
-        [color.withValues(alpha: 0.8), color],
-      )
-      ..style = PaintingStyle.fill;
-
-    final path = Path();
-    path.moveTo(size.width * 0.1, size.height * 0.1);
-    path.quadraticBezierTo(size.width * 0.5, 0, size.width * 0.9, size.height * 0.1);
-    path.lineTo(size.width, size.height * 0.7);
-    path.quadraticBezierTo(size.width * 0.5, size.height, 0, size.height * 0.7);
-    path.lineTo(size.width * 0.1, size.height * 0.1);
-    path.close();
-
-    canvas.drawPath(path, paint);
-
-    final borderPaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.3)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3;
-    canvas.drawPath(path, borderPaint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
-}
-
-class _ShieldClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    // Even tighter curved shield path to definitively hide circle edges
-    path.moveTo(size.width * 0.15, size.height * 0.08); 
-    path.quadraticBezierTo(size.width * 0.5, 0, size.width * 0.85, size.height * 0.08);
-    path.lineTo(size.width * 0.92, size.height * 0.7);
-    path.quadraticBezierTo(size.width * 0.5, size.height * 0.98, size.width * 0.08, size.height * 0.7);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

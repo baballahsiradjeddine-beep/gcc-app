@@ -1,21 +1,18 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:tayssir/common/push_buttons/rounded_pushable_button.dart';
-import 'package:tayssir/constants/app_consts.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:tayssir/common/core/shield_badge.dart';
 import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';
 import 'package:tayssir/router/app_router.dart';
+import 'package:tayssir/services/actions/special_effect_service.dart';
 
 class ProfileButton extends ConsumerWidget {
   const ProfileButton({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userAsync = ref.watch(userNotifierProvider);
-    final user = userAsync.asData?.value;
-
+    final user = ref.watch(userNotifierProvider).asData?.value;
     if (user == null) return const SizedBox.shrink();
 
     final badgeIconUrl = user.badge?.iconUrl;
@@ -29,105 +26,15 @@ class ProfileButton extends ConsumerWidget {
         ref.read(specialEffectServiceProvider).playEffects();
         context.pushNamed(AppRoutes.achievementLog.name);
       },
-      child: SizedBox(
+      child: ShieldBadge(
+        userAvatarUrl: user.completeProfilePic,
+        badgeIconUrl: badgeIconUrl,
+        themeColor: themeColor,
         width: 72,
         height: 90,
-        child: Stack(
-          alignment: Alignment.topCenter,
-          children: [
-            // User Avatar (Bottom Layer)
-            // We wrap the ClipPath in a container that matches the badge image size
-            // to ensure the clipper path aligns perfectly with the PNG.
-            ClipPath(
-              clipper: _ShieldClipper(),
-              child: Container(
-                width: 68, // Matches badge image width
-                height: 85, // Matches badge image height
-                color: Colors.white, // White background for the shield area
-                alignment: Alignment.topCenter,
-                padding: const EdgeInsets.only(top: 18), // Adjusted padding for avatar
-                child: Container(
-                  width: 60, // Optimized to match log screen proportion (89%)
-                  height: 60,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: ClipOval(
-                    child: CachedNetworkImage(
-                      imageUrl: user.completeProfilePic,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            // Badge Design (Top Layer)
-            if (badgeIconUrl != null)
-              CachedNetworkImage(
-                imageUrl: badgeIconUrl,
-                width: 68,
-                height: 85,
-                fit: BoxFit.contain,
-              )
-            else
-              // Mini Shield Fallback
-              Center(
-                child: CustomPaint(
-                  size: const Size(64, 75),
-                  painter: _MiniShieldPainter(color: themeColor),
-                ),
-              ),
-          ],
-        ),
+        avatarPaddingTop: 18,
+        avatarSize: 60,
       ),
     );
   }
-}
-
-class _MiniShieldPainter extends CustomPainter {
-  final Color color;
-  _MiniShieldPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [color.withOpacity(0.8), color],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
-      ..style = PaintingStyle.fill;
-
-    final path = Path();
-    path.moveTo(size.width * 0.1, size.height * 0.1);
-    path.quadraticBezierTo(size.width * 0.5, 0, size.width * 0.9, size.height * 0.1);
-    path.lineTo(size.width, size.height * 0.7);
-    path.quadraticBezierTo(size.width * 0.5, size.height, 0, size.height * 0.7);
-    path.lineTo(size.width * 0.1, size.height * 0.1);
-    path.close();
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
-}
-
-class _ShieldClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    // Even tighter curved shield path to definitively hide circle edges
-    path.moveTo(size.width * 0.15, size.height * 0.08); 
-    path.quadraticBezierTo(size.width * 0.5, 0, size.width * 0.85, size.height * 0.08);
-    path.lineTo(size.width * 0.92, size.height * 0.7);
-    path.quadraticBezierTo(size.width * 0.5, size.height * 0.98, size.width * 0.08, size.height * 0.7);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
