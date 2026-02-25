@@ -73,12 +73,13 @@ class _AchievementLogScreenState extends ConsumerState<AchievementLogScreen> {
     }
 
     return AppScaffold(
-      topSafeArea: true,
+      topSafeArea: false,
       paddingX: 0,
       body: Container(
         color: Colors.white,
-        child: Column(
-          children: [
+        child: SafeArea(
+          child: Column(
+            children: [
             // Header
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
@@ -166,6 +167,7 @@ class _AchievementLogScreenState extends ConsumerState<AchievementLogScreen> {
               ),
             ),
           ],
+          ),
         ),
       ),
     );
