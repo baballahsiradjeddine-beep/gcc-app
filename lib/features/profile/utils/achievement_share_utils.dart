@@ -226,48 +226,64 @@ class _AchievementShareDesign extends StatelessWidget {
           ],
 
           // Rank Label (Badge in Top)
+          // Level Number (Custom Styled Dynamic Number)
           Positioned(
-            top: 2,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-              decoration: BoxDecoration(
-                color: themeColor,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                rank,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 10,
-                  fontFamily: 'SomarSans',
-                ),
-              ),
-            ),
-          ),
-
-          // Level Badge (Overlay at bottom)
-          Positioned(
-            bottom: 15,
-            child: Container(
-              width: 36,
-              height: 24,
-              decoration: BoxDecoration(
-                color: themeColor,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white, width: 1.5),
-              ),
-              child: Center(
-                child: Text(
+            bottom: 10,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Bottom Shadow Layer (3D effect)
+                Text(
                   "$level",
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    fontSize: 28,
                     fontWeight: FontWeight.w900,
-                    fontSize: 13,
                     fontFamily: 'SomarSans',
+                    foreground: Paint()
+                      ..style = PaintingStyle.stroke
+                      ..strokeWidth = 8
+                      ..color = themeColor.withValues(alpha: 0.8),
                   ),
                 ),
-              ),
+                // Offset Shadow
+                Transform.translate(
+                  offset: const Offset(0, 2),
+                  child: Text(
+                    "$level",
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                      fontFamily: 'SomarSans',
+                      foreground: Paint()
+                        ..style = PaintingStyle.fill
+                        ..color = themeColor,
+                    ),
+                  ),
+                ),
+                // Stroke Layer
+                Text(
+                  "$level",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'SomarSans',
+                    foreground: Paint()
+                      ..style = PaintingStyle.stroke
+                      ..strokeWidth = 5
+                      ..color = themeColor,
+                  ),
+                ),
+                // Fill Layer (Top)
+                Text(
+                  "$level",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'SomarSans',
+                    color: const Color(0xFFFBF0FC),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

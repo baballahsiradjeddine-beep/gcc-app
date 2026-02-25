@@ -251,60 +251,83 @@ class _ShieldWidget extends StatelessWidget {
             ),
           ],
 
-          // Rank Label (Badge in Top)
+          // Level Number (Custom Styled Dynamic Number)
           Positioned(
-            top: 5.h,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 3.h),
-              decoration: BoxDecoration(
-                color: themeColor,
-                borderRadius: BorderRadius.circular(8.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 5,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Text(
-                rank,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 12.sp,
-                  fontFamily: 'SomarSans',
-                ),
-              ),
-            ),
-          ),
-
-          // Level Badge (Overlay at bottom)
-          Positioned(
-            bottom: 15.h,
-            child: Container(
-              width: 44.w,
-              height: 30.h,
-              decoration: BoxDecoration(
-                color: themeColor,
-                borderRadius: BorderRadius.circular(15.r),
-                border: Border.all(color: Colors.white, width: 2),
-              ),
-              child: Center(
-                child: Text(
-                  "$level",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 16.sp,
-                    fontFamily: 'SomarSans',
-                  ),
-                ),
-              ),
+            bottom: 10.h,
+            child: _LevelNumber(
+              number: "$level",
+              themeColor: themeColor,
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _LevelNumber extends StatelessWidget {
+  final String number;
+  final Color themeColor;
+
+  const _LevelNumber({required this.number, required this.themeColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Bottom Shadow Layer (3D effect)
+        Text(
+          number,
+          style: TextStyle(
+            fontSize: 32.sp,
+            fontWeight: FontWeight.w900,
+            fontFamily: 'SomarSans',
+            foreground: Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 10
+              ..color = themeColor.withValues(alpha: 0.8),
+          ),
+        ),
+        // Offset Shadow
+        Transform.translate(
+          offset: const Offset(0, 3),
+          child: Text(
+            number,
+            style: TextStyle(
+              fontSize: 32.sp,
+              fontWeight: FontWeight.w900,
+              fontFamily: 'SomarSans',
+              foreground: Paint()
+                ..style = PaintingStyle.fill
+                ..color = themeColor,
+            ),
+          ),
+        ),
+        // Stroke Layer
+        Text(
+          number,
+          style: TextStyle(
+            fontSize: 32.sp,
+            fontWeight: FontWeight.w900,
+            fontFamily: 'SomarSans',
+            foreground: Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 6
+              ..color = themeColor,
+          ),
+        ),
+        // Fill Layer (Top)
+        Text(
+          number,
+          style: TextStyle(
+            fontSize: 32.sp,
+            fontWeight: FontWeight.w900,
+            fontFamily: 'SomarSans',
+            color: const Color(0xFFFBF0FC),
+          ),
+        ),
+      ],
     );
   }
 }
