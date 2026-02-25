@@ -17,137 +17,139 @@ class StreakScreen extends StatelessWidget {
     return AppScaffold(
       onPopScope: () {},
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(height: 30.h),
-              Text(
-                "مبارك لك 🎉",
-                style: TextStyle(
-                  fontSize: 28.sp,
-                  color: const Color(0xFFF28F3B),
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'SomarSans',
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: 10.h),
+                Text(
+                  "مبارك لك 🎉",
+                  style: TextStyle(
+                    fontSize: 24.sp,
+                    color: const Color(0xFFF28F3B),
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'SomarSans',
+                  ),
                 ),
-              ),
-              SizedBox(height: 5.h),
-              Text(
-                "${streak.currentStreak} أيام متواصلة",
-                style: TextStyle(
-                  fontSize: 34.sp,
-                  color: const Color(0xFFF28F3B),
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'SomarSans',
+                SizedBox(height: 5.h),
+                Text(
+                  "${streak.currentStreak} أيام متواصلة",
+                  style: TextStyle(
+                    fontSize: 30.sp,
+                    color: const Color(0xFFF28F3B),
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'SomarSans',
+                  ),
                 ),
-              ),
-              const Spacer(flex: 1),
+                SizedBox(height: 20.h),
 
-              // The Fire Emoji / Image
-              Text(
-                "🔥",
-                style: TextStyle(fontSize: 150.sp),
-              ),
-
-              const Spacer(flex: 1),
-
-              // The 7 days widget Card
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(20.w),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24.r),
-                  border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                // The Fire Emoji / Image
+                Text(
+                  "🔥",
+                  style: TextStyle(fontSize: 120.sp),
                 ),
-                child: Column(
+
+                SizedBox(height: 20.h),
+
+                // The 7 days widget Card
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24.r),
+                    border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: streak.history
+                            .map((day) => Expanded(child: _buildDayItem(day)))
+                            .toList(),
+                      ),
+                      SizedBox(height: 20.h),
+                      const Divider(color: Color(0xFFEEEEEE), thickness: 1.5),
+                      SizedBox(height: 15.h),
+                      Text(
+                        "سلسلتك تكبر مع كل يوم دراسي، لكن إذا توقفت ليوم واحد فقط، تبدأ من الصفر!\nحافظ على استمراريتك وحقق التقدم!",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: const Color(0xFF1B365D),
+                          height: 1.5,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'SomarSans',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: 30.h),
+
+                Text(
+                  "لا تتوقف... كل يوم يصنع فارقاً!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    color: const Color(0xFF1B365D),
+                    fontWeight: FontWeight.w800,
+                    fontFamily: 'SomarSans',
+                  ),
+                ),
+
+                SizedBox(height: 30.h),
+
+                // Actions
+                Row(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: streak.history
-                          .map((day) => _buildDayItem(day))
-                          .toList(),
+                    // Continue Button (Light Blue)
+                    Expanded(
+                      child: _buildCustomButton(
+                        text: "تابع",
+                        backgroundColor: const Color(0xFFECF6FF),
+                        textColor: const Color(0xFF00C4F6),
+                        onPressed: () {
+                          context.pushReplacementNamed(
+                            AppRoutes.chapters.name,
+                            pathParameters: {
+                              'unitId': unitId.toString(),
+                            },
+                          );
+                        },
+                        hasShadow: true,
+                        shadowColor: const Color(0x99C4F6F6),
+                      ),
                     ),
-                    SizedBox(height: 20.h),
-                    const Divider(color: Color(0xFFEEEEEE), thickness: 1.5),
-                    SizedBox(height: 15.h),
-                    Text(
-                      "سلسلتك تكبر مع كل يوم دراسي، لكن إذا توقفت ليوم واحد فقط، تبدأ من الصفر!\nحافظ على استمراريتك وحقق التقدم!",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        color: const Color(0xFF1B365D),
-                        height: 1.6,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'SomarSans',
+                    SizedBox(width: 15.w),
+                    // Share Button (Filled Cyan)
+                    Expanded(
+                      child: _buildCustomButton(
+                        text: "مشاركة",
+                        backgroundColor: const Color(0xFF00C4F6),
+                        textColor: Colors.white,
+                        onPressed: () {
+                          StreakShareUtils.shareStreak(context, streak);
+                        },
+                        hasShadow: true,
+                        shadowColor: const Color(0x9900C4F6),
                       ),
                     ),
                   ],
                 ),
-              ),
-
-              const Spacer(flex: 2),
-
-              Text(
-                "لا تتوقف... كل يوم يصنع فارقاً!",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  color: const Color(0xFF1B365D),
-                  fontWeight: FontWeight.w800,
-                  fontFamily: 'SomarSans',
-                ),
-              ),
-
-              SizedBox(height: 40.h),
-
-              // Actions
-              Row(
-                children: [
-                  // Continue Button (Light Blue)
-                  Expanded(
-                    child: _buildCustomButton(
-                      text: "تابع",
-                      backgroundColor: const Color(0xFFECF6FF),
-                      textColor: const Color(0xFF00C4F6),
-                      onPressed: () {
-                        context.pushReplacementNamed(
-                          AppRoutes.chapters.name,
-                          pathParameters: {
-                            'unitId': unitId.toString(),
-                          },
-                        );
-                      },
-                      hasShadow: true,
-                      shadowColor: const Color(0x99C4F6F6),
-                    ),
-                  ),
-                  SizedBox(width: 15.w),
-                  // Share Button (Filled Cyan)
-                  Expanded(
-                    child: _buildCustomButton(
-                      text: "مشاركة",
-                      backgroundColor: const Color(0xFF00C4F6),
-                      textColor: Colors.white,
-                      onPressed: () {
-                        StreakShareUtils.shareStreak(context, streak);
-                      },
-                      hasShadow: true,
-                      shadowColor: const Color(0x9900C4F6),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10.h),
-            ],
+                SizedBox(height: 10.h),
+              ],
+            ),
           ),
         ),
       ),
