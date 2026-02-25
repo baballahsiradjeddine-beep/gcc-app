@@ -52,15 +52,16 @@ class FCMService {
                 toastification.dismiss(holder);
               },
               child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: const Color(0xFFE5E5E5).withOpacity(0.95), // Duolingo style transluscent/flat pill
                   borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Colors.black.withOpacity(0.04), width: 1),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 20,
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 16,
                       offset: const Offset(0, 8),
                     ),
                   ],
@@ -70,17 +71,17 @@ class FCMService {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // LEFT: App Logo
-                      Container(
-                        width: 46,
-                        height: 46,
-                        decoration: BoxDecoration(
-                          color: const Color(0xffE0F7FA), // Soft background for the logo
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        padding: const EdgeInsets.all(8),
-                        child: SvgPicture.asset(
-                          'assets/svg/latest_logo.svg',
+                      // LEFT: App Logo (Tito Face)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          color: Colors.transparent, 
+                          child: SvgPicture.asset(
+                            'assets/svg/good_tito.svg',
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 14),
@@ -99,7 +100,7 @@ class FCMService {
                                   fontSize: 16,
                                   fontFamily: 'SomarSans',
                                   fontWeight: FontWeight.w900,
-                                  color: Color(0xFF1F2937),
+                                  color: Colors.black87,
                                   height: 1.2,
                                 ),
                                 maxLines: 1,
@@ -109,10 +110,10 @@ class FCMService {
                               Text(
                                 message.notification!.body ?? '',
                                 style: const TextStyle(
-                                  fontSize: 13,
+                                  fontSize: 14,
                                   fontFamily: 'SomarSans',
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF6B7280),
+                                  color: Colors.black54,
                                   height: 1.4,
                                 ),
                                 maxLines: 2,
@@ -127,11 +128,11 @@ class FCMService {
                       if (imageUrl != null) ...[
                         const SizedBox(width: 14),
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10),
                           child: Image.network(
                             imageUrl,
-                            width: 46,
-                            height: 46,
+                            width: 38,
+                            height: 38,
                             fit: BoxFit.cover,
                           ),
                         ),
