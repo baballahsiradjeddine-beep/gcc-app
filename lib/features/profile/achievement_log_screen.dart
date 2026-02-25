@@ -208,10 +208,10 @@ class _ShieldWidget extends StatelessWidget {
 
           // User Avatar (Bottom Layer)
           Positioned(
-            top: 45.h,
+            top: 40.h,
             child: Container(
-              width: 85.w,
-              height: 85.w,
+              width: 105.w,
+              height: 105.w,
               decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
@@ -253,7 +253,7 @@ class _ShieldWidget extends StatelessWidget {
 
           // Level Number (Custom Styled Dynamic Number)
           Positioned(
-            bottom: 10.h,
+            bottom: 28.h,
             child: _LevelNumber(
               number: "$level",
               themeColor: themeColor,

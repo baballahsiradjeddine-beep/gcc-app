@@ -182,10 +182,10 @@ class _AchievementShareDesign extends StatelessWidget {
 
           // User Avatar (Bottom Layer)
           Positioned(
-            top: 35,
+            top: 28,
             child: Container(
-              width: 65,
-              height: 65,
+              width: 80,
+              height: 80,
               decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
@@ -228,7 +228,7 @@ class _AchievementShareDesign extends StatelessWidget {
           // Rank Label (Badge in Top)
           // Level Number (Custom Styled Dynamic Number)
           Positioned(
-            bottom: 10,
+            bottom: 22,
             child: Stack(
               alignment: Alignment.center,
               children: [
