@@ -3,12 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:tayssir/features/streaks/data/streak_model.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
 class StreakShareUtils {
   static Future<void> shareStreak(
       BuildContext context, StreakModel streak) async {
+    // Initialize date formatting for Arabic to avoid LocaleDataException
+    await initializeDateFormatting('ar');
+    
     final screenshotController = ScreenshotController();
 
     // Show a small loading indicator or snackbar if rendering takes a second
