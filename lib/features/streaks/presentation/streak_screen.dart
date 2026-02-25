@@ -6,6 +6,8 @@ import 'package:tayssir/common/core/app_scaffold.dart';
 import 'package:tayssir/features/streaks/data/streak_model.dart';
 import 'package:tayssir/features/streaks/utils/streak_share_utils.dart';
 import 'package:tayssir/router/app_router.dart';
+import 'package:tayssir/resources/resources.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class StreakScreen extends StatelessWidget {
   final StreakModel streak;
@@ -27,45 +29,62 @@ class StreakScreen extends StatelessWidget {
           child: Column(
             children: [
               // Header Section
-              SizedBox(height: 5.h),
+              SizedBox(height: 10.h),
               Text(
                 "مبارك لك 🎉",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 19.sp,
+                  fontSize: 18.sp,
                   color: const Color(0xFFF28F3B),
                   fontWeight: FontWeight.bold,
                   fontFamily: 'SomarSans',
                 ),
               ),
-              SizedBox(height: 2.h),
               Text(
                 "$currentStreak أيام متواصلة",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 25.sp,
+                  fontSize: 26.sp,
                   color: const Color(0xFFF28F3B),
                   fontWeight: FontWeight.w900,
                   fontFamily: 'SomarSans',
                 ),
               ),
+              
+              const Spacer(flex: 1),
 
-              SizedBox(height: 10.h),
-
-              // Responsive Fire Emoji
-              Container(
-                padding: EdgeInsets.all(12.w),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFFFFB74D).withValues(alpha: 0.1),
-                ),
-                child: Text(
-                  "🔥",
-                  style: TextStyle(fontSize: 65.sp),
-                ),
+              // Glowing Fire Section - Adds visual depth
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 130.w,
+                    height: 130.w,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          const Color(0xFFFFB74D).withValues(alpha: 0.25),
+                          const Color(0xFFFFB74D).withValues(alpha: 0.0),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(12.w),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color(0xFFFFB74D).withValues(alpha: 0.1),
+                    ),
+                    child: Text(
+                      "🔥",
+                      style: TextStyle(fontSize: 70.sp),
+                    ),
+                  ),
+                ],
               ),
 
-              SizedBox(height: 10.h),
+              const Spacer(flex: 1),
 
               // Card Section
               Container(
@@ -86,7 +105,6 @@ class StreakScreen extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Days Row - Numeric and RTL Correct
                     Directionality(
                       textDirection: TextDirection.rtl,
                       child: Row(
@@ -102,13 +120,12 @@ class StreakScreen extends StatelessWidget {
                     const Divider(color: Color(0xFFEEEEEE), thickness: 1.2),
                     SizedBox(height: 8.h),
                     Text(
-                      "سلسلتك تكبر مع كل يوم دراسي، لكن إذا توقفت ليوم واحد فقط، تبدأ من الصفر!",
+                      "استمر في العطاء، فكل خطوة صغيرة تقربك من القمة! 🚀",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 12.5.sp,
+                        fontSize: 13.sp,
                         color: const Color(0xFF1B365D),
-                        height: 1.4,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                         fontFamily: 'SomarSans',
                       ),
                     ),
@@ -116,7 +133,18 @@ class StreakScreen extends StatelessWidget {
                 ),
               ),
 
-              const Spacer(),
+              const Spacer(flex: 2),
+
+              // The Mascot (Tito) Cheering - Fills the gap beautifully
+              SizedBox(
+                height: 110.h,
+                child: SvgPicture.asset(
+                  SVGs.titoGood,
+                  fit: BoxFit.contain,
+                ),
+              ),
+
+              const Spacer(flex: 1),
 
               // Footer Section
               Text(
@@ -130,7 +158,7 @@ class StreakScreen extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 12.h),
+              SizedBox(height: 15.h),
 
               Row(
                 children: [
