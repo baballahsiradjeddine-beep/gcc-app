@@ -232,7 +232,7 @@ class _AchievementShareDesign extends StatelessWidget {
             bottom: 22,
             child: Builder(
               builder: (context) {
-                final shadowColor = Color.alphaBlend(Colors.black.withValues(alpha: 0.45), themeColor);
+                final shadowColor = Color.alphaBlend(Colors.black.withValues(alpha: 0.25), themeColor);
                 final textStyle = GoogleFonts.balooDa2(
                   fontSize: 28,
                   fontWeight: FontWeight.w900,

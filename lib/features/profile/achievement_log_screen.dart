@@ -274,7 +274,7 @@ class _LevelNumber extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final shadowColor = Color.alphaBlend(Colors.black.withValues(alpha: 0.45), themeColor);
+    final shadowColor = Color.alphaBlend(Colors.black.withValues(alpha: 0.25), themeColor);
     final textStyle = GoogleFonts.balooDa2(
       fontSize: 32.sp,
       fontWeight: FontWeight.w900,

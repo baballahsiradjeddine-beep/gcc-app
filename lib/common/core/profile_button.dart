@@ -30,17 +30,17 @@ class ProfileButton extends ConsumerWidget {
         context.pushNamed(AppRoutes.achievementLog.name);
       },
       child: SizedBox(
-        width: 48,
-        height: 60,
+        width: 56,
+        height: 70,
         child: Stack(
           alignment: Alignment.topCenter,
           children: [
             // User Avatar (Bottom Layer)
             Positioned(
-              top: 15,
+              top: 18,
               child: Container(
-                width: 32,
-                height: 32,
+                width: 38,
+                height: 38,
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
@@ -60,8 +60,8 @@ class ProfileButton extends ConsumerWidget {
                 top: 0,
                 child: CachedNetworkImage(
                   imageUrl: badgeIconUrl,
-                  width: 45,
-                  height: 55,
+                  width: 52,
+                  height: 65,
                   fit: BoxFit.contain,
                 ),
               )
@@ -69,41 +69,10 @@ class ProfileButton extends ConsumerWidget {
               // Mini Shield Fallback
               Center(
                 child: CustomPaint(
-                  size: const Size(40, 48),
+                  size: const Size(48, 55),
                   painter: _MiniShieldPainter(color: themeColor),
                 ),
               ),
-            
-            // Mini Level Positioned on the badge
-            Positioned(
-              bottom: 8,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Text(
-                    "${user.points}",
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'SomarSans',
-                      foreground: Paint()
-                        ..style = PaintingStyle.stroke
-                        ..strokeWidth = 3
-                        ..color = themeColor,
-                    ),
-                  ),
-                  Text(
-                    "${user.points}",
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'SomarSans',
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),
