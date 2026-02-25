@@ -80,9 +80,9 @@ class StreakShareUtils {
               ),
 
               // 2. Central Minimalist UI
-              // 2. Central Minimalist UI - Shifted Upwards
+              // 2. Central Minimalist UI - Shifted further Upwards
               Align(
-                alignment: const Alignment(0, -0.2), // Slightly above center
+                alignment: const Alignment(0, -0.35), // Moved higher
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
