@@ -23,16 +23,16 @@ class StreakScreen extends StatelessWidget {
       onPopScope: () {},
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 10.h),
           child: Column(
             children: [
               // Header Section
-              SizedBox(height: 10.h),
+              SizedBox(height: 5.h),
               Text(
                 "مبارك لك 🎉",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 20.sp,
+                  fontSize: 19.sp,
                   color: const Color(0xFFF28F3B),
                   fontWeight: FontWeight.bold,
                   fontFamily: 'SomarSans',
@@ -43,34 +43,34 @@ class StreakScreen extends StatelessWidget {
                 "$currentStreak أيام متواصلة",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 26.sp,
+                  fontSize: 25.sp,
                   color: const Color(0xFFF28F3B),
                   fontWeight: FontWeight.w900,
                   fontFamily: 'SomarSans',
                 ),
               ),
               
-              SizedBox(height: 15.h), // Reduced spacing
+              SizedBox(height: 10.h), // Further reduced spacing
 
               // Responsive Fire Emoji
               Container(
-                padding: EdgeInsets.all(14.w),
+                padding: EdgeInsets.all(12.w),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: const Color(0xFFFFB74D).withValues(alpha: 0.1),
                 ),
                 child: Text(
                   "🔥",
-                  style: TextStyle(fontSize: 70.sp),
+                  style: TextStyle(fontSize: 65.sp),
                 ),
               ),
 
-              SizedBox(height: 15.h), // Reduced spacing
+              SizedBox(height: 10.h), // Further reduced spacing
 
               // Card Section - Optimized for space
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20.r),
@@ -78,7 +78,7 @@ class StreakScreen extends StatelessWidget {
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 12,
+                      blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
                   ],
@@ -86,21 +86,26 @@ class StreakScreen extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: List.generate(streak.history.length, (index) {
-                        final dayNumber = weekStartDay + index;
-                        return _buildDayItem(streak.history[index], dayNumber);
-                      }),
+                    // Days Row - Numeric and RTL Correct
+                    Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: List.generate(7, (index) {
+                          final dayNumber = weekStartDay + index;
+                          final bool isCompleted = dayNumber <= currentStreak;
+                          return _buildNumericDayItem(dayNumber, isCompleted);
+                        }),
+                      ),
                     ),
-                    SizedBox(height: 14.h),
+                    SizedBox(height: 12.h),
                     const Divider(color: Color(0xFFEEEEEE), thickness: 1.2),
-                    SizedBox(height: 10.h),
+                    SizedBox(height: 8.h),
                     Text(
                       "سلسلتك تكبر مع كل يوم دراسي، لكن إذا توقفت ليوم واحد فقط، تبدأ من الصفر!",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 13.sp,
+                        fontSize: 12.5.sp,
                         color: const Color(0xFF1B365D),
                         height: 1.4,
                         fontWeight: FontWeight.w600,
@@ -125,7 +130,7 @@ class StreakScreen extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 15.h),
+              SizedBox(height: 12.h),
 
               Row(
                 children: [
@@ -163,7 +168,7 @@ class StreakScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDayItem(StreakDay day, int dayNumber) {
+  Widget _buildNumericDayItem(int dayNumber, bool isCompleted) {
     return Expanded(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -173,10 +178,36 @@ class StreakScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 13.sp,
               color: const Color(0xFF4B5563),
-              fontWeight: day.isToday ? FontWeight.bold : FontWeight.w700,
+              fontWeight: FontWeight.bold,
               fontFamily: 'SomarSans',
             ),
           ),
+          SizedBox(height: 6.h),
+          Container(
+            width: 32.w,
+            height: 32.w,
+            decoration: BoxDecoration(
+              color: isCompleted ? const Color(0xFF00C4F6) : Colors.white,
+              borderRadius: BorderRadius.circular(10.r),
+              border: Border.all(
+                color: const Color(0xFF00C4F6).withValues(alpha: isCompleted ? 1 : 0.3),
+                width: 2,
+              ),
+            ),
+            child: isCompleted
+                ? Icon(
+                    Icons.check,
+                    color: Colors.white,
+                    size: 18.sp,
+                  )
+                : null,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
           SizedBox(height: 8.h),
           Container(
             width: 32.w,
