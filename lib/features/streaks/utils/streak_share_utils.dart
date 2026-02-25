@@ -123,28 +123,56 @@ class StreakShareUtils {
                               ),
                               const SizedBox(height: 20),
 
-                              // "ايام دراسية دون انقطاع" Label
-                              SvgPicture.string(daysLabelSvg, width: 220),
+                              // Label with Underline
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SvgPicture.string(daysLabelSvg, width: 220),
+                                  const SizedBox(height: 4),
+                                  Container(
+                                    height: 1.5,
+                                    width: 140,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.6),
+                                      borderRadius: BorderRadius.circular(1),
+                                    ),
+                                  ),
+                                ],
+                              ),
 
                               const SizedBox(height: 30),
 
-                              // Dynamic Date Styled as the SVG
-                              Text(
-                                DateFormat('dd MMMM yyyy', 'ar')
-                                    .format(DateTime.now()),
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontFamily: 'SomarSans',
-                                  shadows: [
-                                    Shadow(
-                                      color: Colors.black45,
-                                      offset: Offset(0, 2),
-                                      blurRadius: 4,
+                              // Date with Underline
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    DateFormat('dd MMMM yyyy', 'ar')
+                                        .format(DateTime.now()),
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      fontFamily: 'SomarSans',
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.black45,
+                                          offset: Offset(0, 2),
+                                          blurRadius: 4,
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Container(
+                                    height: 1.2,
+                                    width: 100,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.5),
+                                      borderRadius: BorderRadius.circular(1),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
