@@ -435,12 +435,12 @@ class _ShieldClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
-    // A path that matches the shield silhouette to prevent bleed
-    path.moveTo(size.width * 0.05, size.height * 0.1);
-    path.lineTo(size.width * 0.95, size.height * 0.1);
-    path.lineTo(size.width * 0.95, size.height * 0.85);
+    // Generous path: Top and sides are full, only clip the bottom triangle
+    path.moveTo(0, 0);
+    path.lineTo(size.width, 0);
+    path.lineTo(size.width, size.height * 0.82);
     path.lineTo(size.width * 0.5, size.height);
-    path.lineTo(size.width * 0.05, size.height * 0.85);
+    path.lineTo(0, size.height * 0.82);
     path.close();
     return path;
   }

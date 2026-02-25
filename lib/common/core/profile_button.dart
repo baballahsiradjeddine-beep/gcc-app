@@ -116,11 +116,11 @@ class _ShieldClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
-    path.moveTo(size.width * 0.05, size.height * 0.1);
-    path.lineTo(size.width * 0.95, size.height * 0.1);
-    path.lineTo(size.width * 0.95, size.height * 0.85);
+    path.moveTo(0, 0);
+    path.lineTo(size.width, 0);
+    path.lineTo(size.width, size.height * 0.82);
     path.lineTo(size.width * 0.5, size.height);
-    path.lineTo(size.width * 0.05, size.height * 0.85);
+    path.lineTo(0, size.height * 0.82);
     path.close();
     return path;
   }
