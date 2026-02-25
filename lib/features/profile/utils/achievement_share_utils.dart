@@ -184,17 +184,20 @@ class _AchievementShareDesign extends StatelessWidget {
           // User Avatar (Bottom Layer)
           Positioned(
             top: 30,
-            child: Container(
-              width: 105,
-              height: 105,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: ClipOval(
-                child: CachedNetworkImage(
-                  imageUrl: user.completeProfilePic,
-                  fit: BoxFit.cover,
+            child: ClipPath(
+              clipper: _ShieldClipper(),
+              child: Container(
+                width: 105,
+                height: 105,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: ClipOval(
+                  child: CachedNetworkImage(
+                    imageUrl: user.completeProfilePic,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
@@ -416,4 +419,21 @@ class _ShieldPainterDesign extends CustomPainter {
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
+class _ShieldClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.moveTo(size.width * 0.05, size.height * 0.1);
+    path.lineTo(size.width * 0.95, size.height * 0.1);
+    path.lineTo(size.width * 0.95, size.height * 0.85);
+    path.lineTo(size.width * 0.5, size.height);
+    path.lineTo(size.width * 0.05, size.height * 0.85);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

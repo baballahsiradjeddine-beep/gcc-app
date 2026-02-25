@@ -30,25 +30,28 @@ class ProfileButton extends ConsumerWidget {
         context.pushNamed(AppRoutes.achievementLog.name);
       },
       child: SizedBox(
-        width: 56,
-        height: 70,
+        width: 64,
+        height: 80,
         child: Stack(
           alignment: Alignment.topCenter,
           children: [
             // User Avatar (Bottom Layer)
             Positioned(
-              top: 18,
-              child: Container(
-                width: 46,
-                height: 46,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: ClipOval(
-                  child: CachedNetworkImage(
-                    imageUrl: user.completeProfilePic,
-                    fit: BoxFit.cover,
+              top: 20,
+              child: ClipPath(
+                clipper: _ShieldClipper(),
+                child: Container(
+                  width: 54,
+                  height: 54,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: user.completeProfilePic,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
@@ -60,8 +63,8 @@ class ProfileButton extends ConsumerWidget {
                 top: 0,
                 child: CachedNetworkImage(
                   imageUrl: badgeIconUrl,
-                  width: 52,
-                  height: 65,
+                  width: 60,
+                  height: 75,
                   fit: BoxFit.contain,
                 ),
               )
@@ -69,7 +72,7 @@ class ProfileButton extends ConsumerWidget {
               // Mini Shield Fallback
               Center(
                 child: CustomPaint(
-                  size: const Size(48, 55),
+                  size: const Size(56, 65),
                   painter: _MiniShieldPainter(color: themeColor),
                 ),
               ),
@@ -107,4 +110,21 @@ class _MiniShieldPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
+class _ShieldClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.moveTo(size.width * 0.05, size.height * 0.1);
+    path.lineTo(size.width * 0.95, size.height * 0.1);
+    path.lineTo(size.width * 0.95, size.height * 0.85);
+    path.lineTo(size.width * 0.5, size.height);
+    path.lineTo(size.width * 0.05, size.height * 0.85);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

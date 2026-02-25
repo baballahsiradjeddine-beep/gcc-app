@@ -210,17 +210,20 @@ class _ShieldWidget extends StatelessWidget {
           // User Avatar (Bottom Layer)
           Positioned(
             top: 42.h,
-            child: Container(
-              width: 130.w,
-              height: 130.w,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: ClipOval(
-                child: CachedNetworkImage(
-                  imageUrl: userAvatarUrl,
-                  fit: BoxFit.cover,
+            child: ClipPath(
+              clipper: _ShieldClipper(),
+              child: Container(
+                width: 130.w,
+                height: 130.w,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: ClipOval(
+                  child: CachedNetworkImage(
+                    imageUrl: userAvatarUrl,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
@@ -426,4 +429,22 @@ class _AchievementCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _ShieldClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    // A path that matches the shield silhouette to prevent bleed
+    path.moveTo(size.width * 0.05, size.height * 0.1);
+    path.lineTo(size.width * 0.95, size.height * 0.1);
+    path.lineTo(size.width * 0.95, size.height * 0.85);
+    path.lineTo(size.width * 0.5, size.height);
+    path.lineTo(size.width * 0.05, size.height * 0.85);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
