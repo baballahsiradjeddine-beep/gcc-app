@@ -37,10 +37,10 @@ class ProfileButton extends ConsumerWidget {
           children: [
             // User Avatar (Bottom Layer)
             Positioned(
-              top: 18,
+              top: 20,
               child: Container(
-                width: 38,
-                height: 38,
+                width: 42,
+                height: 42,
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,

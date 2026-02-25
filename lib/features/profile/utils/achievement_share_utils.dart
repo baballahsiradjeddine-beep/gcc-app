@@ -183,10 +183,10 @@ class _AchievementShareDesign extends StatelessWidget {
 
           // User Avatar (Bottom Layer)
           Positioned(
-            top: 28,
+            top: 32,
             child: Container(
-              width: 80,
-              height: 80,
+              width: 95,
+              height: 95,
               decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,

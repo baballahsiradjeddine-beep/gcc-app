@@ -209,10 +209,10 @@ class _ShieldWidget extends StatelessWidget {
 
           // User Avatar (Bottom Layer)
           Positioned(
-            top: 40.h,
+            top: 45.h,
             child: Container(
-              width: 105.w,
-              height: 105.w,
+              width: 120.w,
+              height: 120.w,
               decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
