@@ -432,11 +432,11 @@ class _ShieldClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
-    // Tighter curved shield path to hide circle edges
-    path.moveTo(size.width * 0.12, size.height * 0.08); 
-    path.quadraticBezierTo(size.width * 0.5, 0, size.width * 0.88, size.height * 0.08);
-    path.lineTo(size.width * 0.95, size.height * 0.7);
-    path.quadraticBezierTo(size.width * 0.5, size.height * 0.98, size.width * 0.05, size.height * 0.7);
+    // Even tighter curved shield path to definitively hide circle edges
+    path.moveTo(size.width * 0.15, size.height * 0.08); 
+    path.quadraticBezierTo(size.width * 0.5, 0, size.width * 0.85, size.height * 0.08);
+    path.lineTo(size.width * 0.92, size.height * 0.7);
+    path.quadraticBezierTo(size.width * 0.5, size.height * 0.98, size.width * 0.08, size.height * 0.7);
     path.close();
     return path;
   }
