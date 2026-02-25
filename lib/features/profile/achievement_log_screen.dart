@@ -1,0 +1,386 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:tayssir/common/core/app_scaffold.dart';
+import 'package:tayssir/features/streaks/presentation/streak_notifier.dart';
+import 'package:tayssir/common/app_buttons/big_button.dart';
+import 'package:tayssir/features/profile/utils/achievement_share_utils.dart';
+import 'package:tayssir/providers/data/data_provider.dart';
+import 'package:tayssir/providers/user/user_notifier.dart';
+import 'package:tayssir/resources/resources.dart';
+
+class AchievementLogScreen extends ConsumerStatefulWidget {
+  const AchievementLogScreen({super.key});
+
+  @override
+  ConsumerState<AchievementLogScreen> createState() => _AchievementLogScreenState();
+}
+
+class _AchievementLogScreenState extends ConsumerState<AchievementLogScreen> {
+  final screenshotController = ScreenshotController();
+
+  Future<void> _shareScreen() async {
+    final user = ref.read(userNotifierProvider).requireValue!;
+    final streak = ref.read(streakNotifierProvider).asData?.value;
+    final dataState = ref.read(dataProvider);
+
+    final completedLessons = dataState.contentData.chapters
+        .where((e) => e.progress >= 50)
+        .length;
+    final perfectResults = dataState.contentData.chapters
+        .where((e) => e.progress == 100)
+        .length;
+
+    await AchievementShareUtils.shareAchievementLog(
+      context,
+      user: user,
+      streak: streak,
+      completedLessons: completedLessons,
+      perfectResults: perfectResults,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final user = ref.watch(userNotifierProvider).requireValue!;
+    final streak = ref.watch(streakNotifierProvider).asData?.value;
+    final dataState = ref.watch(dataProvider);
+
+    final completedLessons = dataState.contentData.chapters
+        .where((e) => e.progress >= 50)
+        .length;
+    final perfectResults = dataState.contentData.chapters
+        .where((e) => e.progress == 100)
+        .length;
+
+    final level = (user.points / 100).floor();
+    String rank = "مبتدئ";
+    if (user.points >= 10000) {
+      rank = "أسطورة";
+    } else if (user.points >= 6000) {
+      rank = "متميز";
+    } else if (user.points >= 3000) {
+      rank = "مثابر";
+    } else if (user.points >= 1500) {
+      rank = "مستكشف";
+    } else if (user.points >= 500) {
+      rank = "ناشئ";
+    }
+
+    return AppScaffold(
+      topSafeArea: true,
+      paddingX: 0,
+      body: Container(
+        color: Colors.white,
+        child: Column(
+          children: [
+            // Header
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => context.pop(),
+                    child: const Icon(Icons.arrow_back_ios_new, size: 24),
+                  ),
+                  const Spacer(),
+                  Text(
+                    "سجل الإنجازات",
+                    style: TextStyle(
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.w900,
+                      fontFamily: 'SomarSans',
+                      color: const Color(0xFF1F2937),
+                    ),
+                  ),
+                  const Spacer(),
+                  const SizedBox(width: 24),
+                ],
+              ),
+            ),
+
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: Column(
+                  children: [
+                    10.verticalSpace,
+                    // Shield Section
+                    _ShieldWidget(
+                      userAvatarUrl: user.completeProfilePic,
+                      level: level,
+                      rank: rank,
+                    ),
+
+                    15.verticalSpace,
+
+                    // Achievement Cards
+                    _AchievementCard(
+                      icon: SVGs.icStreakAchievement,
+                      title: "عدد أيام الدراسة دون انقطاع :",
+                      value: "${streak?.currentStreak ?? 0} أيام متواصلة",
+                      valueColor: const Color(0xFFF97316),
+                    ),
+                    12.verticalSpace,
+                    _AchievementCard(
+                      icon: SVGs.icPointsAchievement,
+                      title: "إجمالي النقاط :",
+                      value: "${user.points} نقطة",
+                      valueColor: const Color(0xFF00C4F6),
+                    ),
+                    12.verticalSpace,
+                    _AchievementCard(
+                      icon: SVGs.icLessonsAchievement,
+                      title: "إجمالي الدروس المكتملة :",
+                      value: "$completedLessons درس",
+                      valueColor: const Color(0xFF22C55E),
+                    ),
+                    12.verticalSpace,
+                    _AchievementCard(
+                      icon: SVGs.icPerfectAchievement,
+                      title: "إجمالي النتائج المثالية :",
+                      value: "$perfectResults درس",
+                      valueColor: const Color(0xFFD946EF),
+                    ),
+
+                    20.verticalSpace,
+                  ],
+                ),
+              ),
+            ),
+
+            // Share Button
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 10.h),
+              child: BigButton(
+                text: "مشاركة",
+                onPressed: _shareScreen,
+                buttonType: ButtonType.primary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ShieldWidget extends StatelessWidget {
+  final String userAvatarUrl;
+  final int level;
+  final String rank;
+
+  const _ShieldWidget({
+    required this.userAvatarUrl,
+    required this.level,
+    required this.rank,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 190.h,
+      child: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          // Shield Base
+          Center(
+            child: CustomPaint(
+              size: Size(130.w, 150.h),
+              painter: _ShieldPainter(),
+            ),
+          ),
+
+          // Stars
+          Positioned(
+            top: 45.h,
+            left: 55.w,
+            child: const Icon(Icons.star, color: Colors.white70, size: 14),
+          ),
+          Positioned(
+            top: 45.h,
+            right: 55.w,
+            child: const Icon(Icons.star, color: Colors.white70, size: 14),
+          ),
+
+          // User Avatar
+          Positioned(
+            top: 35.h,
+            child: Container(
+              width: 90.w,
+              height: 90.w,
+              padding: const EdgeInsets.all(3),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: ClipOval(
+                child: CachedNetworkImage(
+                  imageUrl: userAvatarUrl,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+
+          // Rank Label (Badge in Top)
+          Positioned(
+            top: 5.h,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 3.h),
+              decoration: BoxDecoration(
+                color: const Color(0xFF2DD4BF),
+                borderRadius: BorderRadius.circular(8.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 5,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Text(
+                rank,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 12.sp,
+                  fontFamily: 'SomarSans',
+                ),
+              ),
+            ),
+          ),
+
+          // Level Badge (Overlay at bottom)
+          Positioned(
+            bottom: 15.h,
+            child: Container(
+              width: 44.w,
+              height: 30.h,
+              decoration: BoxDecoration(
+                color: const Color(0xFF2DD4BF),
+                borderRadius: BorderRadius.circular(15.r),
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+              child: Center(
+                child: Text(
+                  "$level",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16.sp,
+                    fontFamily: 'SomarSans',
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ShieldPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Color(0xFF22D3EE), Color(0xFF0D9488)],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    path.moveTo(size.width * 0.1, size.height * 0.1);
+    path.quadraticBezierTo(size.width * 0.5, 0, size.width * 0.9, size.height * 0.1);
+    path.lineTo(size.width, size.height * 0.7);
+    path.quadraticBezierTo(size.width * 0.5, size.height, 0, size.height * 0.7);
+    path.lineTo(size.width * 0.1, size.height * 0.1);
+    path.close();
+
+    canvas.drawPath(path, paint);
+
+    // Border
+    final borderPaint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.3)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
+    canvas.drawPath(path, borderPaint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
+class _AchievementCard extends StatelessWidget {
+  final String icon;
+  final String title;
+  final String value;
+  final Color valueColor;
+
+  const _AchievementCard({
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.valueColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: const Color(0xFFEEEEEE)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Icon
+          SvgPicture.asset(icon, width: 24.w, height: 28.h),
+          10.horizontalSpace,
+          // Content
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF6B7280),
+                    fontFamily: 'SomarSans',
+                  ),
+                ),
+                1.verticalSpace,
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w900,
+                    color: valueColor,
+                    fontFamily: 'SomarSans',
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

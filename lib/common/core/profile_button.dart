@@ -33,7 +33,7 @@ class ProfileButton extends ConsumerWidget {
       onPressed: () {
         ref.read(specialEffectServiceProvider).playEffects();
 
-        context.pushNamed(AppRoutes.profile.name);
+        context.pushNamed(AppRoutes.achievementLog.name);
       },
     );
   }

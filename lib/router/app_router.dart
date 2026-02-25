@@ -24,6 +24,7 @@ import 'package:tayssir/features/exercice/presentation/exercice_screen.dart';
 import 'package:tayssir/features/exercice/presentation/post_exercise_screen.dart';
 import 'package:tayssir/features/home/presentation/home_screen.dart';
 import 'package:tayssir/features/profile/profile_screen.dart';
+import 'package:tayssir/features/profile/achievement_log_screen.dart';
 // import 'package:tayssir/features/settings/notifications/notifications_view.dart';
 import 'package:tayssir/features/settings/security/security_screen.dart';
 import 'package:tayssir/features/tools/bacs/bacs_screen.dart';
@@ -88,6 +89,7 @@ enum AppRoutes {
   chargilyWebView,
   chargilyInit,
   streak,
+  achievementLog,
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -542,6 +544,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             streak: streak,
             unitId: unitId,
           );
+        },
+        transitionType: TransitionType.sharedAxis,
+        duration: const Duration(milliseconds: 300),
+      ),
+      TayssirCustomGoRoute(
+        name: AppRoutes.achievementLog.name,
+        path: '/achievement-log',
+        pageBuilder: (context, state) {
+          return const AchievementLogScreen();
         },
         transitionType: TransitionType.sharedAxis,
         duration: const Duration(milliseconds: 300),
