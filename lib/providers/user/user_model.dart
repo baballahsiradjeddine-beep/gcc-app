@@ -5,6 +5,7 @@ import 'package:tayssir/environment_config.dart';
 import 'package:tayssir/providers/divisions/division_model.dart';
 import 'package:tayssir/providers/user/subscription_model.dart';
 
+import 'badge_model.dart';
 import 'commune.dart';
 import 'wilaya.dart';
 
@@ -23,6 +24,7 @@ class UserModel extends Equatable {
   final int age;
   final bool hasNewNotifications;
   final int newNotificationsCount;
+  final BadgeModel? badge;
   const UserModel({
     required this.id,
     required this.email,
@@ -38,7 +40,7 @@ class UserModel extends Equatable {
     required this.isEmailVerified,
     required this.hasNewNotifications,
     required this.newNotificationsCount,
-
+    this.badge,
     // this.userProgress,
   });
 
@@ -88,6 +90,7 @@ class UserModel extends Equatable {
     bool? isEmailVerified,
     bool? hasNewNotifications,
     int? newNotificationsCount,
+    BadgeModel? badge,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -105,6 +108,7 @@ class UserModel extends Equatable {
       hasNewNotifications: hasNewNotifications ?? this.hasNewNotifications,
       newNotificationsCount:
           newNotificationsCount ?? this.newNotificationsCount,
+      badge: badge ?? this.badge,
     );
   }
 
@@ -149,6 +153,9 @@ class UserModel extends Equatable {
       isEmailVerified: map['email_verified'] as bool? ?? false,
       hasNewNotifications: map['has_new_notifications'] as bool? ?? false,
       newNotificationsCount: map['new_notifications_count'] as int? ?? 0,
+      badge: map['badge'] == null
+          ? null
+          : BadgeModel.fromMap(map['badge'] as Map<String, dynamic>),
     );
   }
 
@@ -188,7 +195,7 @@ class UserModel extends Equatable {
         isEmailVerified,
         hasNewNotifications,
         newNotificationsCount,
-
+        badge,
         // userProgress
       ];
 }

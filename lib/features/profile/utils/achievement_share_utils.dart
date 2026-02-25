@@ -80,6 +80,12 @@ class _AchievementShareDesign extends StatelessWidget {
     } else if (user.points >= 500) {
       rank = "ناشئ";
     }
+
+    final badgeColor = user.badge?.color;
+    final themeColor = badgeColor != null
+        ? Color(int.parse(badgeColor.replaceAll('#', '0xFF')))
+        : const Color(0xFF2DD4BF);
+
     return Material(
       color: Colors.transparent,
       child: Directionality(
@@ -103,7 +109,13 @@ class _AchievementShareDesign extends StatelessWidget {
                   const SizedBox(height: 100),
 
                   // Shield
-                  _buildShield(context, level, rank),
+                  _buildShield(
+                    context,
+                    level,
+                    rank,
+                    badgeIconUrl: user.badge?.iconUrl,
+                    themeColor: themeColor,
+                  ),
 
                   const SizedBox(height: 15),
 
@@ -148,33 +160,32 @@ class _AchievementShareDesign extends StatelessWidget {
     );
   }
 
-  Widget _buildShield(BuildContext context, int level, String rank) {
+  Widget _buildShield(
+    BuildContext context,
+    int level,
+    String rank, {
+    String? badgeIconUrl,
+    required Color themeColor,
+  }) {
     return SizedBox(
-      height: 140,
-      width: 130,
+      height: 150,
+      width: 140,
       child: Stack(
         alignment: Alignment.topCenter,
         children: [
-          CustomPaint(
-            size: const Size(100, 120),
-            painter: _ShieldPainterDesign(),
-          ),
-          const Positioned(
-            top: 35,
-            left: 42,
-            child: Icon(Icons.star, color: Colors.white70, size: 12),
-          ),
-          const Positioned(
-            top: 35,
-            right: 42,
-            child: Icon(Icons.star, color: Colors.white70, size: 12),
-          ),
+          // Fallback Shield Base
+          if (badgeIconUrl == null)
+            CustomPaint(
+              size: const Size(100, 125),
+              painter: _ShieldPainterDesign(color: themeColor),
+            ),
+
+          // User Avatar (Bottom Layer)
           Positioned(
-            top: 25,
+            top: 35,
             child: Container(
-              width: 70,
-              height: 70,
-              padding: const EdgeInsets.all(2),
+              width: 65,
+              height: 65,
               decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
@@ -187,12 +198,40 @@ class _AchievementShareDesign extends StatelessWidget {
               ),
             ),
           ),
+
+          // Badge Design (Top Layer - Overlap)
+          if (badgeIconUrl != null)
+            Positioned(
+              top: 0,
+              child: CachedNetworkImage(
+                imageUrl: badgeIconUrl,
+                width: 110,
+                height: 130,
+                fit: BoxFit.contain,
+              ),
+            ),
+
+          // Stars (Fallback Only)
+          if (badgeIconUrl == null) ...[
+            const Positioned(
+              top: 35,
+              left: 42,
+              child: Icon(Icons.star, color: Colors.white70, size: 12),
+            ),
+            const Positioned(
+              top: 35,
+              right: 42,
+              child: Icon(Icons.star, color: Colors.white70, size: 12),
+            ),
+          ],
+
+          // Rank Label (Badge in Top)
           Positioned(
             top: 2,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
               decoration: BoxDecoration(
-                color: const Color(0xFF2DD4BF),
+                color: themeColor,
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
@@ -206,13 +245,15 @@ class _AchievementShareDesign extends StatelessWidget {
               ),
             ),
           ),
+
+          // Level Badge (Overlay at bottom)
           Positioned(
-            bottom: 10,
+            bottom: 15,
             child: Container(
               width: 36,
               height: 24,
               decoration: BoxDecoration(
-                color: const Color(0xFF2DD4BF),
+                color: themeColor,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.white, width: 1.5),
               ),
@@ -329,13 +370,16 @@ class _StrokeText extends StatelessWidget {
 }
 
 class _ShieldPainterDesign extends CustomPainter {
+  final Color color;
+  _ShieldPainterDesign({required this.color});
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..shader = ui.Gradient.linear(
         const Offset(0, 0),
         const Offset(0, 150),
-        [const Color(0xFF22D3EE), const Color(0xFF0D9488)],
+        [color.withValues(alpha: 0.8), color],
       )
       ..style = PaintingStyle.fill;
 

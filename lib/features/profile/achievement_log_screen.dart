@@ -114,6 +114,8 @@ class _AchievementLogScreenState extends ConsumerState<AchievementLogScreen> {
                       userAvatarUrl: user.completeProfilePic,
                       level: level,
                       rank: rank,
+                      badgeIconUrl: user.badge?.iconUrl,
+                      badgeColor: user.badge?.color,
                     ),
 
                     15.verticalSpace,
@@ -173,47 +175,43 @@ class _ShieldWidget extends StatelessWidget {
   final String userAvatarUrl;
   final int level;
   final String rank;
+  final String? badgeIconUrl;
+  final String? badgeColor;
 
   const _ShieldWidget({
     required this.userAvatarUrl,
     required this.level,
     required this.rank,
+    this.badgeIconUrl,
+    this.badgeColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final themeColor = badgeColor != null
+        ? Color(int.parse(badgeColor!.replaceAll('#', '0xFF')))
+        : const Color(0xFF2DD4BF);
+
     return SizedBox(
-      height: 190.h,
+      height: 195.h,
       child: Stack(
         alignment: Alignment.topCenter,
         children: [
-          // Shield Base
-          Center(
-            child: CustomPaint(
-              size: Size(130.w, 150.h),
-              painter: _ShieldPainter(),
+          // Shield Base (Fallback if no badge icon)
+          if (badgeIconUrl == null)
+            Center(
+              child: CustomPaint(
+                size: Size(130.w, 150.h),
+                painter: _ShieldPainter(color: themeColor),
+              ),
             ),
-          ),
 
-          // Stars
+          // User Avatar (Bottom Layer)
           Positioned(
             top: 45.h,
-            left: 55.w,
-            child: const Icon(Icons.star, color: Colors.white70, size: 14),
-          ),
-          Positioned(
-            top: 45.h,
-            right: 55.w,
-            child: const Icon(Icons.star, color: Colors.white70, size: 14),
-          ),
-
-          // User Avatar
-          Positioned(
-            top: 35.h,
             child: Container(
-              width: 90.w,
-              height: 90.w,
-              padding: const EdgeInsets.all(3),
+              width: 85.w,
+              height: 85.w,
               decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
@@ -227,13 +225,39 @@ class _ShieldWidget extends StatelessWidget {
             ),
           ),
 
+          // Badge Design (Top Layer - Overlap)
+          if (badgeIconUrl != null)
+            Positioned(
+              top: 0,
+              child: CachedNetworkImage(
+                imageUrl: badgeIconUrl!,
+                width: 140.w,
+                height: 165.h,
+                fit: BoxFit.contain,
+              ),
+            ),
+
+          // Stars (Only show if no badge icon or as part of custom design)
+          if (badgeIconUrl == null) ...[
+            Positioned(
+              top: 45.h,
+              left: 55.w,
+              child: const Icon(Icons.star, color: Colors.white70, size: 14),
+            ),
+            Positioned(
+              top: 45.h,
+              right: 55.w,
+              child: const Icon(Icons.star, color: Colors.white70, size: 14),
+            ),
+          ],
+
           // Rank Label (Badge in Top)
           Positioned(
             top: 5.h,
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 3.h),
               decoration: BoxDecoration(
-                color: const Color(0xFF2DD4BF),
+                color: themeColor,
                 borderRadius: BorderRadius.circular(8.r),
                 boxShadow: [
                   BoxShadow(
@@ -262,7 +286,7 @@ class _ShieldWidget extends StatelessWidget {
               width: 44.w,
               height: 30.h,
               decoration: BoxDecoration(
-                color: const Color(0xFF2DD4BF),
+                color: themeColor,
                 borderRadius: BorderRadius.circular(15.r),
                 border: Border.all(color: Colors.white, width: 2),
               ),
@@ -286,13 +310,16 @@ class _ShieldWidget extends StatelessWidget {
 }
 
 class _ShieldPainter extends CustomPainter {
+  final Color color;
+  _ShieldPainter({required this.color});
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..shader = const LinearGradient(
+      ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [Color(0xFF22D3EE), Color(0xFF0D9488)],
+        colors: [color.withValues(alpha: 0.8), color],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
       ..style = PaintingStyle.fill;
 
