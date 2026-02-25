@@ -142,37 +142,23 @@ class StreakShareUtils {
 
                               const SizedBox(height: 25),
 
-                              // Date with Underline
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    DateFormat('dd MMMM yyyy', 'ar')
-                                        .format(DateTime.now()),
-                                    style: const TextStyle(
-                                      fontSize: 16, // Slightly smaller
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      fontFamily: 'SomarSans',
-                                      shadows: [
-                                        Shadow(
-                                          color: Colors.black45,
-                                          offset: Offset(0, 2),
-                                          blurRadius: 4,
-                                        ),
-                                      ],
+                              // Date (No Underline)
+                              Text(
+                                DateFormat('dd MMMM yyyy', 'ar')
+                                    .format(DateTime.now()),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontFamily: 'SomarSans',
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.black45,
+                                      offset: Offset(0, 2),
+                                      blurRadius: 4,
                                     ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Container(
-                                    height: 1.2,
-                                    width: 90,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(alpha: 0.5),
-                                      borderRadius: BorderRadius.circular(1),
-                                    ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ],
                           ),
