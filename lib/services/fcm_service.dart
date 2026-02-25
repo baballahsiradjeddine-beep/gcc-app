@@ -6,6 +6,7 @@ import 'package:get_secure_storage/get_secure_storage.dart';
 import 'package:tayssir/environment_config.dart';
 import 'package:tayssir/debug/app_logger.dart';
 import 'package:toastification/toastification.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 // Top-level function handles background messages
 @pragma('vm:entry-point')
@@ -42,63 +43,105 @@ class FCMService {
       if (message.notification != null) {
         String? imageUrl = message.notification?.android?.imageUrl ?? message.notification?.apple?.imageUrl ?? message.data['image'];
         
-        toastification.show(
-          title: Text(
-            message.notification!.title ?? 'إشعار جديد',
-            style: const TextStyle(
-              fontSize: 14,
-              fontFamily: 'SomarSans',
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          description: Text(
-            message.notification!.body ?? '',
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 12,
-              fontFamily: 'SomarSans',
-              color: Colors.black87,
-            ),
-          ),
-          autoCloseDuration: const Duration(seconds: 5),
-          type: ToastificationType.info,
-          style: ToastificationStyle.fillColored,
-          alignment: Alignment.topRight,
-          direction: TextDirection.ltr,
-          icon: imageUrl != null 
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: Image.network(
-                    imageUrl, 
-                    width: 40, 
-                    height: 40, 
-                    fit: BoxFit.cover,
-                  ),
-                )
-              : const Icon(
-                  Icons.notifications_active_rounded,
-                  color: Color(0xff00C4F6),
-                  size: 30,
+        toastification.showCustom(
+          autoCloseDuration: const Duration(seconds: 6),
+          alignment: Alignment.topCenter,
+          builder: (BuildContext context, ToastificationItem holder) {
+            return GestureDetector(
+              onTap: () {
+                toastification.dismiss(holder);
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
                 ),
-          showIcon: true,
-          primaryColor: const Color(0xff00C4F6),
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          margin: const EdgeInsets.symmetric(horizontal: 20),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          borderRadius: BorderRadius.circular(12),
-          closeButton: ToastCloseButton(
-            showType: CloseButtonShowType.always,
-            buttonBuilder: (context, onClose) {
-              return const Icon(
-                Icons.close,
-                color: Colors.grey,
-              );
-            },
-          ),
-          closeOnClick: true,
+                child: Directionality(
+                  textDirection: TextDirection.ltr, // App Logo on Left (0), Image on Right (last)
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // LEFT: App Logo
+                      Container(
+                        width: 46,
+                        height: 46,
+                        decoration: BoxDecoration(
+                          color: const Color(0xffE0F7FA), // Soft background for the logo
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        child: SvgPicture.asset(
+                          'assets/svg/latest_logo.svg',
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      
+                      // MIDDLE: Title and Body (Arabic RTL)
+                      Expanded(
+                        child: Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                message.notification!.title ?? 'إشعار جديد',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'SomarSans',
+                                  fontWeight: FontWeight.w900,
+                                  color: Color(0xFF1F2937),
+                                  height: 1.2,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                message.notification!.body ?? '',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontFamily: 'SomarSans',
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF6B7280),
+                                  height: 1.4,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      
+                      // RIGHT: Custom FCM Image (if provided)
+                      if (imageUrl != null) ...[
+                        const SizedBox(width: 14),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            imageUrl,
+                            width: 46,
+                            height: 46,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         );
       }
     });
