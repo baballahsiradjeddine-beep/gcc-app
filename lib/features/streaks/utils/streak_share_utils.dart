@@ -80,9 +80,9 @@ class StreakShareUtils {
               ),
 
               // 2. Central Minimalist UI
-              // 2. Central Minimalist UI - Shifted further Upwards
+              // 2. Central Minimalist UI - Fixed Overlap & Shrunk Size
               Align(
-                alignment: const Alignment(0, -0.35), // Moved higher
+                alignment: const Alignment(0, -0.5), // Raised higher to avoid background overlap
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -92,9 +92,9 @@ class StreakShareUtils {
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
                         child: Container(
-                          width: 280,
+                          width: 250, // Shrunk width
                           padding: const EdgeInsets.symmetric(
-                              vertical: 30, horizontal: 20), // Shrunk height
+                              vertical: 20, horizontal: 15), // Shrunk height
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(20),
@@ -103,11 +103,11 @@ class StreakShareUtils {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              // The Big Number
+                              // The Big Number - Slightly smaller to fit
                               Text(
                                 "${streak.currentStreak}",
                                 style: const TextStyle(
-                                  fontSize: 110,
+                                  fontSize: 95, // Reduced from 110
                                   fontWeight: FontWeight.w900,
                                   color: Colors.white,
                                   height: 1.0,
@@ -121,17 +121,17 @@ class StreakShareUtils {
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 20),
+                              const SizedBox(height: 15),
 
                               // Label with Underline
                               Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  SvgPicture.string(daysLabelSvg, width: 220),
+                                  SvgPicture.string(daysLabelSvg, width: 190), // Scaled down
                                   const SizedBox(height: 4),
                                   Container(
                                     height: 1.5,
-                                    width: 140,
+                                    width: 120, // Shorter line
                                     decoration: BoxDecoration(
                                       color: Colors.white.withValues(alpha: 0.6),
                                       borderRadius: BorderRadius.circular(1),
@@ -140,7 +140,7 @@ class StreakShareUtils {
                                 ],
                               ),
 
-                              const SizedBox(height: 30),
+                              const SizedBox(height: 25),
 
                               // Date with Underline
                               Column(
@@ -150,7 +150,7 @@ class StreakShareUtils {
                                     DateFormat('dd MMMM yyyy', 'ar')
                                         .format(DateTime.now()),
                                     style: const TextStyle(
-                                      fontSize: 18,
+                                      fontSize: 16, // Slightly smaller
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                       fontFamily: 'SomarSans',
@@ -166,7 +166,7 @@ class StreakShareUtils {
                                   const SizedBox(height: 4),
                                   Container(
                                     height: 1.2,
-                                    width: 100,
+                                    width: 90,
                                     decoration: BoxDecoration(
                                       color: Colors.white.withValues(alpha: 0.5),
                                       borderRadius: BorderRadius.circular(1),
