@@ -15,6 +15,10 @@ class StreakScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final int currentStreak = streak.currentStreak;
+    final int weekNumber = (currentStreak > 0) ? (currentStreak - 1) ~/ 7 : 0;
+    final int weekStartDay = (weekNumber * 7) + 1;
+
     return AppScaffold(
       onPopScope: () {},
       body: SafeArea(
@@ -36,7 +40,7 @@ class StreakScreen extends StatelessWidget {
               ),
               SizedBox(height: 2.h),
               Text(
-                "${streak.currentStreak} أيام متواصلة",
+                "$currentStreak أيام متواصلة",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 26.sp,
@@ -46,22 +50,22 @@ class StreakScreen extends StatelessWidget {
                 ),
               ),
               
-              const Spacer(flex: 1),
+              SizedBox(height: 15.h), // Reduced spacing
 
               // Responsive Fire Emoji
               Container(
-                padding: EdgeInsets.all(16.w),
+                padding: EdgeInsets.all(14.w),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: const Color(0xFFFFB74D).withValues(alpha: 0.1),
                 ),
                 child: Text(
                   "🔥",
-                  style: TextStyle(fontSize: 80.sp),
+                  style: TextStyle(fontSize: 70.sp),
                 ),
               ),
 
-              const Spacer(flex: 1),
+              SizedBox(height: 15.h), // Reduced spacing
 
               // Card Section - Optimized for space
               Container(
@@ -84,9 +88,10 @@ class StreakScreen extends StatelessWidget {
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: streak.history
-                          .map((day) => _buildDayItem(day))
-                          .toList(),
+                      children: List.generate(streak.history.length, (index) {
+                        final dayNumber = weekStartDay + index;
+                        return _buildDayItem(streak.history[index], dayNumber);
+                      }),
                     ),
                     SizedBox(height: 14.h),
                     const Divider(color: Color(0xFFEEEEEE), thickness: 1.2),
@@ -106,7 +111,7 @@ class StreakScreen extends StatelessWidget {
                 ),
               ),
 
-              const Spacer(flex: 1),
+              const Spacer(),
 
               // Footer Section
               Text(
@@ -120,7 +125,7 @@ class StreakScreen extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 20.h),
+              SizedBox(height: 15.h),
 
               Row(
                 children: [
@@ -150,7 +155,7 @@ class StreakScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 8.h),
+              SizedBox(height: 5.h),
             ],
           ),
         ),
@@ -158,17 +163,17 @@ class StreakScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDayItem(StreakDay day) {
+  Widget _buildDayItem(StreakDay day, int dayNumber) {
     return Expanded(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            day.dayName.substring(0, 1), // Only first letter if it overflows
+            "$dayNumber",
             style: TextStyle(
-              fontSize: 11.sp,
-              color: const Color(0xFF4B5563).withValues(alpha: 0.8),
-              fontWeight: day.isToday ? FontWeight.bold : FontWeight.w600,
+              fontSize: 13.sp,
+              color: const Color(0xFF4B5563),
+              fontWeight: day.isToday ? FontWeight.bold : FontWeight.w700,
               fontFamily: 'SomarSans',
             ),
           ),
