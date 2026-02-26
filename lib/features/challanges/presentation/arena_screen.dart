@@ -264,8 +264,8 @@ class ArenaScreen extends HookConsumerWidget {
         
         debugPrint('Challenge submission response: $result');
 
-        // FORCE REFRESH USER DATA to see updated points
-        ref.invalidate(userNotifierProvider);
+        // REFRESH USER DATA to see updated points without logging out
+        ref.read(userNotifierProvider.notifier).getUser();
 
         matchRef.child('status').set('finished');
         if (context.mounted) {
