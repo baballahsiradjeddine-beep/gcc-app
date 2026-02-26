@@ -358,7 +358,7 @@ class ArenaScreen extends HookConsumerWidget {
                                     backgroundImage: CachedNetworkImageProvider(myData?['avatar'] ?? ''),
                                     onBackgroundImageError: (_, __) => const Icon(Icons.person),
                                   ),
-                                  if (myData?['emoji'] != null && myData?['emoji'].toString().isNotEmpty)
+                                  if (myData?['emoji']?.toString().isNotEmpty == true)
                                     Positioned(
                                       top: -10,
                                       right: -10,
@@ -403,7 +403,7 @@ class ArenaScreen extends HookConsumerWidget {
                                                     : null,
                                     child: (opponentData?['avatar'] == null || (opponentData?['avatar'] as String).isEmpty) ? const Icon(Icons.android, color: Colors.white) : null,
                                   ),
-                                  if (opponentData?['emoji'] != null && opponentData?['emoji'].toString().isNotEmpty)
+                                  if (opponentData?['emoji']?.toString().isNotEmpty == true)
                                     Positioned(
                                       top: -10,
                                       left: -10,
