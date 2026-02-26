@@ -46,6 +46,7 @@ import 'package:tayssir/features/streaks/presentation/streak_screen.dart';
 import 'package:tayssir/features/challanges/challenges_screen.dart';
 import 'package:tayssir/features/challanges/presentation/matchmaking_screen.dart';
 import 'package:tayssir/features/challanges/presentation/arena_screen.dart';
+import 'package:tayssir/features/challanges/presentation/social_screen.dart';
 import 'bottom_navigation/main_scaffold.dart';
 import 'not_found_screen.dart';
 import 'routes_service.dart';
@@ -94,6 +95,7 @@ enum AppRoutes {
   chargilyInit,
   streak,
   achievementLog,
+  social,
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -292,6 +294,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                         unitId: data['unitId'] as int,
                         courseTitle: data['courseTitle'] as String,
                       );
+                    },
+                    transitionType: TransitionType.sharedAxis,
+                    duration: const Duration(milliseconds: 300),
+                  ),
+                  TayssirCustomGoRoute(
+                    name: AppRoutes.social.name,
+                    path: 'social',
+                    pageBuilder: (context, state) {
+                      return const SocialScreen();
                     },
                     transitionType: TransitionType.sharedAxis,
                     duration: const Duration(milliseconds: 300),

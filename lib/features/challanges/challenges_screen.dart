@@ -49,10 +49,20 @@ class ChallengesScreen extends HookConsumerWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('ساحة التحديات :',
                       style: TextStyle(
                           fontSize: 18.sp, fontWeight: FontWeight.bold)),
+                  IconButton(
+                    onPressed: () => context.pushNamed(AppRoutes.social.name),
+                    icon: Row(
+                      children: [
+                        Text('الأصدقاء ', style: TextStyle(color: Colors.pink, fontWeight: FontWeight.bold, fontSize: 14.sp)),
+                        Icon(Icons.people, color: Colors.pink, size: 24.sp),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
