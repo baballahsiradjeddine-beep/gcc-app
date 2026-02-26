@@ -536,20 +536,23 @@ class ArenaScreen extends HookConsumerWidget {
                     ] else ...[
                        const Text('نوع سؤال غير مدعوم في المعركة', style: TextStyle(color: Colors.red)),
                     ],
-                  ],
+                    ],
+                  ),
                 ),
+              ],
+            ),
+          ),
+          if (!isFinished)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 10.h),
+              child: IconButton(
+                icon: const Icon(Icons.emoji_emotions, color: Colors.amber, size: 40),
+                onPressed: showChatSheet,
               ),
-            if (!isFinished)
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.h),
-                child: IconButton(
-                  icon: const Icon(Icons.emoji_emotions, color: Colors.amber, size: 40),
-                  onPressed: showChatSheet,
-                ),
-              ),
-          ],
-        ),
+            ),
+        ],
       ),
+    ),
     );
   }
 }
