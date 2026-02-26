@@ -12,6 +12,7 @@ import 'package:tayssir/features/challanges/data/challenge_repository.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:confetti/confetti.dart';
 import 'package:lottie/lottie.dart';
+import 'package:tayssir/resources/colors/app_colors.dart';
 
 class ArenaScreen extends HookConsumerWidget {
   final String matchId;
