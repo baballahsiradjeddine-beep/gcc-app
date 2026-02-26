@@ -133,12 +133,12 @@ class ArenaScreen extends HookConsumerWidget {
     final isBotMatch = data['isBotMatch'] == true;
     final currentQuestion = currentIndex < questions.length ? questions[currentIndex] : null;
 
-    final opponentStatus = opponentData!['status'];
+    final opponentStatus = opponentData?['status'];
     final isOpponentDisconnected = opponentStatus == 'disconnected';
 
     // Check if finished
-    final isFinished = currentIndex >= questions.length || data['status'] == 'finished' || isOpponentDisconnected;
-    final isWinner = (myData!['score'] ?? 0) > (opponentData!['score'] ?? 0);
+    final isFinished = (questions.isNotEmpty && currentIndex >= questions.length) || data['status'] == 'finished' || isOpponentDisconnected;
+    final isWinner = ((myData?['score'] as int?) ?? 0) > ((opponentData?['score'] as int?) ?? 0);
 
     useEffect(() {
        if (isFinished && isWinner) {
@@ -355,30 +355,30 @@ class ArenaScreen extends HookConsumerWidget {
                                 children: [
                                   CircleAvatar(
                                     radius: 30.r,
-                                    backgroundImage: CachedNetworkImageProvider(myData!['avatar'] ?? ''),
+                                    backgroundImage: CachedNetworkImageProvider(myData?['avatar'] ?? ''),
                                     onBackgroundImageError: (_, __) => const Icon(Icons.person),
                                   ),
-                                  if (myData!['emoji'] != null && myData!['emoji'].toString().isNotEmpty)
+                                  if (myData?['emoji'] != null && myData?['emoji'].toString().isNotEmpty)
                                     Positioned(
                                       top: -10,
                                       right: -10,
                                       child: Container(
                                         padding: const EdgeInsets.all(4),
                                         decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                                        child: Text(myData!['emoji'], style: TextStyle(fontSize: 20.sp)),
+                                        child: Text(myData?['emoji'] ?? '', style: TextStyle(fontSize: 20.sp)),
                                       ),
                                     ),
                                 ],
                               ),
                               8.verticalSpace,
                               Text(
-                                myData!['name'] ?? 'أنا',
+                                myData?['name'] ?? 'أنا',
                                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: Colors.blue[900]),
                                 textAlign: TextAlign.center,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              Text(myData!['score'].toString(), style: TextStyle(color: Colors.green, fontSize: 22.sp, fontWeight: FontWeight.bold)),
+                              Text((myData?['score'] ?? 0).toString(), style: TextStyle(color: Colors.green, fontSize: 22.sp, fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),
@@ -398,19 +398,19 @@ class ArenaScreen extends HookConsumerWidget {
                                   CircleAvatar(
                                     radius: 30.r,
                                     backgroundColor: Colors.blueAccent,
-                                    backgroundImage: opponentData!['avatar'] != null && opponentData!['avatar'].isNotEmpty 
-                                                    ? CachedNetworkImageProvider(opponentData!['avatar']) 
+                                    backgroundImage: (opponentData?['avatar'] != null && (opponentData?['avatar'] as String).isNotEmpty) 
+                                                    ? CachedNetworkImageProvider(opponentData?['avatar']) 
                                                     : null,
-                                    child: (opponentData!['avatar'] == null || opponentData!['avatar'].isEmpty) ? const Icon(Icons.android, color: Colors.white) : null,
+                                    child: (opponentData?['avatar'] == null || (opponentData?['avatar'] as String).isEmpty) ? const Icon(Icons.android, color: Colors.white) : null,
                                   ),
-                                  if (opponentData!['emoji'] != null && opponentData!['emoji'].toString().isNotEmpty)
+                                  if (opponentData?['emoji'] != null && opponentData?['emoji'].toString().isNotEmpty)
                                     Positioned(
                                       top: -10,
                                       left: -10,
                                       child: Container(
                                         padding: const EdgeInsets.all(4),
                                         decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                                        child: Text(opponentData!['emoji'], style: TextStyle(fontSize: 20.sp)),
+                                        child: Text(opponentData?['emoji'] ?? '', style: TextStyle(fontSize: 20.sp)),
                                       ),
                                     ),
                                 ],
@@ -531,7 +531,7 @@ class ArenaScreen extends HookConsumerWidget {
                               }).toList(),
                             ] else if (currentQuestion?['question_type'] == 'true_or_false') ...[
                                Builder(builder: (context) {
-                                 final isCorrectTrue = (currentQuestion!['correct_answer'] ?? 1) == 1;
+                                 final isCorrectTrue = (currentQuestion?['correct_answer'] ?? 1) == 1;
                                  Color trueColor = Colors.green; 
                                  if (selectedOption.value == 'true') {
                                      trueColor = isOptionCorrect.value == true ? Colors.green : Colors.red;
