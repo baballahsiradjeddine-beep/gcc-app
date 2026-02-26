@@ -19,13 +19,12 @@ class SocialScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tabController = useTabController(initialLength: 3);
     
-    return AppScaffold(
-      topSafeArea: true,
-      isScroll: false,
+    return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text('الأصدقاء والبحث 🤝', style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
         centerTitle: true,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
         bottom: TabBar(
           controller: tabController,
@@ -39,13 +38,15 @@ class SocialScreen extends HookConsumerWidget {
           ],
         ),
       ),
-      body: TabBarView(
-        controller: tabController,
-        children: const [
-          SearchUsersTab(),
-          PendingRequestsTab(),
-          FriendsListTab(),
-        ],
+      body: SafeArea(
+        child: TabBarView(
+          controller: tabController,
+          children: const [
+            SearchUsersTab(),
+            PendingRequestsTab(),
+            FriendsListTab(),
+          ],
+        ),
       ),
     );
   }
@@ -298,10 +299,13 @@ class FriendsListTab extends HookConsumerWidget {
     
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => Container(
         padding: EdgeInsets.all(20.w),
+        height: 500.h,
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             Text('اختر المادة للتحدي ⚔️', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Colors.pink)),
             20.verticalSpace,
@@ -334,10 +338,13 @@ class FriendsListTab extends HookConsumerWidget {
     
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => Container(
         padding: EdgeInsets.all(20.w),
+        height: 500.h,
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             Text('اختر المحور', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Colors.blue)),
             20.verticalSpace,
