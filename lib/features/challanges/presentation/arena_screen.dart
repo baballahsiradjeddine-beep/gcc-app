@@ -37,6 +37,7 @@ class ArenaScreen extends HookConsumerWidget {
     final myEmoji = useState<String>('');
     final opponentEmoji = useState<String>('');
     final isConnected = useState<bool>(true);
+    final isSubmitting = useState<bool>(false);
     final confettiController = useMemoized(() => ConfettiController(duration: const Duration(seconds: 5)));
 
     useEffect(() => confettiController.dispose, []);
@@ -244,12 +245,15 @@ class ArenaScreen extends HookConsumerWidget {
         final currentMatchData = matchData.value;
         if (currentMatchData == null) return;
         
+        if (isSubmitting.value) return;
+        isSubmitting.value = true;
+
         final players = currentMatchData['players'] as Map<dynamic, dynamic>;
         final myInfo = players[myUid] as Map<dynamic, dynamic>?;
-        final opInfo = players.entries.firstWhere((e) => e.key != myUid).value as Map<dynamic, dynamic>?;
+        final opInfo = players.entries.firstWhere((e) => e.key != myUid, orElse: () => const MapEntry('none', null)).value as Map<dynamic, dynamic>?;
 
-        final myScore = matchData.value!['players'][myUid]['score'] ?? 0;
-        final opScore = opInfo?['score'] ?? 0;
+        final myScore = (data['players'][myUid]['score'] as int?) ?? 0;
+        final opScore = (opInfo?['score'] as int?) ?? 0;
         final isWinner = myScore > opScore;
         
         debugPrint('--- SUBMITTING CHALLENGE RESULT ---');
@@ -269,8 +273,8 @@ class ArenaScreen extends HookConsumerWidget {
 
         matchRef.child('status').set('finished');
         if (context.mounted) {
-           context.pop();
            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('انتهى التحدي! نتيجة: $myScore')));
+           context.goNamed(AppRoutes.challanges.name);
         }
       } catch (e) {
         debugPrint('Error submitting result: $e');
@@ -412,13 +416,13 @@ class ArenaScreen extends HookConsumerWidget {
                               ),
                               8.verticalSpace,
                               Text(
-                                opponentData!['name'] ?? 'الخصم',
+                                (opponentData?['name'] ?? 'الخصم'),
                                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: Colors.blue[900]),
                                 textAlign: TextAlign.center,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              Text(opponentData!['score'].toString(), style: TextStyle(color: Colors.red, fontSize: 22.sp, fontWeight: FontWeight.bold)),
+                              Text((opponentData?['score'] ?? 0).toString(), style: TextStyle(color: Colors.red, fontSize: 22.sp, fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),
@@ -467,11 +471,16 @@ class ArenaScreen extends HookConsumerWidget {
                             ),
                             30.verticalSpace,
                             ElevatedButton(
-                              style: ElevatedButton.styleFrom(backgroundColor: Colors.pink, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
-                              onPressed: handleSubmitFinalResult,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: isSubmitting.value ? Colors.grey : Colors.pink, 
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
+                              ),
+                              onPressed: isSubmitting.value ? null : handleSubmitFinalResult,
                               child: Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 15.h),
-                                child: Text('العودة وحفظ النتيجة', style: TextStyle(color: Colors.white, fontSize: 18.sp)),
+                                child: isSubmitting.value 
+                                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                                  : Text('العودة وحفظ النتيجة', style: TextStyle(color: Colors.white, fontSize: 18.sp)),
                               ),
                             ),
                             50.verticalSpace,
