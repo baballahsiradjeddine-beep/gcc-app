@@ -309,278 +309,274 @@ class ArenaScreen extends HookConsumerWidget {
          }
       },
       child: Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+        backgroundColor: Colors.white,
+        body: SafeArea(
           child: Stack(
-            alignment: Alignment.topCenter,
             children: [
-            ConfettiWidget(
-              confettiController: confettiController,
-              blastDirectionality: BlastDirectionality.explosive,
-              shouldLoop: false,
-              colors: const [Colors.pink, Colors.blue, Colors.green, Colors.yellow, Colors.orange],
-            ),
-            Positioned.fill(
-              child: Column(
-                children: [
-          // Connection Warning Header
-          if (!isConnected.value)
-             Container(
-               width: double.infinity,
-               color: Colors.orange,
-               padding: EdgeInsets.symmetric(vertical: 6.h),
-               child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+              // Main Game Content (Scrollable to prevent bottom overflow)
+              SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                     const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)),
-                     8.horizontalSpace,
-                     Text('هنالك ضعف في الاتصال، جاري المحاولة...', style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.bold)),
-                  ]
-               )
-             ),
-             
-              // Header / Scores
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Me
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            CircleAvatar(
-                              radius: 30.r,
-                              backgroundImage: CachedNetworkImageProvider(myData!['avatar'] ?? ''),
-                              onBackgroundImageError: (_, __) => const Icon(Icons.person),
-                            ),
-                            if (myData!['emoji'] != null && myData!['emoji'].toString().isNotEmpty)
-                              Positioned(
-                                top: -10,
-                                right: -10,
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                                  child: Text(myData!['emoji'], style: TextStyle(fontSize: 20.sp)),
-                                ),
-                              ),
-                          ],
-                        ),
-                        8.verticalSpace,
-                        Text(
-                          myData!['name'] ?? 'أنا',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(myData!['score'].toString(), style: TextStyle(color: Colors.green, fontSize: 20.sp, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                  ),
-                  
-                  // VS
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10.w),
-                    child: Text('VS', style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold, color: Colors.pink)),
-                  ),
-                  
-                  // Opponent
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            CircleAvatar(
-                              radius: 30.r,
-                              backgroundColor: Colors.blueAccent,
-                              backgroundImage: opponentData!['avatar'] != null && opponentData!['avatar'].isNotEmpty 
-                                              ? CachedNetworkImageProvider(opponentData!['avatar']) 
-                                              : null,
-                              child: (opponentData!['avatar'] == null || opponentData!['avatar'].isEmpty) ? const Icon(Icons.android, color: Colors.white) : null,
-                            ),
-                            if (opponentData!['emoji'] != null && opponentData!['emoji'].toString().isNotEmpty)
-                              Positioned(
-                                top: -10,
-                                left: -10,
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                                  child: Text(opponentData!['emoji'], style: TextStyle(fontSize: 20.sp)),
-                                ),
-                              ),
-                          ],
-                        ),
-                        8.verticalSpace,
-                        Text(
-                          opponentData!['name'] ?? 'الخصم',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(opponentData!['score'].toString(), style: TextStyle(color: Colors.red, fontSize: 20.sp, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-          
-          20.verticalSpace,
-          const Divider(),
-          if (!isFinished)
-             TweenAnimationBuilder<double>(
-               key: ValueKey(currentIndex),
-               tween: Tween<double>(begin: 1.0, end: 0.0),
-               duration: const Duration(seconds: 15),
-               onEnd: () {
-                  if (selectedOption.value == null && !isFinished) {
-                      handleAnswer(false, 'timeout'); // Time is up!
-                  }
-               },
-               builder: (context, value, _) {
-                  return LinearProgressIndicator(
-                     value: value,
-                     backgroundColor: Colors.grey[200],
-                     color: value > 0.3 ? Colors.green : Colors.red,
-                     minHeight: 8.h,
-                  );
-               },
-             ),
-          15.verticalSpace,
-
-          // Main Play Area
-          Expanded(
-            child: isFinished
-              ? Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (isWinner || isOpponentDisconnected)
-                       Lottie.network(
-                         'https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/celebration/default/24px.svg', // Fallback or use a valid lottie
-                         width: 150.w,
-                         height: 150.h,
-                         errorBuilder: (context, error, stackTrace) => Icon(Icons.emoji_events, size: 100.sp, color: Colors.amber),
+                    // Connection Warning Header
+                    if (!isConnected.value)
+                       Container(
+                         width: double.infinity,
+                         color: Colors.orange,
+                         margin: EdgeInsets.only(bottom: 10.h),
+                         padding: EdgeInsets.symmetric(vertical: 6.h),
+                         child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                               const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)),
+                               8.horizontalSpace,
+                               Text('هنالك ضعف في الاتصال، جاري المحاولة...', style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.bold)),
+                            ]
+                         )
                        ),
-                    Text(
-                      isOpponentDisconnected 
-                        ? '🏆 المنافس هرب ولم يستطع مقاومتك! هههه 😂'
-                        : (isWinner ? '🏆 لقد فزت!' : '😔 حظ أوفر المرة القادمة'),
-                      style: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.bold, color: isOpponentDisconnected ? Colors.orange : (isWinner ? Colors.green : Colors.black)),
-                      textAlign: TextAlign.center,
+                       
+                    // Header / Scores
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Me
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  CircleAvatar(
+                                    radius: 30.r,
+                                    backgroundImage: CachedNetworkImageProvider(myData!['avatar'] ?? ''),
+                                    onBackgroundImageError: (_, __) => const Icon(Icons.person),
+                                  ),
+                                  if (myData!['emoji'] != null && myData!['emoji'].toString().isNotEmpty)
+                                    Positioned(
+                                      top: -10,
+                                      right: -10,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(4),
+                                        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                                        child: Text(myData!['emoji'], style: TextStyle(fontSize: 20.sp)),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              8.verticalSpace,
+                              Text(
+                                myData!['name'] ?? 'أنا',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: Colors.blue[900]),
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(myData!['score'].toString(), style: TextStyle(color: Colors.green, fontSize: 22.sp, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
+                        
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.w),
+                          child: Text('VS', style: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.bold, color: Colors.pink)),
+                        ),
+                        
+                        // Opponent
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  CircleAvatar(
+                                    radius: 30.r,
+                                    backgroundColor: Colors.blueAccent,
+                                    backgroundImage: opponentData!['avatar'] != null && opponentData!['avatar'].isNotEmpty 
+                                                    ? CachedNetworkImageProvider(opponentData!['avatar']) 
+                                                    : null,
+                                    child: (opponentData!['avatar'] == null || opponentData!['avatar'].isEmpty) ? const Icon(Icons.android, color: Colors.white) : null,
+                                  ),
+                                  if (opponentData!['emoji'] != null && opponentData!['emoji'].toString().isNotEmpty)
+                                    Positioned(
+                                      top: -10,
+                                      left: -10,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(4),
+                                        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                                        child: Text(opponentData!['emoji'], style: TextStyle(fontSize: 20.sp)),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              8.verticalSpace,
+                              Text(
+                                opponentData!['name'] ?? 'الخصم',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: Colors.blue[900]),
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(opponentData!['score'].toString(), style: TextStyle(color: Colors.red, fontSize: 22.sp, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
+                    
                     20.verticalSpace,
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.pink, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
-                      onPressed: handleSubmitFinalResult,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 15.h),
-                        child: Text('العودة وحفظ النتيجة', style: TextStyle(color: Colors.white, fontSize: 18.sp)),
-                      ),
-                    ),
+                    const Divider(),
+                    if (!isFinished) ...[
+                       TweenAnimationBuilder<double>(
+                         key: ValueKey(currentIndex),
+                         tween: Tween<double>(begin: 1.0, end: 0.0),
+                         duration: const Duration(seconds: 15),
+                         onEnd: () {
+                            if (selectedOption.value == null && !isFinished) {
+                                handleAnswer(false, 'timeout');
+                            }
+                         },
+                         builder: (context, value, _) {
+                            return LinearProgressIndicator(
+                               value: value,
+                               backgroundColor: Colors.grey[200],
+                               color: value > 0.3 ? Colors.green : Colors.red,
+                               minHeight: 8.h,
+                            );
+                         },
+                       ),
+                       15.verticalSpace,
+                    ],
+
+                    // Main Play Area (Question & Answers)
+                    isFinished
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            50.verticalSpace,
+                            if (isWinner || isOpponentDisconnected)
+                               Icon(Icons.emoji_events, size: 100.sp, color: Colors.amber),
+                            20.verticalSpace,
+                            Text(
+                              isOpponentDisconnected 
+                                ? '🏆 المنافس هرب ولم يستطع مقاومتك! هههه 😂'
+                                : (isWinner ? '🏆 لقد فزت!' : '😔 حظ أوفر المرة القادمة'),
+                              style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold, color: isOpponentDisconnected ? Colors.orange : (isWinner ? Colors.green : Colors.black)),
+                              textAlign: TextAlign.center,
+                            ),
+                            30.verticalSpace,
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(backgroundColor: Colors.pink, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+                              onPressed: handleSubmitFinalResult,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 15.h),
+                                child: Text('العودة وحفظ النتيجة', style: TextStyle(color: Colors.white, fontSize: 18.sp)),
+                              ),
+                            ),
+                            50.verticalSpace,
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            Text('السؤال ${currentIndex + 1} / ${questions.length}', style: TextStyle(color: Colors.grey, fontSize: 14.sp)),
+                            20.verticalSpace,
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(color: Colors.grey.withOpacity(0.1)),
+                                boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.2), blurRadius: 10)]
+                              ),
+                              child: Text(
+                                currentQuestion?['question'] ?? 'جاري التحميل...',
+                                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            30.verticalSpace,
+                            if (currentQuestion?['question_type'] == 'multiple_choices') ...[
+                              ...(currentQuestion?['options'] ?? []).map<Widget>((opt) {
+                                 Color? btnColor;
+                                 if (selectedOption.value == opt['id']) {
+                                     btnColor = isOptionCorrect.value == true ? Colors.green : Colors.red;
+                                 } else if (selectedOption.value != null && opt['is_correct'] == 1) {
+                                     btnColor = Colors.green;
+                                 } else if (selectedOption.value != null) {
+                                     btnColor = Colors.grey; 
+                                 }
+
+                                 return Padding(
+                                   padding: const EdgeInsets.only(bottom: 12),
+                                   child: SmallButton(
+                                     text: opt['text'],
+                                     width: double.infinity,
+                                     height: 55.h,
+                                     color: btnColor,
+                                     onPressed: () => handleAnswer(opt['is_correct'] == 1, opt['id']),
+                                   ),
+                                 );
+                              }).toList(),
+                            ] else if (currentQuestion?['question_type'] == 'true_or_false') ...[
+                               Builder(builder: (context) {
+                                 final isCorrectTrue = (currentQuestion!['correct_answer'] ?? 1) == 1;
+                                 Color trueColor = Colors.green; 
+                                 if (selectedOption.value == 'true') {
+                                     trueColor = isOptionCorrect.value == true ? Colors.green : Colors.red;
+                                 } else if (selectedOption.value != null && isCorrectTrue) {
+                                     trueColor = Colors.green;
+                                 } else if (selectedOption.value != null) {
+                                     trueColor = Colors.grey;
+                                 }
+                                 
+                                 Color falseColor = Colors.red;
+                                 if (selectedOption.value == 'false') {
+                                     falseColor = isOptionCorrect.value == true ? Colors.green : Colors.red;
+                                 } else if (selectedOption.value != null && !isCorrectTrue) {
+                                     falseColor = Colors.green;
+                                 } else if (selectedOption.value != null) {
+                                     falseColor = Colors.grey;
+                                 }
+
+                                 return Column(children: [
+                                    SmallButton(text: 'صحيح', color: trueColor, width: double.infinity, height: 60.h, onPressed: () => handleAnswer(isCorrectTrue, 'true')),
+                                    15.verticalSpace,
+                                    SmallButton(text: 'خطأ', color: falseColor, width: double.infinity, height: 60.h, onPressed: () => handleAnswer(!isCorrectTrue, 'false')),
+                                 ]);
+                               }),
+                            ],
+                            100.verticalSpace, // Extra space for scrolling/bottom padding
+                          ],
+                        ),
                   ],
-              )
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('السؤال ${currentIndex + 1} / ${questions.length}', style: TextStyle(color: Colors.grey, fontSize: 14.sp)),
-                    20.verticalSpace,
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.2), blurRadius: 10)]
-                      ),
-                      child: Text(
-                        currentQuestion?['question'] ?? 'جاري التحميل...',
-                        style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
+                ),
+              ),
+
+              // Floating Overlays
+              ConfettiWidget(
+                confettiController: confettiController,
+                blastDirectionality: BlastDirectionality.explosive,
+                shouldLoop: false,
+                colors: const [Colors.pink, Colors.blue, Colors.green, Colors.yellow, Colors.orange],
+              ),
+              
+              if (!isFinished)
+                Positioned(
+                  bottom: 20.h,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: IconButton(
+                      icon: const Icon(Icons.emoji_emotions, color: Colors.amber, size: 50),
+                      onPressed: showChatSheet,
                     ),
-                    40.verticalSpace,
-                    // Answer Options or True/False
-                    if (currentQuestion?['question_type'] == 'multiple_choices') ...[
-                      ...(currentQuestion?['options'] ?? []).map<Widget>((opt) {
-                         Color? btnColor;
-                         // Logic for Coloring Buttons after Answer Selection
-                         if (selectedOption.value == opt['id']) {
-                             btnColor = isOptionCorrect.value == true ? Colors.green : Colors.red;
-                         } else if (selectedOption.value != null && opt['is_correct'] == 1) {
-                             btnColor = Colors.green; // Highlight the real correct answer
-                         } else if (selectedOption.value != null) {
-                             btnColor = Colors.grey; 
-                         }
-
-                         return Padding(
-                           padding: const EdgeInsets.only(bottom: 15),
-                           child: btnColor == null ? SmallButton(
-                             text: opt['text'],
-                             width: double.infinity,
-                             height: 50.h,
-                             onPressed: () => handleAnswer(opt['is_correct'] == 1, opt['id']),
-                           ) : SmallButton(
-                             text: opt['text'],
-                             width: double.infinity,
-                             height: 50.h,
-                             color: btnColor,
-                             onPressed: () => handleAnswer(opt['is_correct'] == 1, opt['id']),
-                           ),
-                         );
-                      }).toList(),
-                    ] else if (currentQuestion?['question_type'] == 'true_or_false') ...[
-                       Builder(builder: (context) {
-                         final isCorrectTrue = (currentQuestion!['correct_answer'] ?? 1) == 1;
-                         Color trueColor = Colors.green;
-                         if (selectedOption.value == 'true') {
-                             trueColor = isOptionCorrect.value == true ? Colors.green : Colors.red;
-                         } else if (selectedOption.value != null && isCorrectTrue) {
-                             trueColor = Colors.green;
-                         } else if (selectedOption.value != null) {
-                             trueColor = Colors.grey;
-                         }
-                         
-                         Color falseColor = Colors.red;
-                         if (selectedOption.value == 'false') {
-                             falseColor = isOptionCorrect.value == true ? Colors.green : Colors.red;
-                         } else if (selectedOption.value != null && !isCorrectTrue) {
-                             falseColor = Colors.green;
-                         } else if (selectedOption.value != null) {
-                             falseColor = Colors.grey;
-                         }
-
-                         return Column(children: [
-                            SmallButton(text: 'صحيح', color: trueColor, width: double.infinity, height: 60.h, onPressed: () => handleAnswer(isCorrectTrue, 'true')),
-                            15.verticalSpace,
-                            SmallButton(text: 'خطأ', color: falseColor, width: double.infinity, height: 60.h, onPressed: () => handleAnswer(!isCorrectTrue, 'false')),
-                         ]);
-                       }),
-                    ] else ...[
-                       const Text('نوع سؤال غير مدعوم في المعركة', style: TextStyle(color: Colors.red)),
-                    ],
-                    ],
                   ),
                 ),
-              ],
-            ),
+            ],
           ),
-          if (!isFinished)
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 10.h),
-              child: IconButton(
-                icon: const Icon(Icons.emoji_emotions, color: Colors.amber, size: 40),
-                onPressed: showChatSheet,
-              ),
-            ),
-        ],
+        ),
       ),
-    ),
-  ),
-    ),
     );
   }
 }
