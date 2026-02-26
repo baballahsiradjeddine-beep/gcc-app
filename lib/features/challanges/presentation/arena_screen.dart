@@ -538,19 +538,19 @@ class ArenaScreen extends HookConsumerWidget {
                     ]
                   ],
                 ),
-          ),
-          
-          if (!isFinished)
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 10.h),
-              child: IconButton(
-                icon: const Icon(Icons.emoji_emotions, color: Colors.amber, size: 40),
-                onPressed: showChatSheet,
               ),
             ),
+            if (!isFinished)
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 10.h),
+                child: IconButton(
+                  icon: const Icon(Icons.emoji_emotions, color: Colors.amber, size: 40),
+                  onPressed: showChatSheet,
+                ),
+              ),
           ],
         ),
       ),
-    );
+    ); // SEMICOLON ADDED HERE
   }
 }
