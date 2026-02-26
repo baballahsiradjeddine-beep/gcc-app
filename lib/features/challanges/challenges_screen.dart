@@ -55,7 +55,7 @@ class ChallengesScreen extends HookConsumerWidget {
                       style: TextStyle(
                           fontSize: 18.sp, fontWeight: FontWeight.bold)),
                   IconButton(
-                    onPressed: () => context.pushNamed(AppRoutes.social.name),
+                    onPressed: () => context.push('/challanges/social'),
                     icon: Row(
                       children: [
                         Text('الأصدقاء ', style: TextStyle(color: Colors.pink, fontWeight: FontWeight.bold, fontSize: 14.sp)),
