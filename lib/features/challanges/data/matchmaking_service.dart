@@ -49,7 +49,7 @@ class MatchmakingService {
 
      final challengeRepo = _ref.read(challengeRepositoryProvider);
      final questionsData = await challengeRepo.getQuestions(unitId);
-     final questionsList = questionsData['questions'] as List<dynamic>;
+     final questionsList = (questionsData['questions'] as List?) ?? [];
 
      await matchRef.set({
         'status': 'waiting_for_opponent',
@@ -150,7 +150,7 @@ class MatchmakingService {
         // Fetch questions from backend
         final challengeRepo = _ref.read(challengeRepositoryProvider);
         final questionsData = await challengeRepo.getQuestions(unitId);
-        final questionsList = questionsData['questions'] as List<dynamic>;
+        final questionsList = (questionsData['questions'] as List?) ?? [];
         
         // Create Match in Firebase
         await _db.child('challenges/matches/$matchId').set({
@@ -275,7 +275,7 @@ class MatchmakingService {
       };
     }
     
-    final questionsList = questionsData['questions'] as List<dynamic>;
+    final questionsList = (questionsData['questions'] as List?) ?? [];
     
     final botNames = ['Tito Bot 🐧', 'Ahmed 🤓', 'Sara 📚', 'Amine ⭐'];
     final botName = botNames[Random().nextInt(botNames.length)];

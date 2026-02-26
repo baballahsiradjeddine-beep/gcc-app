@@ -56,7 +56,7 @@ class ArenaScreen extends HookConsumerWidget {
       statusRef.set('playing');
 
       final sub = matchRef.onValue.listen((event) {
-        if (event.snapshot.exists) {
+        if (event.snapshot.exists && event.snapshot.value != null) {
           final data = event.snapshot.value as Map<dynamic, dynamic>;
           matchData.value = data;
         }
@@ -106,9 +106,9 @@ class ArenaScreen extends HookConsumerWidget {
     }
 
     final data = matchData.value!;
-    final players = data['players'] as Map<dynamic, dynamic>;
-    final questions = data['questions'] as List<dynamic>;
-    final currentIndex = data['currentQuestionIndex'] as int;
+    final players = (data['players'] as Map<dynamic, dynamic>?) ?? {};
+    final questions = (data['questions'] as List<dynamic>?) ?? [];
+    final currentIndex = (data['currentQuestionIndex'] as int?) ?? 0;
 
     // Identify Opponent and Me
     Map<dynamic, dynamic>? myData;
