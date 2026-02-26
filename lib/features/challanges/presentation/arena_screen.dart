@@ -547,10 +547,11 @@ class ArenaScreen extends HookConsumerWidget {
                 onPressed: showChatSheet,
               ),
             ),
+          ],
             ),
           ],
         ),
       ),
-    );
+      );
   }
 }

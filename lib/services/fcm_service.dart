@@ -8,6 +8,7 @@ import 'package:tayssir/debug/app_logger.dart';
 import 'package:toastification/toastification.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tayssir/router/app_router.dart';
+import 'package:go_router/go_router.dart';
 import '../firebase_options.dart';
 
 // Top-level function handles background messages
@@ -160,10 +161,13 @@ class FCMService {
       _handleMessageNavigation(initialMessage);
     }
 
-    // Handle message when app is in background but not terminated
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      AppLogger.logInfo("App opened from background via message: ${message.messageId}");
-      _handleMessageNavigation(message);
+    // Get the FCM token
+    syncToken();
+
+    // Refresh token listener
+    _firebaseMessaging.onTokenRefresh.listen((newToken) {
+      AppLogger.logInfo("Refreshed FCM Token: $newToken");
+      _sendTokenToBackend(newToken);
     });
   }
 
@@ -187,15 +191,6 @@ class FCMService {
      }
   }
 
-    // Get the FCM token
-    syncToken();
-
-    // Refresh token listener
-    _firebaseMessaging.onTokenRefresh.listen((newToken) {
-      AppLogger.logInfo("Refreshed FCM Token: $newToken");
-      _sendTokenToBackend(newToken);
-    });
-  }
 
   static Future<void> syncToken() async {
     print("FCM: syncToken() called");

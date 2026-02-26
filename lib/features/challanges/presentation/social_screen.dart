@@ -245,113 +245,6 @@ class FriendsListTab extends HookConsumerWidget {
       );
     }
 
-    void _showInvitationSettings(BuildContext context, WidgetRef ref, dynamic friend) {
-      final courses = ref.read(dataProvider).contentData.modules;
-      
-      showModalBottomSheet(
-        context: context,
-        builder: (ctx) => Container(
-          padding: EdgeInsets.all(20.w),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('اختر المادة للتحدي ⚔️', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Colors.pink)),
-              20.verticalSpace,
-              Expanded(
-                child: ListView.builder(
-                  itemCount: courses.length,
-                  itemBuilder: (context, i) {
-                    final course = courses[i];
-                    return Card(
-                      child: ListTile(
-                        title: Text(course.title),
-                        trailing: const Icon(Icons.arrow_forward_ios),
-                        onTap: () {
-                          Navigator.pop(ctx);
-                          _showUnitSelection(context, ref, friend, course);
-                        },
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    void _showUnitSelection(BuildContext context, WidgetRef ref, dynamic friend, MaterialModel course) {
-      final units = ref.read(dataProvider).contentData.units.where((u) => u.materialId == course.id).toList();
-      
-      showModalBottomSheet(
-        context: context,
-        builder: (ctx) => Container(
-          padding: EdgeInsets.all(20.w),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('اختر المحور', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Colors.blue)),
-              20.verticalSpace,
-              if (units.isEmpty)
-                const Text('لا توجد محاور متاحة حالياً.')
-              else
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: units.length,
-                    itemBuilder: (context, i) {
-                      final unit = units[i];
-                      return ListTile(
-                        title: Text(unit.title),
-                        onTap: () async {
-                          Navigator.pop(ctx);
-                          _handleInvite(context, ref, friend, unit, course.title);
-                        },
-                      );
-                    },
-                  ),
-                ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    Future<void> _handleInvite(BuildContext context, WidgetRef ref, dynamic friend, dynamic unit, String courseTitle) async {
-       try {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('جاري تجهيز التحدي وإرسال الدعوة...')));
-          
-          final matchmaking = ref.read(matchmakingServiceProvider);
-          final social = ref.read(socialRepositoryProvider);
-          
-          // 1. Create Private Match
-          final code = await matchmaking.createPrivateMatch(unit.id, courseTitle);
-          
-          // 2. Send Invitation Push
-          await social.sendChallengeInvite(
-            receiverId: friend['id'],
-            unitId: unit.id,
-            courseTitle: courseTitle,
-            invitationCode: code, // Add this
-          );
-          
-          // 3. Go to Matchmaking Screen but in "Waiting Room" state for this specific code
-          if (context.mounted) {
-             context.pushNamed(
-                AppRoutes.challengeMatchmaking.name,
-                extra: {
-                  'unitId': unit.id,
-                  'courseTitle': courseTitle,
-                  'initialSearchMode': 'create_private',
-                  'invitationCode': code,
-                },
-             );
-          }
-       } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('خطأ: $e')));
-       }
-    }
-
     return ListView.builder(
       padding: EdgeInsets.all(16.w),
       itemCount: friends.value.length,
@@ -398,5 +291,112 @@ class FriendsListTab extends HookConsumerWidget {
         );
       },
     );
+  }
+
+  void _showInvitationSettings(BuildContext context, WidgetRef ref, dynamic friend) {
+    final courses = ref.read(dataProvider).contentData.modules;
+    
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => Container(
+        padding: EdgeInsets.all(20.w),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('اختر المادة للتحدي ⚔️', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Colors.pink)),
+            20.verticalSpace,
+            Expanded(
+              child: ListView.builder(
+                itemCount: courses.length,
+                itemBuilder: (context, i) {
+                  final course = courses[i];
+                  return Card(
+                    child: ListTile(
+                      title: Text(course.title),
+                      trailing: const Icon(Icons.arrow_forward_ios),
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        _showUnitSelection(context, ref, friend, course);
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showUnitSelection(BuildContext context, WidgetRef ref, dynamic friend, MaterialModel course) {
+    final units = ref.read(dataProvider).contentData.units.where((u) => u.materialId == course.id).toList();
+    
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => Container(
+        padding: EdgeInsets.all(20.w),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('اختر المحور', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Colors.blue)),
+            20.verticalSpace,
+            if (units.isEmpty)
+              const Text('لا توجد محاور متاحة حالياً.')
+            else
+              Expanded(
+                child: ListView.builder(
+                  itemCount: units.length,
+                  itemBuilder: (context, i) {
+                    final unit = units[i];
+                    return ListTile(
+                      title: Text(unit.title),
+                      onTap: () async {
+                        Navigator.pop(ctx);
+                        _handleInvite(context, ref, friend, unit, course.title);
+                      },
+                    );
+                  },
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleInvite(BuildContext context, WidgetRef ref, dynamic friend, dynamic unit, String courseTitle) async {
+     try {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('جاري تجهيز التحدي وإرسال الدعوة...')));
+        
+        final matchmaking = ref.read(matchmakingServiceProvider);
+        final social = ref.read(socialRepositoryProvider);
+        
+        // 1. Create Private Match
+        final code = await matchmaking.createPrivateMatch(unit.id, courseTitle);
+        
+        // 2. Send Invitation Push
+        await social.sendChallengeInvite(
+          receiverId: friend['id'],
+          unitId: unit.id,
+          courseTitle: courseTitle,
+          invitationCode: code,
+        );
+        
+        // 3. Go to Matchmaking Screen
+        if (context.mounted) {
+           context.pushNamed(
+              AppRoutes.challengeMatchmaking.name,
+              extra: {
+                'unitId': unit.id,
+                'courseTitle': courseTitle,
+                'initialSearchMode': 'create_private',
+                'invitationCode': code,
+              },
+           );
+        }
+     } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('خطأ: $e')));
+     }
   }
 }
