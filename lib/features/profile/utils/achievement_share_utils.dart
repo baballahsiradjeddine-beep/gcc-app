@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
@@ -9,7 +8,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:tayssir/common/core/shield_badge.dart';
 import 'package:tayssir/resources/resources.dart';
 import 'package:tayssir/features/streaks/data/streak_model.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class AchievementShareUtils {
   static Future<void> shareAchievementLog(

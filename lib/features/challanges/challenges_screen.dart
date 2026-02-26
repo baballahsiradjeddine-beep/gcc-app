@@ -86,7 +86,7 @@ class ChallengesScreen extends HookConsumerWidget {
                               horizontal: 0, vertical: 10),
                           child: CardWidget(
                             title: course.title,
-                            subTitle: "تحدَّ أصدقاءك في " + course.title,
+                            subTitle: "تحدَّ أصدقاءك في ${course.title}",
                             onPressed: () {
                               final units = ref.read(dataProvider).contentData.units.where((u) => u.materialId == course.id).toList();
                               if (units.isEmpty) {

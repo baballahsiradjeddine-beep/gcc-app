@@ -26,5 +26,7 @@
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
 	<string>1:72429524357:ios:181dec0990b9fd5c65a0ec</string>
+	<key>DATABASE_URL</key>
+	<string>https://bayan-e-learning-default-rtdb.europe-west1.firebasedatabase.app</string>
 </dict>
 </plist>

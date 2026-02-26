@@ -36,7 +36,6 @@ import 'package:tayssir/features/tools/common/pdf_content_screen.dart';
 import 'package:tayssir/features/tools/resumes/resumes_screen.dart';
 import 'package:tayssir/router/app_transitions.dart';
 
-import '../common/coming_soon_screen.dart';
 import '../features/chapters/chapters_screen.dart';
 import '../features/settings/security/reset_password_screen.dart';
 import '../features/settings/settings_screen.dart';

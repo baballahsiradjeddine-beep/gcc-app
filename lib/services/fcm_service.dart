@@ -7,11 +7,16 @@ import 'package:tayssir/environment_config.dart';
 import 'package:tayssir/debug/app_logger.dart';
 import 'package:toastification/toastification.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../firebase_options.dart';
 
 // Top-level function handles background messages
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
   AppLogger.logInfo("Handling a background message: ${message.messageId}");
 }
 

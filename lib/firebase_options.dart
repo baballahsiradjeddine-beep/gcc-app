@@ -42,6 +42,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyB2EWYa2_HzPx3aM7GbSrQOqCrnf3IA4Vk',
+    databaseURL: 'https://bayan-e-learning-default-rtdb.europe-west1.firebasedatabase.app/',
     appId: '1:72429524357:web:0316f62d857a074965a0ec',
     messagingSenderId: '72429524357',
     projectId: 'bayan-e-learning',
@@ -51,6 +52,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyC3pX16S-jaD0TRJFpHXAjfyO7w0ObLnl8',
+    databaseURL: 'https://bayan-e-learning-default-rtdb.europe-west1.firebasedatabase.app/',
     appId: '1:72429524357:android:e6c9d919abdeafe965a0ec',
     messagingSenderId: '72429524357',
     projectId: 'bayan-e-learning',
@@ -59,6 +61,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBCqgm2Clq2cMNIeAeFvtu7GKupU06y3MU',
+    databaseURL: 'https://bayan-e-learning-default-rtdb.europe-west1.firebasedatabase.app/',
     appId: '1:72429524357:ios:181dec0990b9fd5c65a0ec',
     messagingSenderId: '72429524357',
     projectId: 'bayan-e-learning',
@@ -68,6 +71,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyBCqgm2Clq2cMNIeAeFvtu7GKupU06y3MU',
+    databaseURL: 'https://bayan-e-learning-default-rtdb.europe-west1.firebasedatabase.app/',
     appId: '1:72429524357:ios:181dec0990b9fd5c65a0ec',
     messagingSenderId: '72429524357',
     projectId: 'bayan-e-learning',
@@ -77,6 +81,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions windows = FirebaseOptions(
     apiKey: 'AIzaSyB2EWYa2_HzPx3aM7GbSrQOqCrnf3IA4Vk',
+    databaseURL: 'https://bayan-e-learning-default-rtdb.europe-west1.firebasedatabase.app/',
     appId: '1:72429524357:web:5e32e7e75ebc920e65a0ec',
     messagingSenderId: '72429524357',
     projectId: 'bayan-e-learning',

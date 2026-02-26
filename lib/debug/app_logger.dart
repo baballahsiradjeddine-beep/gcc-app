@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:logger/logger.dart';
 import 'package:dio/dio.dart';
-import 'package:tayssir/constants/app_consts.dart';
-import 'package:tayssir/debug/device_helper.dart';
 
 enum LogType { auth, home, chapters, tools, subscriptions }
 

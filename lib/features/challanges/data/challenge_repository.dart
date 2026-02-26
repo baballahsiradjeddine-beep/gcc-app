@@ -17,6 +17,10 @@ class ChallengeRepository {
       final response = await _dioClient.get('/v2/challenges/questions/$unitId');
       return response.data['data'] as Map<String, dynamic>;
     } catch (e) {
+      if (e is DioException) {
+        print('--- GET QUESTIONS ERROR ---');
+        print(e.response?.data);
+      }
       rethrow;
     }
   }
@@ -27,6 +31,7 @@ class ChallengeRepository {
     required int pointsGained,
   }) async {
     try {
+      print('Sending POST to /v2/challenges/result with unit_id: $unitId, points: $pointsGained');
       final response = await _dioClient.post('/v2/challenges/result', data: {
         'unit_id': unitId,
         'is_winner': isWinner,
@@ -34,6 +39,11 @@ class ChallengeRepository {
       });
       return response.data['data'] as Map<String, dynamic>;
     } catch (e) {
+      if (e is DioException) {
+        print('--- DIO ERROR 500 DETAILS ---');
+        print(e.response?.data);
+        print('-----------------------------');
+      }
       rethrow;
     }
   }
