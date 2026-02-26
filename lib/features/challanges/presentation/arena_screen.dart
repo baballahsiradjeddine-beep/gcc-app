@@ -536,8 +536,7 @@ class ArenaScreen extends HookConsumerWidget {
                     ] else ...[
                        const Text('نوع سؤال غير مدعوم في المعركة', style: TextStyle(color: Colors.red)),
                     ]
-                  ],
-                ),
+                ],
               ),
             ),
             if (!isFinished)
@@ -551,6 +550,6 @@ class ArenaScreen extends HookConsumerWidget {
           ],
         ),
       ),
-    ); // SEMICOLON ADDED HERE
+    );
   }
 }
