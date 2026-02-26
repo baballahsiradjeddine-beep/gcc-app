@@ -513,7 +513,7 @@ class ArenaScreen extends HookConsumerWidget {
                                      text: opt['text'],
                                      width: double.infinity,
                                      height: 55.h,
-                                     color: btnColor,
+                                     color: btnColor ?? AppColors.primaryColor,
                                      onPressed: () => handleAnswer(opt['is_correct'] == 1, opt['id']),
                                    ),
                                  );
