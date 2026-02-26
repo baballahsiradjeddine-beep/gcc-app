@@ -308,11 +308,14 @@ class ArenaScreen extends HookConsumerWidget {
              context.pop();
          }
       },
-      child: AppScaffold(
-        topSafeArea: true,
-        body: Stack(
-          alignment: Alignment.topCenter,
-          children: [
+      child: Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+          child: Stack(
+            alignment: Alignment.topCenter,
+            children: [
             ConfettiWidget(
               confettiController: confettiController,
               blastDirectionality: BlastDirectionality.explosive,
@@ -338,71 +341,94 @@ class ArenaScreen extends HookConsumerWidget {
                )
              ),
              
-          // Header / Scores
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Me
-              Column(
+              // Header / Scores
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      CircleAvatar(
-                         radius: 30,
-                         backgroundImage: CachedNetworkImageProvider(myData!['avatar'] ?? ''),
-                         onBackgroundImageError: (_, __) => const Icon(Icons.person),
-                      ),
-                      if (myData!['emoji'] != null && myData!['emoji'].toString().isNotEmpty)
-                        Positioned(
-                          top: -10,
-                          right: -10,
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                            child: Text(myData!['emoji'], style: TextStyle(fontSize: 20.sp)),
-                          ),
+                  // Me
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            CircleAvatar(
+                              radius: 30.r,
+                              backgroundImage: CachedNetworkImageProvider(myData!['avatar'] ?? ''),
+                              onBackgroundImageError: (_, __) => const Icon(Icons.person),
+                            ),
+                            if (myData!['emoji'] != null && myData!['emoji'].toString().isNotEmpty)
+                              Positioned(
+                                top: -10,
+                                right: -10,
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                                  child: Text(myData!['emoji'], style: TextStyle(fontSize: 20.sp)),
+                                ),
+                              ),
+                          ],
                         ),
-                    ],
+                        8.verticalSpace,
+                        Text(
+                          myData!['name'] ?? 'أنا',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(myData!['score'].toString(), style: TextStyle(color: Colors.green, fontSize: 20.sp, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
                   ),
-                  Text(myData!['name'] ?? 'أنا', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp)),
-                  Text(myData!['score'].toString(), style: TextStyle(color: Colors.green, fontSize: 20.sp, fontWeight: FontWeight.bold)),
+                  
+                  // VS
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10.w),
+                    child: Text('VS', style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold, color: Colors.pink)),
+                  ),
+                  
+                  // Opponent
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            CircleAvatar(
+                              radius: 30.r,
+                              backgroundColor: Colors.blueAccent,
+                              backgroundImage: opponentData!['avatar'] != null && opponentData!['avatar'].isNotEmpty 
+                                              ? CachedNetworkImageProvider(opponentData!['avatar']) 
+                                              : null,
+                              child: (opponentData!['avatar'] == null || opponentData!['avatar'].isEmpty) ? const Icon(Icons.android, color: Colors.white) : null,
+                            ),
+                            if (opponentData!['emoji'] != null && opponentData!['emoji'].toString().isNotEmpty)
+                              Positioned(
+                                top: -10,
+                                left: -10,
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                                  child: Text(opponentData!['emoji'], style: TextStyle(fontSize: 20.sp)),
+                                ),
+                              ),
+                          ],
+                        ),
+                        8.verticalSpace,
+                        Text(
+                          opponentData!['name'] ?? 'الخصم',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(opponentData!['score'].toString(), style: TextStyle(color: Colors.red, fontSize: 20.sp, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
                 ],
               ),
-              // VS
-              Text('VS', style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold, color: Colors.pink)),
-              // Opponent
-              Column(
-                children: [
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                       CircleAvatar(
-                         radius: 30,
-                         backgroundColor: Colors.blueAccent,
-                         backgroundImage: opponentData!['avatar'] != null && opponentData!['avatar'].isNotEmpty 
-                                          ? CachedNetworkImageProvider(opponentData!['avatar']) 
-                                          : null,
-                         child: (opponentData!['avatar'] == null || opponentData!['avatar'].isEmpty) ? const Icon(Icons.android, color: Colors.white) : null,
-                      ),
-                      if (opponentData!['emoji'] != null && opponentData!['emoji'].toString().isNotEmpty)
-                        Positioned(
-                          top: -10,
-                          left: -10,
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                            child: Text(opponentData!['emoji'], style: TextStyle(fontSize: 20.sp)),
-                          ),
-                        ),
-                    ],
-                  ),
-                  Text(opponentData!['name'] ?? 'الخصم', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp)),
-                  Text(opponentData!['score'].toString(), style: TextStyle(color: Colors.red, fontSize: 20.sp, fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ],
-          ),
           
           20.verticalSpace,
           const Divider(),
@@ -552,6 +578,8 @@ class ArenaScreen extends HookConsumerWidget {
             ),
         ],
       ),
+    ),
+  ),
     ),
     );
   }
