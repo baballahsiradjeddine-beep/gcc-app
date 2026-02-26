@@ -319,8 +319,9 @@ class ArenaScreen extends HookConsumerWidget {
               shouldLoop: false,
               colors: const [Colors.pink, Colors.blue, Colors.green, Colors.yellow, Colors.orange],
             ),
-            Column(
-            children: [
+            Positioned.fill(
+              child: Column(
+                children: [
           // Connection Warning Header
           if (!isConnected.value)
              Container(
@@ -548,10 +549,9 @@ class ArenaScreen extends HookConsumerWidget {
               ),
             ),
           ],
-            ),
-          ],
         ),
       ),
-      );
+    ),
+    );
   }
 }
