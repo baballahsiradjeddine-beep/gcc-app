@@ -547,11 +547,12 @@ class ArenaScreen extends HookConsumerWidget {
                 icon: const Icon(Icons.emoji_emotions, color: Colors.amber, size: 40),
                 onPressed: showChatSheet,
               ),
+                ],
+              ),
             ),
           ],
         ),
       ),
-    ),
     );
   }
 }
