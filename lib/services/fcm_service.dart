@@ -7,6 +7,7 @@ import 'package:tayssir/environment_config.dart';
 import 'package:tayssir/debug/app_logger.dart';
 import 'package:toastification/toastification.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tayssir/router/app_router.dart';
 import '../firebase_options.dart';
 
 // Top-level function handles background messages
@@ -46,23 +47,25 @@ class FCMService {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       AppLogger.logInfo("Message received in foreground: ${message.notification?.title}");
       if (message.notification != null) {
+        final isChallenge = message.data['type'] == 'challenge_invite';
         String? imageUrl = message.notification?.android?.imageUrl ?? message.notification?.apple?.imageUrl ?? message.data['image'];
         
         toastification.showCustom(
-          autoCloseDuration: const Duration(seconds: 6),
+          autoCloseDuration: const Duration(seconds: 10),
           alignment: Alignment.topCenter,
           builder: (BuildContext context, ToastificationItem holder) {
             return GestureDetector(
               onTap: () {
                 toastification.dismiss(holder);
+                _handleMessageNavigation(message);
               },
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE5E5E5).withOpacity(0.95), // Duolingo style transluscent/flat pill
+                  color: isChallenge ? Colors.pink[50]!.withOpacity(0.95) : const Color(0xFFE5E5E5).withOpacity(0.95),
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.black.withOpacity(0.04), width: 1),
+                  border: Border.all(color: isChallenge ? Colors.pink : Colors.black.withOpacity(0.04), width: 1.5),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.1),
@@ -72,11 +75,10 @@ class FCMService {
                   ],
                 ),
                 child: Directionality(
-                  textDirection: TextDirection.ltr, // App Logo on Left (0), Image on Right (last)
+                  textDirection: TextDirection.ltr,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // LEFT: App Logo (Tito Face)
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
@@ -90,8 +92,6 @@ class FCMService {
                         ),
                       ),
                       const SizedBox(width: 14),
-                      
-                      // MIDDLE: Title and Body (Arabic RTL)
                       Expanded(
                         child: Directionality(
                           textDirection: TextDirection.rtl,
@@ -103,7 +103,6 @@ class FCMService {
                                 message.notification!.title ?? 'إشعار جديد',
                                 style: const TextStyle(
                                   fontSize: 16,
-                                  fontFamily: 'SomarSans',
                                   fontWeight: FontWeight.w900,
                                   color: Colors.black87,
                                   height: 1.2,
@@ -116,7 +115,6 @@ class FCMService {
                                 message.notification!.body ?? '',
                                 style: const TextStyle(
                                   fontSize: 14,
-                                  fontFamily: 'SomarSans',
                                   fontWeight: FontWeight.w600,
                                   color: Colors.black54,
                                   height: 1.4,
@@ -128,18 +126,21 @@ class FCMService {
                           ),
                         ),
                       ),
-                      
-                      // RIGHT: Custom FCM Image (if provided)
-                      if (imageUrl != null) ...[
+                      if (isChallenge) ...[
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.pink, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                          onPressed: () {
+                            toastification.dismiss(holder);
+                            _handleMessageNavigation(message);
+                          },
+                          child: const Text('قبول'),
+                        ),
+                      ] else if (imageUrl != null) ...[
                         const SizedBox(width: 14),
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.network(
-                            imageUrl,
-                            width: 38,
-                            height: 38,
-                            fit: BoxFit.cover,
-                          ),
+                          child: Image.network(imageUrl, width: 38, height: 38, fit: BoxFit.cover),
                         ),
                       ],
                     ],
@@ -156,12 +157,35 @@ class FCMService {
     RemoteMessage? initialMessage = await _firebaseMessaging.getInitialMessage();
     if (initialMessage != null) {
       AppLogger.logInfo("App opened from initial message: ${initialMessage.messageId}");
+      _handleMessageNavigation(initialMessage);
     }
 
     // Handle message when app is in background but not terminated
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       AppLogger.logInfo("App opened from background via message: ${message.messageId}");
+      _handleMessageNavigation(message);
     });
+  }
+
+  static void _handleMessageNavigation(RemoteMessage message) {
+     if (message.data['type'] == 'challenge_invite') {
+        final code = message.data['invitation_code'];
+        final unitId = int.tryParse(message.data['unit_id'] ?? '0') ?? 0;
+        final courseTitle = message.data['course_title'] ?? '';
+        
+        if (code != null && rootNavigatorKey.currentContext != null) {
+            rootNavigatorKey.currentContext!.pushNamed(
+                AppRoutes.challengeMatchmaking.name,
+                extra: {
+                  'unitId': unitId,
+                  'courseTitle': courseTitle,
+                  'initialSearchMode': 'join_private',
+                  'invitationCode': code,
+                },
+            );
+        }
+     }
+  }
 
     // Get the FCM token
     syncToken();

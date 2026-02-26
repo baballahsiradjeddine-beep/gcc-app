@@ -10,6 +10,8 @@ import 'package:tayssir/common/core/app_scaffold.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';
 import 'package:tayssir/features/challanges/data/challenge_repository.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:confetti/confetti.dart';
+import 'package:lottie/lottie.dart';
 
 class ArenaScreen extends HookConsumerWidget {
   final String matchId;
@@ -34,6 +36,9 @@ class ArenaScreen extends HookConsumerWidget {
     final myEmoji = useState<String>('');
     final opponentEmoji = useState<String>('');
     final isConnected = useState<bool>(true);
+    final confettiController = useMemoized(() => ConfettiController(duration: const Duration(seconds: 5)));
+
+    useEffect(() => confettiController.dispose, []);
 
     // Network & disconnect listener
     useEffect(() {
@@ -130,6 +135,14 @@ class ArenaScreen extends HookConsumerWidget {
 
     // Check if finished
     final isFinished = currentIndex >= questions.length || data['status'] == 'finished' || isOpponentDisconnected;
+    final isWinner = (myData!['score'] ?? 0) > (opponentData!['score'] ?? 0);
+
+    useEffect(() {
+       if (isFinished && isWinner) {
+          confettiController.play();
+       }
+       return null;
+    }, [isFinished]);
 
     // Simulated Bot logic hook (only runs if it's a bot match and not finished)
     useEffect(() {
@@ -297,8 +310,17 @@ class ArenaScreen extends HookConsumerWidget {
       },
       child: AppScaffold(
         topSafeArea: true,
-        body: Column(
-        children: [
+        body: Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            ConfettiWidget(
+              confettiController: confettiController,
+              blastDirectionality: BlastDirectionality.explosive,
+              shouldLoop: false,
+              colors: const [Colors.pink, Colors.blue, Colors.green, Colors.yellow, Colors.orange],
+            ),
+            Column(
+            children: [
           // Connection Warning Header
           if (!isConnected.value)
              Container(
@@ -410,16 +432,23 @@ class ArenaScreen extends HookConsumerWidget {
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    if (isWinner || isOpponentDisconnected)
+                       Lottie.network(
+                         'https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/celebration/default/24px.svg', // Fallback or use a valid lottie
+                         width: 150.w,
+                         height: 150.h,
+                         errorBuilder: (context, error, stackTrace) => Icon(Icons.emoji_events, size: 100.sp, color: Colors.amber),
+                       ),
                     Text(
                       isOpponentDisconnected 
                         ? '🏆 المنافس هرب ولم يستطع مقاومتك! هههه 😂'
-                        : ((myData!['score'] ?? 0) > (opponentData!['score'] ?? 0) ? '🏆 لقد فزت!' : '😔 حظ أوفر المرة القادمة'),
-                      style: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.bold, color: isOpponentDisconnected ? Colors.orange : Colors.black),
+                        : (isWinner ? '🏆 لقد فزت!' : '😔 حظ أوفر المرة القادمة'),
+                      style: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.bold, color: isOpponentDisconnected ? Colors.orange : (isWinner ? Colors.green : Colors.black)),
                       textAlign: TextAlign.center,
                     ),
                     20.verticalSpace,
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.pink, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
                       onPressed: handleSubmitFinalResult,
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 15.h),
@@ -518,9 +547,10 @@ class ArenaScreen extends HookConsumerWidget {
                 onPressed: showChatSheet,
               ),
             ),
-        ],
+            ),
+          ],
+        ),
       ),
-    ),
     );
   }
 }

@@ -5,6 +5,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tayssir/common/core/app_scaffold.dart';
 import 'package:tayssir/common/app_buttons/app_button.dart';
 import 'package:tayssir/features/challanges/data/social_repository.dart';
+import 'package:tayssir/providers/data/data_provider.dart';
+import 'package:tayssir/providers/data/models/material_model.dart';
+import 'package:tayssir/features/challanges/data/matchmaking_service.dart';
+import 'package:tayssir/router/app_router.dart';
+import 'package:go_router/go_router.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class SocialScreen extends HookConsumerWidget {
   const SocialScreen({super.key});
@@ -239,22 +245,154 @@ class FriendsListTab extends HookConsumerWidget {
       );
     }
 
+    void _showInvitationSettings(BuildContext context, WidgetRef ref, dynamic friend) {
+      final courses = ref.read(dataProvider).contentData.modules;
+      
+      showModalBottomSheet(
+        context: context,
+        builder: (ctx) => Container(
+          padding: EdgeInsets.all(20.w),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('اختر المادة للتحدي ⚔️', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Colors.pink)),
+              20.verticalSpace,
+              Expanded(
+                child: ListView.builder(
+                  itemCount: courses.length,
+                  itemBuilder: (context, i) {
+                    final course = courses[i];
+                    return Card(
+                      child: ListTile(
+                        title: Text(course.title),
+                        trailing: const Icon(Icons.arrow_forward_ios),
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          _showUnitSelection(context, ref, friend, course);
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    void _showUnitSelection(BuildContext context, WidgetRef ref, dynamic friend, MaterialModel course) {
+      final units = ref.read(dataProvider).contentData.units.where((u) => u.materialId == course.id).toList();
+      
+      showModalBottomSheet(
+        context: context,
+        builder: (ctx) => Container(
+          padding: EdgeInsets.all(20.w),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('اختر المحور', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Colors.blue)),
+              20.verticalSpace,
+              if (units.isEmpty)
+                const Text('لا توجد محاور متاحة حالياً.')
+              else
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: units.length,
+                    itemBuilder: (context, i) {
+                      final unit = units[i];
+                      return ListTile(
+                        title: Text(unit.title),
+                        onTap: () async {
+                          Navigator.pop(ctx);
+                          _handleInvite(context, ref, friend, unit, course.title);
+                        },
+                      );
+                    },
+                  ),
+                ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    Future<void> _handleInvite(BuildContext context, WidgetRef ref, dynamic friend, dynamic unit, String courseTitle) async {
+       try {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('جاري تجهيز التحدي وإرسال الدعوة...')));
+          
+          final matchmaking = ref.read(matchmakingServiceProvider);
+          final social = ref.read(socialRepositoryProvider);
+          
+          // 1. Create Private Match
+          final code = await matchmaking.createPrivateMatch(unit.id, courseTitle);
+          
+          // 2. Send Invitation Push
+          await social.sendChallengeInvite(
+            receiverId: friend['id'],
+            unitId: unit.id,
+            courseTitle: courseTitle,
+            invitationCode: code, // Add this
+          );
+          
+          // 3. Go to Matchmaking Screen but in "Waiting Room" state for this specific code
+          if (context.mounted) {
+             context.pushNamed(
+                AppRoutes.challengeMatchmaking.name,
+                extra: {
+                  'unitId': unit.id,
+                  'courseTitle': courseTitle,
+                  'initialSearchMode': 'create_private',
+                  'invitationCode': code,
+                },
+             );
+          }
+       } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('خطأ: $e')));
+       }
+    }
+
     return ListView.builder(
       padding: EdgeInsets.all(16.w),
       itemCount: friends.value.length,
       itemBuilder: (context, index) {
         final friend = friends.value[index];
+        final friendId = friend['id'];
+        
         return Card(
           child: ListTile(
-            leading: CircleAvatar(backgroundImage: NetworkImage(friend['avatar_url'] ?? 'https://via.placeholder.com/150')),
+            leading: StreamBuilder(
+              stream: FirebaseDatabase.instance.ref('users/$friendId/status').onValue,
+              builder: (context, snap) {
+                final isOnline = snap.data?.snapshot.value == 'online';
+                return Stack(
+                  children: [
+                    CircleAvatar(
+                      backgroundImage: NetworkImage(friend['avatar_url'] ?? 'https://via.placeholder.com/150'),
+                    ),
+                    if (isOnline)
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: Container(
+                          width: 12,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              }
+            ),
             title: Text(friend['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
             trailing: SmallButton(
               text: 'تحدي ⚔️',
               color: Colors.blue,
-              onPressed: () {
-                // Here we could implement direct invitation
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('ميزة الدعوة المباشرة قيد التطوير')));
-              },
+              onPressed: () => _showInvitationSettings(context, ref, friend),
             ),
           ),
         );

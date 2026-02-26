@@ -98,12 +98,15 @@ enum AppRoutes {
   social,
 }
 
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   ref.onDispose(() {
     AppLogger.logDebug('disposing app router');
   });
   final routesManager = ref.watch(routesServiceProvider);
   return GoRouter(
+    navigatorKey: rootNavigatorKey,
     debugLogDiagnostics: false,
     redirect: routesManager.onRedirect,
     errorBuilder: (context, state) {
@@ -279,6 +282,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                       return MatchmakingScreen(
                         unitId: data['unitId'] as int,
                         courseTitle: data['courseTitle'] as String,
+                        initialSearchMode: data['initialSearchMode'] as String?,
+                        invitationCode: data['invitationCode'] as String?,
                       );
                     },
                     transitionType: TransitionType.sharedAxis,

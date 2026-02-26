@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tayssir/debug/app_logger.dart';
 import 'package:tayssir/providers/data/data_provider.dart';
@@ -54,6 +55,7 @@ class UserNotifier extends StateNotifier<AsyncValue<UserModel?>> {
         content: 'User made a transition to authenticated state',
       );
       state = AsyncValue.data(user);
+      _updateUserStatus(user.id, true);
     } on DioException catch (e) {
       //TODO: Enhacnce error handling here by checking the error type and defining Exceptions
       if (e.response!.isUnauthorized) {
@@ -71,7 +73,24 @@ class UserNotifier extends StateNotifier<AsyncValue<UserModel?>> {
   }
 
   void clearUser() {
+    if (state.value?.id != null) {
+      _updateUserStatus(state.value!.id, false);
+    }
     state = const AsyncValue.data(null);
+  }
+
+  void _updateUserStatus(int userId, bool isOnline) {
+    try {
+      final ref = FirebaseDatabase.instance.ref('users/$userId/status');
+      if (isOnline) {
+        ref.set('online');
+        ref.onDisconnect().set('offline');
+      } else {
+        ref.set('offline');
+      }
+    } catch (e) {
+      AppLogger.logError('Error updating player status: $e');
+    }
   }
 
   Future<void> updateUser(UpdateUserRequest userReq) async {

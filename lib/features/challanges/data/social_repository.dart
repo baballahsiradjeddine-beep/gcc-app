@@ -38,4 +38,18 @@ class SocialRepository {
     final response = await _dioClient.get('/v2/social/requests/pending');
     return response.data['data'];
   }
+
+  Future<void> sendChallengeInvite({
+    required int receiverId,
+    required int unitId,
+    required String courseTitle,
+    required String invitationCode,
+  }) async {
+    await _dioClient.post('/v2/social/challenge/invite', data: {
+      'receiver_id': receiverId,
+      'unit_id': unitId,
+      'course_title': courseTitle,
+      'invitation_code': invitationCode,
+    });
+  }
 }

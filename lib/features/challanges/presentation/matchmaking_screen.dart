@@ -15,11 +15,15 @@ import 'package:tayssir/resources/resources.dart';
 class MatchmakingScreen extends HookConsumerWidget {
   final int unitId;
   final String courseTitle;
+  final String? initialSearchMode;
+  final String? invitationCode;
 
   const MatchmakingScreen({
     super.key,
     required this.unitId,
     required this.courseTitle,
+    this.initialSearchMode,
+    this.invitationCode,
   });
 
   @override
@@ -27,8 +31,8 @@ class MatchmakingScreen extends HookConsumerWidget {
     final statusText = useState<String>('');
     final matchId = useState<String?>(null);
     final error = useState<String?>(null);
-    final searchMode = useState<String>('initial'); // initial, random, create_private, join_private
-    final privateCode = useState<String?>(null);
+    final searchMode = useState<String>(initialSearchMode ?? 'initial'); // initial, random, create_private, join_private
+    final privateCode = useState<String?>(invitationCode);
     final codeController = useTextEditingController();
 
     void goToArena(String id) {
