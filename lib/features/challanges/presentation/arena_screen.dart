@@ -130,6 +130,16 @@ class ArenaScreen extends HookConsumerWidget {
       );
     }
 
+    String? getAvatarUrl(dynamic avatar) {
+      if (avatar == null || avatar.toString().trim().isEmpty) return null;
+      final url = avatar.toString().trim();
+      if (url.startsWith('http')) return url;
+      return 'https://gcc.tayssir-bac.com/storage/${url.replaceAll(RegExp(r"^/"), "")}';
+    }
+    
+    final myAvatarUrl = getAvatarUrl(myData?['avatar']);
+    final opAvatarUrl = getAvatarUrl(opponentData?['avatar']);
+
     final isBotMatch = data['isBotMatch'] == true;
     final currentQuestion = currentIndex < questions.length ? questions[currentIndex] : null;
 
@@ -355,8 +365,10 @@ class ArenaScreen extends HookConsumerWidget {
                                 children: [
                                   CircleAvatar(
                                     radius: 30.r,
-                                    backgroundImage: CachedNetworkImageProvider(myData?['avatar'] ?? ''),
-                                    onBackgroundImageError: (_, __) => const Icon(Icons.person),
+                                    backgroundColor: Colors.blueAccent,
+                                    backgroundImage: myAvatarUrl != null ? CachedNetworkImageProvider(myAvatarUrl) : null,
+                                    onBackgroundImageError: myAvatarUrl != null ? (_, __) {} : null,
+                                    child: myAvatarUrl == null ? const Icon(Icons.person, color: Colors.white) : null,
                                   ),
                                   if (myData?['emoji']?.toString().isNotEmpty == true)
                                     Positioned(
@@ -398,10 +410,9 @@ class ArenaScreen extends HookConsumerWidget {
                                   CircleAvatar(
                                     radius: 30.r,
                                     backgroundColor: Colors.blueAccent,
-                                    backgroundImage: (opponentData?['avatar'] != null && (opponentData?['avatar'] as String).isNotEmpty) 
-                                                    ? CachedNetworkImageProvider(opponentData?['avatar']) 
-                                                    : null,
-                                    child: (opponentData?['avatar'] == null || (opponentData?['avatar'] as String).isEmpty) ? const Icon(Icons.android, color: Colors.white) : null,
+                                    backgroundImage: opAvatarUrl != null ? CachedNetworkImageProvider(opAvatarUrl) : null,
+                                    onBackgroundImageError: opAvatarUrl != null ? (_, __) {} : null,
+                                    child: opAvatarUrl == null ? const Icon(Icons.android, color: Colors.white) : null,
                                   ),
                                   if (opponentData?['emoji']?.toString().isNotEmpty == true)
                                     Positioned(
