@@ -47,7 +47,9 @@ class UserNotifier extends StateNotifier<AsyncValue<UserModel?>> {
 
   Future<void> getUser() async {
     if (state.isLoading) return;
-    state = const AsyncValue.loading();
+    if (!state.hasValue || state.value?.isEmpty == true) {
+      state = const AsyncValue.loading();
+    }
     try {
       final user = await userService.getUser();
       await AppLogger.sendLog(
