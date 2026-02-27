@@ -11,6 +11,12 @@ class BadgeModel extends Equatable {
     this.iconUrl,
   });
 
+  String? get completeIconUrl {
+    if (iconUrl == null || iconUrl!.isEmpty) return null;
+    if (iconUrl!.startsWith('http')) return iconUrl;
+    return 'https://gcc.tayssir-bac.com/storage/${iconUrl!.replaceAll(RegExp(r"^/"), "")}';
+  }
+
   factory BadgeModel.fromMap(Map<String, dynamic> map) {
     return BadgeModel(
       name: map['name'] ?? '',

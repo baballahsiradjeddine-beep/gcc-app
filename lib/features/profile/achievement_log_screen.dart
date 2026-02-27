@@ -115,7 +115,7 @@ class _AchievementLogScreenState extends ConsumerState<AchievementLogScreen> {
                       userAvatarUrl: user.completeProfilePic,
                       level: user.points,
                       rank: rank,
-                      badgeIconUrl: user.badge?.iconUrl,
+                      badgeIconUrl: user.badge?.completeIconUrl,
                       badgeColor: user.badge?.color,
                     ),
 

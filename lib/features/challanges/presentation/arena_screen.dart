@@ -101,13 +101,13 @@ class ArenaScreen extends HookConsumerWidget {
       };
     }, []);
 
-    if (matchData.value == null || myUid == null) {
+    final data = matchData.value;
+    if (data == null || myUid == null) {
       return const AppScaffold(
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
-    final data = matchData.value!;
     final players = (data['players'] as Map<dynamic, dynamic>?) ?? {};
     final questions = (data['questions'] as List<dynamic>?) ?? [];
     final currentIndex = (data['currentQuestionIndex'] as int?) ?? 0;
@@ -159,8 +159,8 @@ class ArenaScreen extends HookConsumerWidget {
               // Bot answers correctly 70% of the time
               final isCorrect = (DateTime.now().millisecond % 10) < 7;
               if (isCorrect) {
-                 final newScore = (opponentData!['score'] ?? 0) + 10;
-                 matchRef.child('players/${opponentData!['uid']}/score').set(newScore);
+                 final newScore = ((opponentData?['score'] as int?) ?? 0) + 10;
+                 matchRef.child('players/${opponentData?['uid']}/score').set(newScore);
                  // Move to next question
                  matchRef.child('currentQuestionIndex').set(currentIndex + 1);
               }
@@ -201,7 +201,7 @@ class ArenaScreen extends HookConsumerWidget {
           final snap = await matchRef.child('currentQuestionIndex').get();
           if (snap.value == currentIndex) {
              if (isCorrect) {
-                final newScore = (myData!['score'] ?? 0) + 10;
+                final newScore = ((myData?['score'] as int?) ?? 0) + 10;
                 await matchRef.child('players/$myUid/score').set(newScore);
              }
              await matchRef.child('currentQuestionIndex').set(currentIndex + 1);

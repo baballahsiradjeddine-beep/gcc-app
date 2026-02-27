@@ -135,7 +135,7 @@ class ProfileScreen extends HookConsumerWidget {
           10.verticalSpace,
           Builder(
             builder: (context) {
-              final badgeIconUrl = user.badge?.iconUrl;
+              final badgeIconUrl = user.badge?.completeIconUrl;
               final badgeColor = user.badge?.color;
               final themeColor = badgeColor != null
                   ? Color(int.parse(badgeColor.replaceAll('#', '0xFF')))

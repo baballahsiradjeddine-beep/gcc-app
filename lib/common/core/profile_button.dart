@@ -14,7 +14,7 @@ class ProfileButton extends ConsumerWidget {
     final user = ref.watch(userNotifierProvider).asData?.value;
     if (user == null) return const SizedBox.shrink();
 
-    final badgeIconUrl = user.badge?.iconUrl;
+    final badgeIconUrl = user.badge?.completeIconUrl;
     final badgeColor = user.badge?.color;
     final themeColor = badgeColor != null
         ? Color(int.parse(badgeColor.replaceAll('#', '0xFF')))

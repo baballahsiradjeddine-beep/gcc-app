@@ -59,24 +59,32 @@ class ShieldBadge extends StatelessWidget {
                 child: ClipOval(
                   child: localAvatarImage != null
                       ? Image(image: localAvatarImage!, fit: BoxFit.cover)
-                      : (userAvatarUrl != null
+                      : (userAvatarUrl != null && userAvatarUrl!.trim().isNotEmpty
                           ? CachedNetworkImage(
-                              imageUrl: userAvatarUrl!,
+                              imageUrl: userAvatarUrl!.startsWith('http') 
+                                ? userAvatarUrl! 
+                                : 'https://gcc.tayssir-bac.com/storage/${userAvatarUrl!.replaceAll(RegExp(r'^/'), '')}',
                               fit: BoxFit.cover,
+                              errorWidget: (context, url, error) => const Icon(Icons.person),
+                              placeholder: (context, url) => const CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const SizedBox.shrink()),
+                          : const Icon(Icons.person)),
                 ),
               ),
             ),
           ),
 
           // 3. Top Layer: Shield Badge PNG
-          if (badgeIconUrl != null)
+          if (badgeIconUrl != null && badgeIconUrl!.trim().isNotEmpty)
             CachedNetworkImage(
-              imageUrl: badgeIconUrl!,
+              imageUrl: badgeIconUrl!.startsWith('http') 
+                ? badgeIconUrl! 
+                : 'https://gcc.tayssir-bac.com/storage/${badgeIconUrl!.replaceAll(RegExp(r'^/'), '')}',
               width: width,
               height: height,
               fit: BoxFit.contain,
+              errorWidget: (context, url, error) => const SizedBox.shrink(),
+              placeholder: (context, url) => const SizedBox.shrink(),
             )
           else
             // Fallback Shield Paint

@@ -112,7 +112,7 @@ class _AchievementShareDesign extends StatelessWidget {
                     context,
                     user.points,
                     rank,
-                    badgeIconUrl: user.badge?.iconUrl,
+                    badgeIconUrl: user.badge?.completeIconUrl,
                     themeColor: themeColor,
                   ),
 
