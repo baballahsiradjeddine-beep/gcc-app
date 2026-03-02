@@ -95,7 +95,7 @@ final configsProvider = FutureProvider<ConfigModel>((ref) async {
 - كن مختصراً ومفيداً وشجع الطالب دائماً (برافو، راكم قدها).
 - إذا سأل عن شيء لا تعرفه، وجهه للتواصل مع الدعم الفني.
 ''',
-      titoApiKey: 'AIzaSyB5OCh3aznvxY9aAOiHA4yXSG4xvCPp0uI',
+      titoApiKey: '',
     );
   }
 });

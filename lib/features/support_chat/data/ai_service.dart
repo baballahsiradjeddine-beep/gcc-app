@@ -4,7 +4,7 @@ import 'package:tayssir/common/data/configs.dart';
 import 'package:tayssir/debug/app_logger.dart';
 
 // User should replace this with their actual API key from Google AI Studio
-const String _kGeminiApiKey = 'AIzaSyB5OCh3aznvxY9aAOiHA4yXSG4xvCPp0uI';
+const String _kGeminiApiKey = 'REPLACE_WITH_YOUR_API_KEY';
 
 final aiServiceProvider = Provider((ref) {
   final configs = ref.watch(configsProvider).valueOrNull;
