@@ -1,5 +1,6 @@
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tayssir/common/data/configs.dart';
 import 'package:tayssir/debug/app_logger.dart';
 
 // User should replace this with their actual API key from Google AI Studio

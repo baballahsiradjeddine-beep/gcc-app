@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:tayssir/common/data/configs.dart';
 import '../data/ai_service.dart';
 
 class ChatMessage {

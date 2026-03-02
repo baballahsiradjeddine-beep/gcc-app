@@ -15,6 +15,7 @@ import '../../../providers/data/data_provider.dart';
 import '../../../common/core/app_scaffold.dart';
 import '../../../router/app_router.dart';
 import '../../../common/core/custom_app_bar.dart';
+import 'package:tayssir/common/data/configs.dart';
 import 'widgets/course_widget.dart';
 import 'subscribe_section.dart';
 import 'view_style.dart';
@@ -31,6 +32,7 @@ class HomeScreen extends HookConsumerWidget {
     final List<MaterialModel> courses = List.from(dataState.contentData.modules as List<MaterialModel>);
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final onboarding = ref.watch(onboardingProvider);
+    final configs = ref.watch(configsProvider).valueOrNull;
 
     // Load data for guest using their division_id
     useEffect(() {
