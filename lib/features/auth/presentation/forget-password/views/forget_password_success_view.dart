@@ -11,7 +11,6 @@ class ForgetPasswordSuccessView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     return TayssirSuccessView(
       title: AppStrings.changingPassword,
       titoText: AppStrings.passwordChangedSuccessfully,

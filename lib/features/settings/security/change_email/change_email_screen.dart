@@ -5,7 +5,6 @@ import 'package:tayssir/features/settings/security/change_email/change_email_otp
 import 'package:tayssir/features/settings/security/change_email/change_email_success_view.dart';
 import 'package:tayssir/features/settings/security/change_email/enter_email_view.dart';
 
-
 class ChangeEmailScreen extends HookConsumerWidget {
   const ChangeEmailScreen({super.key});
 

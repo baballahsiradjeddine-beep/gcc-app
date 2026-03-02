@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:tayssir/common/core/app_scaffold.dart';
 import 'package:tayssir/common/core/shield_badge.dart';
 import 'package:tayssir/common/app_buttons/big_button.dart';
 import 'package:tayssir/common/sliver_scrolling_widget.dart';
@@ -33,14 +34,23 @@ class ProfileScreen extends HookConsumerWidget {
   });
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userNotifierProvider).requireValue!;
+    final userAsync = ref.watch(userNotifierProvider);
+    final user = userAsync.valueOrNull;
+
+    if (user == null) {
+      return const AppScaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
     final nameController = useTextEditingController(text: user.name);
     final ageController = useTextEditingController(text: user.age.toString());
     final phoneController =
         useTextEditingController(text: user.phoneNumber ?? '');
     final wilayas = ref.watch(wilayasProvider).asData?.value ?? [];
-    final wilaya = useState<Wilaya>(user.wilaya ?? wilayas.first);
+    final wilaya = useState<Wilaya>(user.wilaya ?? (wilayas.isNotEmpty ? wilayas.first : Wilaya(number: 0, name: '')));
 
     final communes = ref
             .watch(communesProvider(
@@ -55,7 +65,7 @@ class ProfileScreen extends HookConsumerWidget {
     final localImage = useState<File?>(null);
     final isShowOverlay = useState(false);
 
-    final currentUserSubscription = user.subscriptions.first;
+    final currentUserSubscription = user.subscriptions.isNotEmpty ? user.subscriptions.first : null;
 
     ref.listen<ProfileState>(profileControllerProvider, (prev, next) {
       if (next.isCompleted && !prev!.isCompleted) {
@@ -133,68 +143,70 @@ class ProfileScreen extends HookConsumerWidget {
             ],
           ),
           10.verticalSpace,
-          Builder(
-            builder: (context) {
-              final badgeIconUrl = user.badge?.completeIconUrl;
-              final badgeColor = user.badge?.color;
-              final themeColor = badgeColor != null
-                  ? Color(int.parse(badgeColor.replaceAll('#', '0xFF')))
-                  : const Color(0xFF2DD4BF);
+          Builder(builder: (context) {
+            final badgeIconUrl = user.badge?.completeIconUrl;
+            final badgeColor = user.badge?.color;
+            final themeColor = badgeColor != null
+                ? Color(int.parse(badgeColor.replaceAll('#', '0xFF')))
+                : const Color(0xFF2DD4BF);
 
-              return Stack(
-                children: [
-                  ShieldBadge(
-                    localAvatarImage: localImage.value != null ? FileImage(localImage.value!) : null,
-                    userAvatarUrl: localImage.value == null ? user.completeProfilePic : null,
-                    badgeIconUrl: badgeIconUrl,
-                    themeColor: themeColor,
-                    width: 100,
-                    height: 125,
-                    avatarPaddingTop: 25,
-                    avatarSize: 85,
+            return Stack(
+              children: [
+                ShieldBadge(
+                  localAvatarImage: localImage.value != null
+                      ? FileImage(localImage.value!)
+                      : null,
+                  userAvatarUrl:
+                      localImage.value == null ? user.completeProfilePic : null,
+                  badgeIconUrl: badgeIconUrl,
+                  themeColor: themeColor,
+                  width: 100,
+                  height: 125,
+                  avatarPaddingTop: 25,
+                  avatarSize: 85,
+                ),
+                Positioned(
+                  bottom: 10,
+                  right: 15,
+                  child: GestureDetector(
+                    onTap: () async {
+                      final resultImage = await ImagePickerService.pickImage();
+                      if (resultImage != null) {
+                        localImage.value = resultImage;
+                        isShowOverlay.value = true;
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: const BoxDecoration(
+                          color: Colors.pink,
+                          borderRadius: BorderRadius.all(Radius.circular(4))),
+                      child:
+                          const Icon(Icons.edit, color: Colors.white, size: 10),
+                    ),
                   ),
+                ),
+                if (localImage.value != null)
                   Positioned(
-                    bottom: 10,
+                    top: 5,
                     right: 15,
                     child: GestureDetector(
-                      onTap: () async {
-                        final resultImage = await ImagePickerService.pickImage();
-                        if (resultImage != null) {
-                          localImage.value = resultImage;
-                          isShowOverlay.value = true;
-                        }
+                      onTap: () {
+                        localImage.value = null;
                       },
                       child: Container(
                         padding: const EdgeInsets.all(5),
                         decoration: const BoxDecoration(
                             color: Colors.pink,
                             borderRadius: BorderRadius.all(Radius.circular(4))),
-                        child: const Icon(Icons.edit, color: Colors.white, size: 10),
+                        child: const Icon(Icons.cancel,
+                            color: Colors.white, size: 10),
                       ),
                     ),
                   ),
-                  if (localImage.value != null)
-                    Positioned(
-                      top: 5,
-                      right: 15,
-                      child: GestureDetector(
-                        onTap: () {
-                          localImage.value = null;
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(5),
-                          decoration: const BoxDecoration(
-                              color: Colors.pink,
-                              borderRadius: BorderRadius.all(Radius.circular(4))),
-                          child: const Icon(Icons.cancel,
-                              color: Colors.white, size: 10),
-                        ),
-                      ),
-                    ),
-                ],
-              );
-            }
-          ),
+              ],
+            );
+          }),
           // 10.verticalSpace,
           //iser points
           if (user.subscriptions.isNotEmpty) ...[
@@ -353,7 +365,7 @@ class ProfileScreen extends HookConsumerWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    currentUserSubscription.name,
+                                    currentUserSubscription?.name ?? 'لا يوجد اشتراك',
                                     style: TextStyle(
                                       fontSize: 10.sp,
                                       fontWeight: FontWeight.w700,
@@ -452,7 +464,7 @@ class ProfileScreen extends HookConsumerWidget {
           20.verticalSpace,
           TayssirDropDown<DivisionModel>(
             selectedItem: division.value,
-            items: ref.watch(divisionsProvider).requireValue,
+            items: ref.watch(divisionsProvider).valueOrNull ?? [],
             onChanged: (value) {
               division.value = value;
             },
@@ -466,6 +478,10 @@ class ProfileScreen extends HookConsumerWidget {
               onPressed: ref.watch(profileControllerProvider).isLoading
                   ? null
                   : () {
+                      if (commune.value == null || division.value == null) {
+                        SnackBarService.showErrorSnackBar('يرجى ملء جميع الحقول المطلوبة', context: context);
+                        return;
+                      }
                       ref
                           .read(profileControllerProvider.notifier)
                           .updateUser(UpdateUserRequest(

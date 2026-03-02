@@ -87,4 +87,10 @@ class PomodoroState {
       : 'عمل';
 
   int get sessionsLeft => totalCycles - completedSessions;
+
+  int get totalTime => isBreak
+      ? (currentCycle % cyclesBeforeLongBreak == 0
+          ? longBreakDuration
+          : shortBreakDuration)
+      : workDuration;
 }

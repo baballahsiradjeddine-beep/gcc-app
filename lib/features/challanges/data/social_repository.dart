@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tayssir/providers/dio/dio.dart';
 
@@ -13,20 +12,24 @@ class SocialRepository {
   SocialRepository(this._dioClient);
 
   Future<List<dynamic>> searchUsers(String query) async {
-    final response = await _dioClient.get('/v2/social/search', queryParameters: {'q': query});
+    final response = await _dioClient
+        .get('/v2/social/search', queryParameters: {'q': query});
     return response.data['data'];
   }
 
   Future<void> sendFriendRequest(int receiverId) async {
-    await _dioClient.post('/v2/social/requests/send', data: {'receiver_id': receiverId});
+    await _dioClient
+        .post('/v2/social/requests/send', data: {'receiver_id': receiverId});
   }
 
   Future<void> acceptFriendRequest(int requestId) async {
-    await _dioClient.post('/v2/social/requests/accept', data: {'request_id': requestId});
+    await _dioClient
+        .post('/v2/social/requests/accept', data: {'request_id': requestId});
   }
 
   Future<void> rejectFriendRequest(int requestId) async {
-    await _dioClient.post('/v2/social/requests/reject', data: {'request_id': requestId});
+    await _dioClient
+        .post('/v2/social/requests/reject', data: {'request_id': requestId});
   }
 
   Future<List<dynamic>> getFriends() async {

@@ -7,8 +7,6 @@ import 'package:tayssir/exceptions/app_exception.dart';
 import 'package:tayssir/features/auth/data/auth_repository.dart';
 import 'package:tayssir/features/settings/security/change_email/change_email_state.dart';
 
-
-
 final changeEmailControllerProvider = StateNotifierProvider.autoDispose<
     ForgetPasswordController, ChangeEmailState>((ref) {
   return ForgetPasswordController(

@@ -5,8 +5,6 @@ import 'package:equatable/equatable.dart';
 
 import '../user/wilaya_dropdown_item.dart';
 
-
-
 class DivisionModel extends Equatable implements TaysirDropdownItem {
   final int id;
   @override
@@ -18,7 +16,7 @@ class DivisionModel extends Equatable implements TaysirDropdownItem {
   });
 
   @override
-  int get number => id; 
+  int get number => id;
 
   DivisionModel copyWith({
     int? id,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tayssir/features/home/presentation/widgets/course_widget.dart';
 
 class ToolModel {
   final String name;
@@ -22,5 +21,14 @@ class ToolModel {
     required this.isLocked,
     required this.toolImage,
     this.isStartBottomColor = true,
+  });
+}
+class ToolImage {
+  final String grid;
+  final String list;
+
+  const ToolImage({
+    required this.grid,
+    required this.list,
   });
 }

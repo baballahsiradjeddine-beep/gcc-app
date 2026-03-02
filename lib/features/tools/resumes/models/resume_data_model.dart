@@ -36,7 +36,6 @@ class ResumeDataModel extends Equatable {
   List<Object?> get props => [materials, units];
 }
 
-
 // // Mock data provider for ResumeDataModel
 // final resumeDataProvider = Provider<ResumeDataModel>((ref) {
 //   return const ResumeDataModel(

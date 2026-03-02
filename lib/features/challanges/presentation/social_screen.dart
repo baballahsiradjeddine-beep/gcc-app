@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:tayssir/common/core/app_scaffold.dart';
-import 'package:tayssir/common/app_buttons/app_button.dart';
 import 'package:tayssir/features/challanges/data/social_repository.dart';
 import 'package:tayssir/providers/data/data_provider.dart';
 import 'package:tayssir/providers/data/models/material_model.dart';
 import 'package:tayssir/features/challanges/data/matchmaking_service.dart';
 import 'package:tayssir/router/app_router.dart';
 import 'package:go_router/go_router.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
+final friendsListProvider = FutureProvider<List<dynamic>>((ref) {
+  return ref.watch(socialRepositoryProvider).getFriends();
+});
+
+final pendingRequestsProvider = FutureProvider<List<dynamic>>((ref) {
+  return ref.watch(socialRepositoryProvider).getPendingRequests();
+});
 
 class SocialScreen extends HookConsumerWidget {
   const SocialScreen({super.key});
@@ -18,34 +26,70 @@ class SocialScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tabController = useTabController(initialLength: 3);
-    
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text('الأصدقاء والبحث 🤝', style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        bottom: TabBar(
-          controller: tabController,
-          labelColor: Colors.pink,
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: Colors.pink,
-          tabs: const [
-            Tab(text: 'البحث'),
-            Tab(text: 'الطلبات'),
-            Tab(text: 'أصدقائي'),
-          ],
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: const Color(0xFF0B1120),
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF0B1120),
+          elevation: 0,
+          leading: IconButton(
+            icon: CircleAvatar(
+              backgroundColor: Colors.white.withOpacity(0.05),
+              child: const Icon(Icons.arrow_back, color: Colors.white),
+            ),
+            onPressed: () => context.pop(),
+          ),
+          title: Text(
+            'الأصدقاء والبحث 🤝',
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w900,
+              fontFamily: 'SomarSans',
+              color: Colors.white,
+            ),
+          ),
+          centerTitle: true,
+          bottom: TabBar(
+            controller: tabController,
+            labelColor: const Color(0xFFEC4899),
+            unselectedLabelColor: Colors.white38,
+            indicatorColor: const Color(0xFFEC4899),
+            indicatorWeight: 3,
+            labelStyle: TextStyle(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w900,
+              fontFamily: 'SomarSans',
+            ),
+            unselectedLabelStyle: TextStyle(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'SomarSans',
+            ),
+            tabs: const [
+              Tab(text: 'البحث'),
+              Tab(text: 'الطلبات'),
+              Tab(text: 'أصدقائي'),
+            ],
+          ),
         ),
-      ),
-      body: SafeArea(
-        child: TabBarView(
-          controller: tabController,
-          children: const [
-            SearchUsersTab(),
-            PendingRequestsTab(),
-            FriendsListTab(),
-          ],
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFF0B1120), Color(0xFF0F172A)],
+            ),
+          ),
+          child: TabBarView(
+            controller: tabController,
+            children: const [
+              SearchUsersTab(),
+              PendingRequestsTab(),
+              FriendsListTab(),
+            ],
+          ),
         ),
       ),
     );
@@ -65,7 +109,8 @@ class SearchUsersTab extends HookConsumerWidget {
       if (val.length < 2) return;
       isLoading.value = true;
       try {
-        final results = await ref.read(socialRepositoryProvider).searchUsers(val);
+        final results =
+            await ref.read(socialRepositoryProvider).searchUsers(val);
         searchResults.value = results;
       } finally {
         isLoading.value = false;
@@ -79,12 +124,14 @@ class SearchUsersTab extends HookConsumerWidget {
           TextField(
             controller: searchController,
             onChanged: (val) => handleSearch(val),
+            style: const TextStyle(color: Colors.white, fontFamily: 'SomarSans'),
             decoration: InputDecoration(
               hintText: 'ابحث عن اسم زميلك...',
-              prefixIcon: const Icon(Icons.search),
-              fillColor: Colors.grey[100],
+              hintStyle: const TextStyle(color: Colors.white24, fontFamily: 'SomarSans'),
+              prefixIcon: const Icon(Icons.search, color: Color(0xFFEC4899)),
+              fillColor: const Color(0xFF1E293B),
               filled: true,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
             ),
           ),
           20.verticalSpace,
@@ -92,232 +139,191 @@ class SearchUsersTab extends HookConsumerWidget {
             const Center(child: CircularProgressIndicator())
           else
             Expanded(
-              child: ListView.builder(
-                itemCount: searchResults.value.length,
-                itemBuilder: (context, index) {
-                  final user = searchResults.value[index];
-                  return Card(
-                    margin: EdgeInsets.only(bottom: 10.h),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(user['avatar_url'] ?? 'https://via.placeholder.com/150'),
+              child: searchResults.value.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.search, size: 80.sp, color: Colors.white10),
+                          10.verticalSpace,
+                          Text("ابحث عن مستخدمين لتحديهم!", style: TextStyle(color: Colors.white24, fontSize: 14.sp, fontFamily: 'SomarSans')),
+                        ],
                       ),
-                      title: Text(user['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text(user['friendship_status'] == 'none' ? 'ليس في قائمة الأصدقاء' : user['friendship_status']),
-                      trailing: _buildActionButton(context, ref, user),
+                    )
+                  : ListView.builder(
+                      itemCount: searchResults.value.length,
+                      itemBuilder: (context, index) {
+                        final u = searchResults.value[index];
+                        return _buildUserListItem(u, ref, context, isSearch: true);
+                      },
                     ),
-                  );
-                },
-              ),
             ),
         ],
       ),
     );
   }
 
-  Widget _buildActionButton(BuildContext context, WidgetRef ref, dynamic user) {
-    if (user['friendship_status'] == 'none') {
-      return SmallButton(
-        text: 'إضافة',
-        onPressed: () async {
-          await ref.read(socialRepositoryProvider).sendFriendRequest(user['id']);
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم إرسال طلب الصداقة')));
-        },
-      );
-    } else if (user['friendship_status'] == 'pending') {
-      return Text(user['is_sender'] ? 'تم الإرسال' : 'بانتظار قبولك', style: const TextStyle(color: Colors.orange));
-    } else {
-      return const Icon(Icons.check_circle, color: Colors.green);
-    }
-  }
-}
-
-class PendingRequestsTab extends HookConsumerWidget {
-  const PendingRequestsTab({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final requests = useState<List<dynamic>>([]);
-    final isLoading = useState(true);
-
-    Future<void> fetchRequests() async {
-      isLoading.value = true;
-      try {
-        final data = await ref.read(socialRepositoryProvider).getPendingRequests();
-        requests.value = data;
-      } finally {
-        isLoading.value = false;
-      }
-    }
-
-    useEffect(() {
-      fetchRequests();
-      return null;
-    }, []);
-
-    if (isLoading.value) return const Center(child: CircularProgressIndicator());
-
-    if (requests.value.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.person_add_disabled, size: 60.sp, color: Colors.grey),
-            10.verticalSpace,
-            const Text('لا يوجد طلبات معلقة حالياً'),
-          ],
-        ),
-      );
-    }
-
-    return ListView.builder(
-      padding: EdgeInsets.all(16.w),
-      itemCount: requests.value.length,
-      itemBuilder: (context, index) {
-        final req = requests.value[index];
-        final sender = req['sender'];
-        return Card(
-          child: ListTile(
-            leading: CircleAvatar(backgroundImage: NetworkImage(sender['avatar_url'] ?? 'https://via.placeholder.com/150')),
-            title: Text(sender['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: const Text('يريد أن يصبح صديقك'),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
+  Widget _buildUserListItem(dynamic u, WidgetRef ref, BuildContext context, {bool isSearch = false, bool isPending = false, bool isFriend = false}) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.03),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: Row(
+        children: [
+          _buildHexagonAvatar(u['avatar_url'] ?? u['profile_pic']),
+          15.horizontalSpace,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                IconButton(
-                  icon: const Icon(Icons.check_circle, color: Colors.green),
-                  onPressed: () async {
-                    await ref.read(socialRepositoryProvider).acceptFriendRequest(req['id']);
-                    fetchRequests();
-                  },
+                Text(
+                  u['name'] ?? 'مستخدم',
+                  style: TextStyle(color: Colors.white, fontSize: 15.sp, fontWeight: FontWeight.w900, fontFamily: 'SomarSans'),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.cancel, color: Colors.red),
-                  onPressed: () async {
-                    await ref.read(socialRepositoryProvider).rejectFriendRequest(req['id']);
-                    fetchRequests();
-                  },
+                Text(
+                  "المستوى: ${u['points'] ?? 0}",
+                  style: TextStyle(color: Colors.white38, fontSize: 12.sp, fontFamily: 'SomarSans'),
                 ),
               ],
             ),
           ),
-        );
-      },
-    );
+          if (isSearch)
+            _buildActionBtn("إضافة", const Color(0xFF00C6E0), () async {
+              await ref.read(socialRepositoryProvider).sendFriendRequest(u['id']);
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("تم إرسال طلب الصداقة بنجاح")));
+            }),
+          if (isPending)
+            Row(
+              children: [
+                _buildActionBtn("قبول", Colors.green, () async {
+                  await ref.read(socialRepositoryProvider).acceptFriendRequest(u['id']);
+                  ref.invalidate(pendingRequestsProvider);
+                  ref.invalidate(friendsListProvider);
+                }),
+                10.horizontalSpace,
+                _buildActionBtn("حذف", Colors.redAccent, () async {
+                  await ref.read(socialRepositoryProvider).rejectFriendRequest(u['id']);
+                  ref.invalidate(pendingRequestsProvider);
+                }),
+              ],
+            ),
+          if (isFriend)
+            _buildActionBtn("تحدي ⚔️", const Color(0xFFEC4899), () {
+              _showInvitationSettings(context, ref, u);
+            }),
+        ],
+      ),
+    ).animate().fadeIn(delay: 50.ms);
   }
-}
 
-class FriendsListTab extends HookConsumerWidget {
-  const FriendsListTab({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final friends = useState<List<dynamic>>([]);
-    final isLoading = useState(true);
-
-    Future<void> fetchFriends() async {
-      isLoading.value = true;
-      try {
-        final data = await ref.read(socialRepositoryProvider).getFriends();
-        friends.value = data;
-      } finally {
-        isLoading.value = false;
-      }
-    }
-
-    useEffect(() {
-      fetchFriends();
-      return null;
-    }, []);
-
-    if (isLoading.value) return const Center(child: CircularProgressIndicator());
-
-    if (friends.value.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.people_outline, size: 60.sp, color: Colors.grey),
-            10.verticalSpace,
-            const Text('قائمة أصدقائك فارغة، ابدأ بالبحث والإضافة!'),
-          ],
+  Widget _buildHexagonAvatar(dynamic pic) {
+    return Container(
+      width: 52.w,
+      height: 58.h,
+      decoration: const ShapeDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF1CB0F6), Color(0xFF0A66C2)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
-      );
-    }
-
-    return ListView.builder(
-      padding: EdgeInsets.all(16.w),
-      itemCount: friends.value.length,
-      itemBuilder: (context, index) {
-        final friend = friends.value[index];
-        final friendId = friend['id'];
-        
-        return Card(
-          child: ListTile(
-            leading: StreamBuilder(
-              stream: FirebaseDatabase.instance.ref('users/$friendId/status').onValue,
-              builder: (context, snap) {
-                final isOnline = snap.data?.snapshot.value == 'online';
-                return Stack(
-                  children: [
-                    CircleAvatar(
-                      backgroundImage: NetworkImage(friend['avatar_url'] ?? 'https://via.placeholder.com/150'),
-                    ),
-                    if (isOnline)
-                      Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
-                          ),
-                        ),
-                      ),
-                  ],
-                );
-              }
-            ),
-            title: Text(friend['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
-            trailing: SmallButton(
-              text: 'تحدي ⚔️',
-              color: Colors.blue,
-              onPressed: () => _showInvitationSettings(context, ref, friend),
-            ),
+        shape: HexagonShapeBorder(),
+      ),
+      padding: const EdgeInsets.all(2),
+      child: Container(
+        decoration: const ShapeDecoration(
+          color: Color(0xFF1E293B),
+          shape: HexagonShapeBorder(),
+        ),
+        child: ClipPath(
+          clipper: _HexagonClipper(),
+          child: CachedNetworkImage(
+            imageUrl: _getValidUrl(pic),
+            fit: BoxFit.cover,
+            errorWidget: (c, e, s) => const Icon(Icons.person, color: Colors.white10),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
-  void _showInvitationSettings(BuildContext context, WidgetRef ref, dynamic friend) {
+  Widget _buildActionBtn(String label, Color color, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withOpacity(0.5)),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(color: color, fontSize: 12.sp, fontWeight: FontWeight.bold, fontFamily: 'SomarSans'),
+        ),
+      ),
+    );
+  }
+
+  String _getValidUrl(dynamic avatar) {
+    if (avatar == null) return '';
+    final url = avatar.toString().trim();
+    if (url.startsWith('http')) return url;
+    return 'https://gcc.tayssir-bac.com/storage/${url.replaceAll(RegExp(r"^/"), "")}';
+  }
+
+  void _showInvitationSettings(
+      BuildContext context, WidgetRef ref, dynamic friend) {
     final courses = ref.read(dataProvider).contentData.modules;
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        padding: EdgeInsets.all(20.w),
-        height: 500.h,
+        padding: EdgeInsets.all(24.w),
+        height: 600.h,
+        decoration: const BoxDecoration(
+          color: Color(0xFF0F172A),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
+          border: Border(top: BorderSide(color: Colors.white10, width: 1)),
+        ),
         child: Column(
           children: [
-            Text('اختر المادة للتحدي ⚔️', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Colors.pink)),
+            Container(width: 50.w, height: 5.h, decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(10))),
+            30.verticalSpace,
+            Text('اختر المادة للتحدي ⚔️',
+                style: TextStyle(
+                    fontSize: 22.sp,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'SomarSans',
+                    color: const Color(0xFFEC4899),
+                    shadows: [Shadow(color: const Color(0xFFEC4899).withOpacity(0.3), blurRadius: 10)])),
             20.verticalSpace,
             Expanded(
               child: ListView.builder(
                 itemCount: courses.length,
                 itemBuilder: (context, i) {
                   final course = courses[i];
-                  return Card(
+                  return Container(
+                    margin: EdgeInsets.only(bottom: 12.h),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.white.withOpacity(0.05)),
+                    ),
                     child: ListTile(
-                      title: Text(course.title),
-                      trailing: const Icon(Icons.arrow_forward_ios),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+                      title: Text(course.title,
+                          style: TextStyle(
+                              color: Colors.white, 
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16.sp,
+                              fontFamily: 'SomarSans')),
+                      trailing: const Icon(Icons.arrow_back_ios_new, color: Colors.white24, size: 18),
                       onTap: () {
                         Navigator.pop(ctx);
                         _showUnitSelection(context, ref, friend, course);
@@ -333,35 +339,66 @@ class FriendsListTab extends HookConsumerWidget {
     );
   }
 
-  void _showUnitSelection(BuildContext context, WidgetRef ref, dynamic friend, MaterialModel course) {
-    final units = ref.read(dataProvider).contentData.units.where((u) => u.materialId == course.id).toList();
-    
+  void _showUnitSelection(BuildContext context, WidgetRef ref, dynamic friend,
+      MaterialModel course) {
+    final units = ref
+        .read(dataProvider)
+        .contentData
+        .units
+        .where((u) => u.materialId == course.id)
+        .toList();
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        padding: EdgeInsets.all(20.w),
-        height: 500.h,
+        padding: EdgeInsets.all(24.w),
+        height: 600.h,
+        decoration: const BoxDecoration(
+          color: Color(0xFF0F172A),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
+          border: Border(top: BorderSide(color: Colors.white10, width: 1)),
+        ),
         child: Column(
           children: [
-            Text('اختر المحور', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Colors.blue)),
+            Container(width: 50.w, height: 5.h, decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(10))),
+            30.verticalSpace,
+            Text('اختر المحور للتحدي 🎯',
+                style: TextStyle(
+                    fontSize: 22.sp,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'SomarSans',
+                    color: const Color(0xFF00C6E0),
+                    shadows: [Shadow(color: const Color(0xFF00C6E0).withOpacity(0.3), blurRadius: 10)])),
             20.verticalSpace,
             if (units.isEmpty)
-              const Text('لا توجد محاور متاحة حالياً.')
+              Padding(
+                padding: EdgeInsets.only(top: 50.h),
+                child: Text('لا توجد محاور متاحة حالياً.', style: TextStyle(color: Colors.white38, fontFamily: 'SomarSans', fontSize: 14.sp)),
+              )
             else
               Expanded(
                 child: ListView.builder(
                   itemCount: units.length,
                   itemBuilder: (context, i) {
                     final unit = units[i];
-                    return ListTile(
-                      title: Text(unit.title),
-                      onTap: () async {
-                        Navigator.pop(ctx);
-                        _handleInvite(context, ref, friend, unit, course.title);
-                      },
+                    return Container(
+                      margin: EdgeInsets.only(bottom: 12.h),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.white.withOpacity(0.05)),
+                      ),
+                      child: ListTile(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+                        title: Text(unit.title, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16.sp, fontFamily: 'SomarSans')),
+                        trailing: const Icon(Icons.play_circle_fill, color: Color(0xFF00C6E0), size: 30),
+                        onTap: () async {
+                          Navigator.pop(ctx);
+                          _handleInvite(context, ref, friend, unit, course.title);
+                        },
+                      ),
                     );
                   },
                 ),
@@ -372,38 +409,125 @@ class FriendsListTab extends HookConsumerWidget {
     );
   }
 
-  Future<void> _handleInvite(BuildContext context, WidgetRef ref, dynamic friend, dynamic unit, String courseTitle) async {
-     try {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('جاري تجهيز التحدي وإرسال الدعوة...')));
-        
-        final matchmaking = ref.read(matchmakingServiceProvider);
-        final social = ref.read(socialRepositoryProvider);
-        
-        // 1. Create Private Match
-        final code = await matchmaking.createPrivateMatch(unit.id, courseTitle);
-        
-        // 2. Send Invitation Push
-        await social.sendChallengeInvite(
-          receiverId: friend['id'],
-          unitId: unit.id,
-          courseTitle: courseTitle,
-          invitationCode: code,
+  Future<void> _handleInvite(BuildContext context, WidgetRef ref,
+      dynamic friend, dynamic unit, String courseTitle) async {
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('جاري تجهيز التحدي وإرسال الدعوة...')));
+
+      final matchmaking = ref.read(matchmakingServiceProvider);
+      final social = ref.read(socialRepositoryProvider);
+
+      // 1. Create Private Match
+      final code = await matchmaking.createPrivateMatch(unit.id, courseTitle);
+
+      // 2. Send Invitation Push
+      await social.sendChallengeInvite(
+        receiverId: friend['id'],
+        unitId: unit.id,
+        courseTitle: courseTitle,
+        invitationCode: code,
+      );
+
+      // 3. Go to Matchmaking Screen
+      if (context.mounted) {
+        context.pushNamed(
+          AppRoutes.challengeMatchmaking.name,
+          extra: {
+            'unitId': unit.id,
+            'courseTitle': courseTitle,
+            'initialSearchMode': 'create_private',
+            'invitationCode': code,
+          },
         );
-        
-        // 3. Go to Matchmaking Screen
-        if (context.mounted) {
-           context.pushNamed(
-              AppRoutes.challengeMatchmaking.name,
-              extra: {
-                'unitId': unit.id,
-                'courseTitle': courseTitle,
-                'initialSearchMode': 'create_private',
-                'invitationCode': code,
-              },
-           );
-        }
-     } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('خطأ: $e')));
-     }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('خطأ: $e')));
+    }
   }
+}
+class PendingRequestsTab extends HookConsumerWidget {
+  const PendingRequestsTab({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final searchUsersTab = SearchUsersTab();
+    return ref.watch(pendingRequestsProvider).when(
+          data: (requests) {
+            if (requests.isEmpty) {
+              return const Center(child: Text("لا توجد طلبات معلقة 📥", style: TextStyle(color: Colors.white24, fontFamily: 'SomarSans')));
+            }
+            return ListView.builder(
+              padding: EdgeInsets.all(16.w),
+              itemCount: requests.length,
+              itemBuilder: (context, index) {
+                return searchUsersTab._buildUserListItem(requests[index]['sender'], ref, context, isPending: true);
+              },
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => Center(child: Text('Error: $err')),
+        );
+  }
+}
+
+class FriendsListTab extends HookConsumerWidget {
+  const FriendsListTab({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final searchUsersTab = SearchUsersTab();
+    return ref.watch(friendsListProvider).when(
+          data: (friends) {
+            if (friends.isEmpty) {
+              return const Center(child: Text("ابدأ بإضافة أصدقاء جدد! 👋", style: TextStyle(color: Colors.white24, fontFamily: 'SomarSans')));
+            }
+            return ListView.builder(
+              padding: EdgeInsets.all(16.w),
+              itemCount: friends.length,
+              itemBuilder: (context, index) {
+                return searchUsersTab._buildUserListItem(friends[index], ref, context, isFriend: true);
+              },
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => Center(child: Text('Error: $err')),
+        );
+  }
+}
+
+class _HexagonClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.moveTo(size.width * 0.5, 0);
+    path.lineTo(size.width, size.height * 0.25);
+    path.lineTo(size.width, size.height * 0.75);
+    path.lineTo(size.width * 0.5, size.height);
+    path.lineTo(0, size.height * 0.75);
+    path.lineTo(0, size.height * 0.25);
+    path.close();
+    return path;
+  }
+  @override bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+class HexagonShapeBorder extends ShapeBorder {
+  const HexagonShapeBorder();
+  @override EdgeInsetsGeometry get dimensions => EdgeInsets.zero;
+  @override Path getInnerPath(Rect rect, {TextDirection? textDirection}) => getOuterPath(rect, textDirection: textDirection);
+  @override Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
+    final path = Path();
+    path.moveTo(rect.center.dx, rect.top);
+    path.lineTo(rect.right, rect.top + rect.height * 0.25);
+    path.lineTo(rect.right, rect.bottom - rect.height * 0.25);
+    path.lineTo(rect.center.dx, rect.bottom);
+    path.lineTo(rect.left, rect.bottom - rect.height * 0.25);
+    path.lineTo(rect.left, rect.top + rect.height * 0.25);
+    path.close();
+    return path;
+  }
+  @override void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {}
+  @override ShapeBorder scale(double t) => this;
 }

@@ -5,7 +5,6 @@ import 'package:video_player/video_player.dart';
 
 import 'dummy_slider.dart';
 
-
 class VideoDurationSlider extends ConsumerWidget {
   const VideoDurationSlider({
     super.key,

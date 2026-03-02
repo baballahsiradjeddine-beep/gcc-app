@@ -31,7 +31,8 @@ class ChallengeRepository {
     required int pointsGained,
   }) async {
     try {
-      print('Sending POST to /v2/challenges/result with unit_id: $unitId, points: $pointsGained');
+      print(
+          'Sending POST to /v2/challenges/result with unit_id: $unitId, points: $pointsGained');
       final response = await _dioClient.post('/v2/challenges/result', data: {
         'unit_id': unitId,
         'is_winner': isWinner,

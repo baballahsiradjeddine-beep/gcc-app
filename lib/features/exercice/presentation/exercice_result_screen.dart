@@ -18,6 +18,8 @@ import '../../../providers/data/data_provider.dart';
 import '../../../resources/resources.dart';
 import '../../../router/app_router.dart';
 import 'package:tayssir/features/streaks/presentation/streak_notifier.dart';
+import 'package:tayssir/common/core/app_assets/dynamic_app_asset.dart';
+import 'package:tayssir/features/onboarding/onboarding_notifier.dart';
 import 'widgets/results/result_stats_widget.dart';
 
 class ExerciceResultScreen extends HookConsumerWidget {
@@ -30,7 +32,7 @@ class ExerciceResultScreen extends HookConsumerWidget {
     final dataState = ref.watch(dataProvider);
 
     final isComplete = exercisesState.bestProgress == 100;
-    final user = ref.watch(userNotifierProvider).requireValue!;
+    final user = ref.watch(userNotifierProvider).valueOrNull;
     final visib = dataState
         .getChapterVisibility(exercisesState.exercises.first.chapterId);
 
@@ -87,8 +89,10 @@ class ExerciceResultScreen extends HookConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 30.horizontalSpace,
-                SvgPicture.asset(
-                  exercisesState.accuracy.resultIcon(),
+                DynamicAppAsset(
+                  assetKey: exercisesState.accuracy.resultAssetKey(),
+                  fallbackAssetPath: exercisesState.accuracy.resultIcon(),
+                  type: AppAssetType.svg,
                   height: context.isSmallDevice ? 180.h : 260.h,
                 ),
               ],
@@ -137,36 +141,50 @@ class ExerciceResultScreen extends HookConsumerWidget {
                 await Future.delayed(const Duration(milliseconds: 100));
 
                 if (context.mounted) {
-                  await AppLogger.sendLog(
-                    email: user.email,
-                    content:
-                        'Finished exercise: ${dataState.getChapterById(exercisesState.exercises.first.chapterId).title} Accuracy: ${exercisesState.accuracy.toPercentage()}',
-                    type: LogType.chapters,
-                  );
-
-                  if (context.mounted) {
-                  final bool hasStudiedToday = streakState?.history
-                          .any((day) => day.isToday && day.studied) ??
-                      false;
-
-                  if (context.mounted) {
-                    if (didStreakIncrease || hasStudiedToday) {
-                      context.pushReplacementNamed(
-                        AppRoutes.streak.name,
-                        extra: {
-                          'streak': streakState!,
-                          'unitId': unitId,
-                        },
-                      );
-                    } else {
-                      context.pushReplacementNamed(
-                        AppRoutes.chapters.name,
-                        pathParameters: {
-                          'unitId': unitId.toString(),
-                        },
-                      );
+                  final chapterId = exercisesState.exercises.first.chapterId;
+                  
+                  // Special handling for the guest tutorial tour
+                  if (chapterId == -999) {
+                    // Set tour step to 99 to trigger the registration sheet on Home
+                    await ref.read(onboardingProvider.notifier).setTourStep(99);
+                    if (context.mounted) {
+                      context.goNamed(AppRoutes.home.name);
                     }
+                    return;
                   }
+
+                  if (user?.email != null) {
+                    await AppLogger.sendLog(
+                      email: user!.email,
+                      content:
+                          'Finished exercise: ${dataState.getChapterById(exercisesState.exercises.first.chapterId).title} Accuracy: ${exercisesState.accuracy.toPercentage()}',
+                      type: LogType.chapters,
+                    );
+                  }
+
+                  if (context.mounted) {
+                    final bool hasStudiedToday = streakState?.history
+                            .any((day) => day.isToday && day.studied) ??
+                        false;
+
+                    if (context.mounted) {
+                      if ((didStreakIncrease || hasStudiedToday) && streakState != null) {
+                        context.pushReplacementNamed(
+                          AppRoutes.streak.name,
+                          extra: {
+                            'streak': streakState,
+                            'unitId': unitId,
+                          },
+                        );
+                      } else {
+                        context.pushReplacementNamed(
+                          AppRoutes.chapters.name,
+                          pathParameters: {
+                            'unitId': unitId.toString(),
+                          },
+                        );
+                      }
+                    }
                   }
                 }
               },

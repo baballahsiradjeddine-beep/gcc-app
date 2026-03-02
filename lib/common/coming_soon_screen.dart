@@ -7,7 +7,6 @@ import 'package:tayssir/utils/extensions/context.dart';
 
 import '../resources/resources.dart';
 
-
 class ComingSoonScreen extends StatelessWidget {
   const ComingSoonScreen({super.key});
 

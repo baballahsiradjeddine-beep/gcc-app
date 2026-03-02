@@ -7,6 +7,7 @@ import 'package:tayssir/constants/strings.dart';
 
 import '../../common/app_buttons/big_button.dart';
 import '../../resources/resources.dart';
+import 'package:tayssir/common/core/app_assets/dynamic_app_asset.dart';
 
 class PomodoroDialogContent extends StatelessWidget {
   const PomodoroDialogContent({
@@ -29,8 +30,10 @@ class PomodoroDialogContent extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  SvgPicture.asset(
-                    SVGs.titoPomodoroDone,
+                  DynamicAppAsset(
+                    assetKey: 'tito_pomodoro_done',
+                    fallbackAssetPath: SVGs.titoPomodoroDone,
+                    type: AppAssetType.svg,
                     height: 200.h,
                   ),
                   10.verticalSpace,

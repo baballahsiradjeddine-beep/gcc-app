@@ -72,7 +72,6 @@ class SelectMultipleOptionExercise extends ExerciseModel {
       finalResult = resultAnswer.join(', ');
     }
 
-    return finalResult; 
-
+    return finalResult;
   }
 }

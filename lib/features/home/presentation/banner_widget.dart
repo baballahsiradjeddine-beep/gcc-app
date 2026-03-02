@@ -38,8 +38,8 @@ class BannerWidget extends StatelessWidget {
         }
       },
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 8.w),
-        height: 120.h,
+        margin: EdgeInsets.symmetric(horizontal: 20.w), // maintain side gap
+        height: 115.h,
         width: double.infinity,
         decoration: BoxDecoration(
           gradient: !hasImage
@@ -50,11 +50,27 @@ class BannerWidget extends StatelessWidget {
                   ],
                 )
               : null,
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(20), // Updated to match SubscribeButton
         ),
-        child: hasImage
-            ? _buildImageBanner(context)
-            : _buildGradientBanner(context),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          children: [
+            // Dot Pattern for all banners
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.2,
+                child: CustomPaint(
+                  painter: DotPatternPainter(),
+                ),
+              ),
+            ),
+            
+            if (hasImage)
+              Positioned.fill(child: _buildImageBanner(context))
+            else
+              Positioned.fill(child: _buildGradientBanner(context)),
+          ],
+        ),
       ),
     );
   }
@@ -139,4 +155,22 @@ class BannerWidget extends StatelessWidget {
             ),
     );
   }
+}
+
+class DotPatternPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = Colors.white;
+    const spacing = 18.0;
+    const radius = 1.2;
+
+    for (double x = 0; x < size.width; x += spacing) {
+      for (double y = 0; y < size.height; y += spacing) {
+        canvas.drawCircle(Offset(x, y), radius, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

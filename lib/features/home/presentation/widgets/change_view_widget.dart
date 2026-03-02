@@ -18,13 +18,15 @@ class ChangeViewWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () {
-        final email = ref.watch(userNotifierProvider).requireValue!.email;
-        AppLogger.sendLog(
-          email: email,
-          content:
-              'Change view style to ${viewStyle.value == ViewStyle.list ? 'grid' : 'list'}',
-          type: LogType.home,
-        );
+        final email = ref.watch(userNotifierProvider).valueOrNull?.email;
+        if (email != null) {
+          AppLogger.sendLog(
+            email: email,
+            content:
+                'Change view style to ${viewStyle.value == ViewStyle.list ? 'grid' : 'list'}',
+            type: LogType.home,
+          );
+        }
         viewStyle.value =
             viewStyle.value == ViewStyle.list ? ViewStyle.grid : ViewStyle.list;
       },

@@ -11,20 +11,19 @@ import 'true_false_state.dart';
 //     StateNotifierProvider.autoDispose<TrueFalseNotifier, TrueFalseState>((ref) {
 //   // final currentExercice =
 //   //     ref.watch(exercicesProvider.select((value) => value.currentExercise));
-//   return TrueFalseNotifier(ref , 
+//   return TrueFalseNotifier(ref ,
 //     currentExercice as TrueFalseExercise
 //   );
 // });
 
-final trueFalseNotifierProvider = StateNotifierProvider.family.autoDispose<TrueFalseNotifier, TrueFalseState, TrueFalseExercise>((ref, exercise) {
+final trueFalseNotifierProvider = StateNotifierProvider.family
+    .autoDispose<TrueFalseNotifier, TrueFalseState, TrueFalseExercise>(
+        (ref, exercise) {
   return TrueFalseNotifier(ref, exercise);
 });
 
-
 class TrueFalseNotifier extends StateNotifier<TrueFalseState> {
-  TrueFalseNotifier(this.ref, 
-    this.exercise
-  ) : super(TrueFalseState.initial());
+  TrueFalseNotifier(this.ref, this.exercise) : super(TrueFalseState.initial());
 
   final Ref ref;
   final TrueFalseExercise exercise;
@@ -35,6 +34,7 @@ class TrueFalseNotifier extends StateNotifier<TrueFalseState> {
   void clearSelectedAnswer() {
     state = state.clearSelectedAnswer();
   }
+
   bool _isCorrectAnswer() {
     return exercise.correctAnswer == state.selectedAnswer;
   }
@@ -43,14 +43,14 @@ class TrueFalseNotifier extends StateNotifier<TrueFalseState> {
     final isCorrect = _isCorrectAnswer();
 
     ref.read(exercicesProvider.notifier).checkAnswer(
-      context,
-      isCorrect,
-      // onSuccess: () {
-      //   clearSelectedAnswer();
-      // },
-      // onError: () {
-      //   clearSelectedAnswer();
-      // },
-    );
+          context,
+          isCorrect,
+          // onSuccess: () {
+          //   clearSelectedAnswer();
+          // },
+          // onError: () {
+          //   clearSelectedAnswer();
+          // },
+        );
   }
 }

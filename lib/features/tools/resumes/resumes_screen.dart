@@ -11,7 +11,6 @@ import 'package:tayssir/features/tools/common/data/tool_repository.dart';
 import 'package:tayssir/features/tools/resumes/models/resume_data_model.dart';
 import 'package:tayssir/router/app_router.dart';
 
-
 final resumeDataProvider = FutureProvider<ResumeDataModel>((ref) async {
   final res = await ref.watch(toolRepositoryProvider).getResumesData();
   return res;

@@ -59,14 +59,18 @@ class ShieldBadge extends StatelessWidget {
                 child: ClipOval(
                   child: localAvatarImage != null
                       ? Image(image: localAvatarImage!, fit: BoxFit.cover)
-                      : (userAvatarUrl != null && userAvatarUrl!.trim().isNotEmpty
+                      : (userAvatarUrl != null &&
+                              userAvatarUrl!.trim().isNotEmpty
                           ? CachedNetworkImage(
-                              imageUrl: userAvatarUrl!.startsWith('http') 
-                                ? userAvatarUrl! 
-                                : 'https://gcc.tayssir-bac.com/storage/${userAvatarUrl!.replaceAll(RegExp(r'^/'), '')}',
+                              imageUrl: userAvatarUrl!.startsWith('http')
+                                  ? userAvatarUrl!
+                                  : 'https://gcc.tayssir-bac.com/storage/${userAvatarUrl!.replaceAll(RegExp(r'^/'), '')}',
                               fit: BoxFit.cover,
-                              errorWidget: (context, url, error) => const Icon(Icons.person),
-                              placeholder: (context, url) => const CircularProgressIndicator(strokeWidth: 2),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.person),
+                              placeholder: (context, url) =>
+                                  const CircularProgressIndicator(
+                                      strokeWidth: 2),
                             )
                           : const Icon(Icons.person)),
                 ),
@@ -77,9 +81,9 @@ class ShieldBadge extends StatelessWidget {
           // 3. Top Layer: Shield Badge PNG
           if (badgeIconUrl != null && badgeIconUrl!.trim().isNotEmpty)
             CachedNetworkImage(
-              imageUrl: badgeIconUrl!.startsWith('http') 
-                ? badgeIconUrl! 
-                : 'https://gcc.tayssir-bac.com/storage/${badgeIconUrl!.replaceAll(RegExp(r'^/'), '')}',
+              imageUrl: badgeIconUrl!.startsWith('http')
+                  ? badgeIconUrl!
+                  : 'https://gcc.tayssir-bac.com/storage/${badgeIconUrl!.replaceAll(RegExp(r'^/'), '')}',
               width: width,
               height: height,
               fit: BoxFit.contain,
@@ -104,20 +108,20 @@ class _ShieldClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
-    // This is strictly an "underlay" clip path for the background color. 
-    // It is narrowed at the top (0.25 to 0.75) and starts lower (0.18) 
+    // This is strictly an "underlay" clip path for the background color.
+    // It is narrowed at the top (0.25 to 0.75) and starts lower (0.18)
     // to guarantee it hides perfectly beneath the shield's curved top/shoulders.
-    path.moveTo(size.width * 0.25, size.height * 0.18);
-    path.quadraticBezierTo(
-        size.width * 0.5, size.height * 0.15, size.width * 0.75, size.height * 0.18);
-    
+    path.moveTo(size.width * 0.3, size.height * 0.27);
+    path.quadraticBezierTo(size.width * 0.5, size.height * 0.24,
+        size.width * 0.7, size.height * 0.27);
+
     // Spreads outwards to safely cover the full width of the circular avatar hole
     path.lineTo(size.width * 0.86, size.height * 0.60);
-    
-    // Curves to fill the bottom, staying safely above the pointy tip to avoid leaking 
-    path.quadraticBezierTo(
-        size.width * 0.5, size.height * 0.95, size.width * 0.14, size.height * 0.60);
-    
+
+    // Curves to fill the bottom, staying safely above the pointy tip to avoid leaking
+    path.quadraticBezierTo(size.width * 0.5, size.height * 0.95,
+        size.width * 0.14, size.height * 0.60);
+
     path.close();
     return path;
   }
@@ -143,11 +147,11 @@ class _ShieldPainter extends CustomPainter {
     // The original beautiful shield curve perfectly restored for the fallback
     final path = Path();
     path.moveTo(size.width * 0.15, size.height * 0.08);
-    path.quadraticBezierTo(
-        size.width * 0.5, size.height * 0.03, size.width * 0.85, size.height * 0.08);
+    path.quadraticBezierTo(size.width * 0.5, size.height * 0.03,
+        size.width * 0.85, size.height * 0.08);
     path.lineTo(size.width * 0.92, size.height * 0.7);
-    path.quadraticBezierTo(
-        size.width * 0.5, size.height * 0.98, size.width * 0.08, size.height * 0.7);
+    path.quadraticBezierTo(size.width * 0.5, size.height * 0.98,
+        size.width * 0.08, size.height * 0.7);
     path.close();
 
     canvas.drawPath(path, paint);

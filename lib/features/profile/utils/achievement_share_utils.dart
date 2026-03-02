@@ -200,59 +200,58 @@ class _AchievementShareDesign extends StatelessWidget {
           // Level Number (Custom Styled Dynamic Number)
           Positioned(
             bottom: 18,
-            child: Builder(
-              builder: (context) {
-                final shadowColor = Color.alphaBlend(Colors.black.withValues(alpha: 0.25), themeColor);
-                final textStyle = GoogleFonts.balooDa2(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                );
-                final pointsStr = points.toString();
+            child: Builder(builder: (context) {
+              final shadowColor = Color.alphaBlend(
+                  Colors.black.withValues(alpha: 0.25), themeColor);
+              final textStyle = GoogleFonts.balooDa2(
+                fontSize: 28,
+                fontWeight: FontWeight.w900,
+              );
+              final pointsStr = points.toString();
 
-                return Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Bottom Shadow Layer (3D effect)
-                    Text(
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Bottom Shadow Layer (3D effect)
+                  Text(
+                    pointsStr,
+                    style: textStyle.copyWith(
+                      foreground: Paint()
+                        ..style = PaintingStyle.stroke
+                        ..strokeWidth = 6,
+                      color: shadowColor,
+                    ),
+                  ),
+                  // Offset Shadow
+                  Transform.translate(
+                    offset: const Offset(0, 2),
+                    child: Text(
                       pointsStr,
                       style: textStyle.copyWith(
-                        foreground: Paint()
-                          ..style = PaintingStyle.stroke
-                          ..strokeWidth = 6,
-                          color: shadowColor,
+                        color: shadowColor,
                       ),
                     ),
-                    // Offset Shadow
-                    Transform.translate(
-                      offset: const Offset(0, 2),
-                      child: Text(
-                        pointsStr,
-                        style: textStyle.copyWith(
-                          color: shadowColor,
-                        ),
-                      ),
+                  ),
+                  // Stroke Layer
+                  Text(
+                    pointsStr,
+                    style: textStyle.copyWith(
+                      foreground: Paint()
+                        ..style = PaintingStyle.stroke
+                        ..strokeWidth = 4
+                        ..color = themeColor,
                     ),
-                    // Stroke Layer
-                    Text(
-                      pointsStr,
-                      style: textStyle.copyWith(
-                        foreground: Paint()
-                          ..style = PaintingStyle.stroke
-                          ..strokeWidth = 4
-                          ..color = themeColor,
-                      ),
+                  ),
+                  // Fill Layer (Top)
+                  Text(
+                    pointsStr,
+                    style: textStyle.copyWith(
+                      color: const Color(0xFFFBF0FC),
                     ),
-                    // Fill Layer (Top)
-                    Text(
-                      pointsStr,
-                      style: textStyle.copyWith(
-                        color: const Color(0xFFFBF0FC),
-                      ),
-                    ),
-                  ],
-                );
-              }
-            ),
+                  ),
+                ],
+              );
+            }),
           ),
         ],
       ),
@@ -272,7 +271,8 @@ class _AchievementShareDesign extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: themeColor.withValues(alpha: 0.5), width: 1.0),
+        border:
+            Border.all(color: themeColor.withValues(alpha: 0.5), width: 1.0),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

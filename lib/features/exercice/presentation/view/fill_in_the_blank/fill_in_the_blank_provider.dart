@@ -22,8 +22,7 @@ class FillInTheBlankNotifier extends StateNotifier<FillInTheBlankState> {
 
     if (blankIndex != -1 && !state.isWordSelected(wordIndex)) {
       //todo FITB
-      currentFilledBlanks[blankIndex] =
-          state.exercise.suggestions[wordIndex];
+      currentFilledBlanks[blankIndex] = state.exercise.suggestions[wordIndex];
       currentWordSelectionState[wordIndex] = true;
       state = state.copyWith(
         filledBlanks: currentFilledBlanks,

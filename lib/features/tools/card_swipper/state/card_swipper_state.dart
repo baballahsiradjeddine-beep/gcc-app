@@ -1,4 +1,3 @@
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
@@ -126,6 +125,5 @@ class CardSwipperState extends Equatable {
         cardController,
         allCategories,
         allCards,
-        
       ];
 }

@@ -19,31 +19,31 @@ class GoogleSignInWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final googleSignIn = ref.watch(googleSignInProvider);
     if (!googleSignIn.supportsAuthenticate()) return const SizedBox.shrink();
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: 0.h),
-      child: SizedBox(
-        width: double.infinity,
-        child: ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
-            padding: EdgeInsets.symmetric(vertical: 14.h),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.r),
-              side: BorderSide(color: Colors.grey.shade300),
-            ),
-            elevation: 0,
+    return Container(
+      width: double.infinity,
+      height: 56.h,
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-          icon: SvgPicture.asset(
-            SVGs.icGoogle,
-            height: 24.h,
-          ),
-          label: Text(
-            'تسجيل الدخول باستخدام جوجل',
-            style: TextStyle(fontSize: 16.sp),
-          ),
-          onPressed: () async {
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20.r),
+          onTap: () async {
             final res = await googleSignIn.authenticate();
             if (isLogin) {
               ref.read(loginControllerProvider.notifier).loginWithGoogle(
@@ -57,6 +57,25 @@ class GoogleSignInWidget extends ConsumerWidget {
                   );
             }
           },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+               SvgPicture.asset(
+                SVGs.icGoogle,
+                height: 24.h,
+              ),
+              12.horizontalSpace,
+              Text(
+                'المتابعة باستخدام Google',
+                style: TextStyle(
+                  color: isDark ? Colors.white : const Color(0xFF334155),
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'SomarSans',
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

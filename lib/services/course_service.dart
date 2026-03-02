@@ -32,13 +32,13 @@ class DataService {
   final List<ChapterModel> chapters = [];
   final List<ExerciseModel> exercises = [];
 
-  Future<void> getCourses() async {
-    await fetchCourses();
+  Future<void> getCourses({int? divisionId}) async {
+    await fetchCourses(divisionId: divisionId);
   }
 
   //fetch courses
-  Future<void> fetchCourses() async {
-    final response = await _coursesRepository.getCourses();
+  Future<void> fetchCourses({int? divisionId}) async {
+    final response = await _coursesRepository.getCourses(divisionId: divisionId);
     clearData();
     modules.addAll(response.modules);
     units.addAll(response.units);

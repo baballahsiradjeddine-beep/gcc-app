@@ -17,8 +17,10 @@ class ResumeMaterialModel extends Equatable {
       id: json['id'] as int,
       name: json['name'] as String,
       colors: (json['colors'] as List<dynamic>?)
-          ?.map((e) => Color(int.parse((e as String).replaceFirst('#', ''), radix: 16) + 0xFF000000))
-          .toList() ??
+              ?.map((e) => Color(
+                  int.parse((e as String).replaceFirst('#', ''), radix: 16) +
+                      0xFF000000))
+              .toList() ??
           [],
     );
   }

@@ -8,6 +8,7 @@ import 'package:tayssir/common/core/app_scaffold.dart';
 import 'package:tayssir/common/core/custom_app_bar.dart';
 import 'package:tayssir/debug/app_logger.dart';
 import 'package:tayssir/features/chapters/widgets/custom_lesson_widget.dart';
+import 'package:tayssir/features/support_chat/presentation/tito_support_fab.dart';
 import 'package:tayssir/features/home/presentation/subscribe_section.dart';
 import 'package:tayssir/features/units/empty_content_widget.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';
@@ -26,8 +27,13 @@ class ChaptersScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userNotifierProvider).valueOrNull;
+    final isSub = user?.isSub ?? false;
     final state = ref.watch(dataProvider);
     final chapters = state.getChaptersByUnitId(unitId);
+    final unit = state.getUnitById(unitId);
+    final material = state.getMaterialById(unit.materialId);
+
     const publicLessonKey = 'الدروس';
 
     if (chapters.isEmpty) {
@@ -35,21 +41,26 @@ class ChaptersScreen extends HookConsumerWidget {
         message: 'سيتم اضافة فصول  قريبا',
       );
     }
-
+    
+    // ... groupChapters and isUniqueChapter logic ...
     Map<String, List<ChapterModel>> groupChapters(List<ChapterModel> chapters) {
       final Map<String, List<ChapterModel>> groupedChapters = {};
-      int uniqueCounter = 0;
+      String? lastDescription;
+      int groupCounter = 0;
 
       for (final chapter in chapters) {
-        if (chapter.description == null || chapter.description!.isEmpty) {
-          final uniqueKey = 'unique_chapter_${uniqueCounter++}';
-          groupedChapters[uniqueKey] = [chapter];
+        final currentDescription = (chapter.description == null || chapter.description!.isEmpty) 
+            ? null 
+            : chapter.description;
+        
+        // If the description changes (or becomes null/not null), start a new group
+        if (currentDescription != lastDescription || groupedChapters.isEmpty) {
+          final groupKey = currentDescription ?? 'default_group_${groupCounter++}';
+          groupedChapters[groupKey] = [chapter];
+          lastDescription = currentDescription;
         } else {
-          final description = chapter.description!;
-          if (!groupedChapters.containsKey(description)) {
-            groupedChapters[description] = [];
-          }
-          groupedChapters[description]!.add(chapter);
+          // Add to the last group
+          groupedChapters[groupedChapters.keys.last]!.add(chapter);
         }
       }
 
@@ -57,7 +68,7 @@ class ChaptersScreen extends HookConsumerWidget {
     }
 
     bool isUniqueChapter(String groupTitle) {
-      return groupTitle.startsWith('unique_chapter_');
+      return groupTitle.startsWith('default_group_');
     }
 
     final groupedChapters = groupChapters(chapters);
@@ -68,246 +79,214 @@ class ChaptersScreen extends HookConsumerWidget {
       return null;
     }, []);
 
+    final scrollOffset = useState<double>(0.0);
+
     return AppScaffold(
         paddingB: 0,
         paddingX: 0,
-        // paddingY: 0,
         swipeBackEnabled: true,
         topSafeArea: false,
-        appBar: Padding(
-          padding: EdgeInsets.only(top: 20.h, left: 20.w, right: 20.w),
-          child: const CustomAppBar(),
+        floatingActionButton: Padding(
+          padding: EdgeInsets.only(bottom: 90.h),
+          child: const TitoSupportFab(),
         ),
-        body: ShowCaseWidget(builder: (context) {
-          // handleStartigTutorial(context);
-          return Showcase(
-            key: tutorialKey,
-            description: 'هنا يمكنك مشاهدة الفصول الخاصة بك',
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const SubscribeSection(),
-                20.verticalSpace,
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  child: TayssirProgressWidget(
-                    name:
-                        ref.watch(dataProvider).getUnitById(unitId).description,
-                    progress:
-                        ref.watch(dataProvider).getUnitById(unitId).progress,
-                    upperText:
-                        ref.watch(dataProvider).getUnitById(unitId).title,
-                    direction: ref.watch(dataProvider).getUnitDirection(unitId),
+        appBar: Padding(
+          padding: EdgeInsets.only(left: 20.w, right: 20.w, top: 8.h, bottom: 16.h),
+          child: const CustomAppBar(reverse: true),
+        ),
+        body: Column(
+          children: [
+            // Fixed top section with dynamic shadow based on scroll
+            Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: scrollOffset.value > 10 ? 0.08 : 0),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
-                ),
-                10.verticalSpace,
-                Directionality(
-                  textDirection:
-                      ref.watch(dataProvider).getUnitDirection(unitId),
-                  child: Expanded(
-                    child: ListView.builder(
-                      itemCount: groupedChapters.length,
-                      shrinkWrap: true,
-                      padding: EdgeInsets.zero,
-                      itemBuilder: (context, index) {
-                        final groupTitle =
-                            groupedChapters.keys.elementAt(index);
-                        final chaptersInGroup = groupedChapters[groupTitle]!;
-
-                        return Padding(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 2.h,
-                            horizontal: 20.w,
+                ],
+              ),
+              child: const SubscribeSection(),
+            ),
+            Expanded(
+              child: Stack(
+                children: [
+                  NotificationListener<ScrollNotification>(
+                    onNotification: (notification) {
+                      if (notification is ScrollUpdateNotification) {
+                        scrollOffset.value = notification.metrics.pixels;
+                      }
+                      return true;
+                    },
+                    child: CustomScrollView(
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.only(left: 20.w, right: 20.w, top: 20.h, bottom: 2.h),
+                            child: TayssirProgressWidget(
+                              name: unit.description,
+                              progress: unit.progress,
+                              upperText: unit.title,
+                              direction: state.getUnitDirection(unitId),
+                              startColor: _hexToColor(material.gradiantColorStart),
+                              endColor: _hexToColor(material.gradiantColorEnd),
+                              imageUrl: material.imageList,
+                            ),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // groupTitle != publicLessonKey
-                              isUniqueChapter(groupTitle)
-                                  ? chapters.indexOf(chaptersInGroup.first) == 0
-                                      ? const SizedBox(
-                                          height: 15,
-                                        )
-                                      : Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 15),
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: Container(
-                                                  height: 2,
-                                                  color: state.isLockedChapter(
-                                                          unitId,
-                                                          chaptersInGroup
-                                                              .first.id,
-                                                          ref
-                                                              .watch(
-                                                                  userNotifierProvider)
-                                                              .requireValue!
-                                                              .isSub)
-                                                      ? const Color(
-                                                          0xFFD3D3D3) // Grey if locked
-                                                      : const Color(
-                                                          0xffFF41AA), // Pink if unlocked
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                  : Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 15),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: Container(
-                                              height: 2,
-                                              color: state.isLockedChapter(
-                                                      unitId,
-                                                      chaptersInGroup.first.id,
-                                                      ref
-                                                          .watch(
-                                                              userNotifierProvider)
-                                                          .requireValue!
-                                                          .isSub)
-                                                  ? const Color(
-                                                      0xFFD3D3D3) // Grey if locked
-                                                  : const Color(
-                                                      0xffFF41AA), // Pink if unlocked
-                                            ),
-                                          ),
-                                          10.horizontalSpace,
-                                          Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 10.w),
-                                            child: Text(
-                                              groupTitle,
-                                              textAlign: TextAlign.center,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyMedium!
-                                                  .copyWith(
-                                                    color: state.isLockedChapter(
-                                                            unitId,
-                                                            chaptersInGroup
-                                                                .first.id,
-                                                            ref
-                                                                .watch(
-                                                                    userNotifierProvider)
-                                                                .requireValue!
-                                                                .isSub)
-                                                        ? const Color(
-                                                            0xFF909090)
-                                                        : const Color(
-                                                            0xff012246),
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                            ),
-                                          ),
-                                          10.horizontalSpace,
-                                          Expanded(
-                                            child: Container(
-                                              height: 2,
-                                              color: state.isLockedChapter(
-                                                      unitId,
-                                                      chaptersInGroup.first.id,
-                                                      ref
-                                                          .watch(
-                                                              userNotifierProvider)
-                                                          .requireValue!
-                                                          .isSub)
-                                                  ? const Color(
-                                                      0xFFD3D3D3) // Grey if locked
-                                                  : const Color(
-                                                      0xffFF41AA), // Pink if unlocked
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                              // 10.verticalSpace,
-                              ...chaptersInGroup.map((chapter) {
-                                // Create a unique key for each chapter
-                                final GlobalKey showcaseKey = GlobalKey();
-                                final isPro =
-                                    state.isPremiumChapter(chapter.id);
+                        ),
+                        SliverPadding(
+                          padding: EdgeInsets.symmetric(horizontal: 20.w),
+                          sliver: SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) {
+                                final groupTitle = groupedChapters.keys.elementAt(index);
+                                final chaptersInGroup = groupedChapters[groupTitle]!;
 
-                                return ShowCaseWidget(
-                                  builder: (ctx) => Showcase(
-                                    key: showcaseKey,
-                                    description: chapter.title,
-                                    child: CustomLessonWidget(
-                                      onPressed: isPro &&
-                                              !ref
-                                                  .watch(userNotifierProvider)
-                                                  .requireValue!
-                                                  .isSub
-                                          ? () {
-                                              DialogService
-                                                  .showNeedSubscriptionDialog(
-                                                      context);
-                                            }
-                                          : state.isLockedChapter(
-                                                  unitId,
-                                                  chapter.id,
-                                                  ref
-                                                      .watch(
-                                                          userNotifierProvider)
-                                                      .requireValue!
-                                                      .isSub)
-                                              ? null
-                                              : () {
-                                                  // ShowCaseWidget.of(context)
-                                                  //     .startShowCase([showcaseKey]);
-                                                  // return;
-
-                                                  AppLogger.sendLog(
-                                                    email: ref
-                                                        .watch(
-                                                            userNotifierProvider)
-                                                        .requireValue!
-                                                        .email,
-                                                    content:
-                                                        'Opened chapter: ${chapter.title}',
-                                                    type: LogType.chapters,
-                                                  );
-                                                  ref
-                                                          .read(
-                                                              currentChapterIdProvider
-                                                                  .notifier)
-                                                          .state =
-                                                      int.parse(chapter.id
-                                                          .toString());
-                                                  //here im doing something realy bad and i need to review this , becayse i dont like push replacement and i want to use pop mechanism
-                                                  context.pushReplacementNamed(
-                                                    AppRoutes.exercices.name,
-                                                  );
-                                                },
-                                      progress: chapter.progress,
-                                      imageUrl: chapter.image,
-                                      title: chapter.title,
-                                      isCurrent: state.isCurrentCHapter(
-                                          chapter.id,
-                                          unitId,
-                                          ref
-                                              .watch(userNotifierProvider)
-                                              .requireValue!
-                                              .isSub),
-                                      isPremium: isPro,
-                                    ),
-                                  ),
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    isUniqueChapter(groupTitle)
+                                        ? index == 0
+                                            ? const SizedBox(height: 0)
+                                            : _buildDivider(state, unitId, chaptersInGroup.first.id, isSub)
+                                        : _buildGroupHeader(context, state, unitId, chaptersInGroup.first.id, groupTitle, isSub),
+                                    
+                                    ...chaptersInGroup.map((chapter) {
+                                      final isPro = state.isPremiumChapter(chapter.id);
+                                      return CustomLessonWidget(
+                                        onPressed: isPro && !isSub
+                                            ? () => DialogService.showNeedSubscriptionDialog(context)
+                                            : state.isLockedChapter(unitId, chapter.id, isSub)
+                                                ? null
+                                                : () {
+                                                    if (user?.email != null) {
+                                                      AppLogger.sendLog(
+                                                        email: user!.email,
+                                                        content: 'Opened chapter: ${chapter.title}',
+                                                        type: LogType.chapters,
+                                                      );
+                                                    }
+                                                    ref.read(currentChapterIdProvider.notifier).state = chapter.id;
+                                                    context.pushReplacementNamed(AppRoutes.exercices.name);
+                                                  },
+                                        progress: chapter.progress,
+                                        imageUrl: chapter.image,
+                                        title: chapter.title,
+                                        isCurrent: state.isCurrentCHapter(chapter.id, unitId, isSub),
+                                        isPremium: isPro,
+                                      );
+                                    }),
+                                  ],
                                 );
-                              }),
-                            ],
+                              },
+                              childCount: groupedChapters.length,
+                            ),
                           ),
-                        );
-                      },
+                        ),
+                        SliverToBoxAdapter(child: 100.verticalSpace),
+                      ],
                     ),
                   ),
-                )
-              ],
+                  // Top fade effect that matches the current theme background
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 25.h,
+                    child: IgnorePointer(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Theme.of(context).scaffoldBackgroundColor,
+                              Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          );
-        }));
+          ],
+        ));
+  }
+
+  Widget _buildDivider(dynamic state, int unitId, int chapterId, bool isSub) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              height: 3,
+              decoration: BoxDecoration(
+                gradient: state.isLockedChapter(unitId, chapterId, isSub)
+                    ? null
+                    : const LinearGradient(
+                        colors: [Colors.transparent, Color(0xffEC4899)],
+                      ),
+                color: state.isLockedChapter(unitId, chapterId, isSub) ? const Color(0xFFD3D3D3) : null,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGroupHeader(BuildContext context, dynamic state, int unitId, int chapterId, String groupTitle, bool isSub) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Row(
+        children: [
+          Expanded(child: _gradientLine(true)),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12.w),
+            child: Text(
+              groupTitle,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: state.isLockedChapter(unitId, chapterId, isSub)
+                    ? const Color(0xFF909090)
+                    : Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xff1E293B),
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w900,
+                fontFamily: 'SomarSans',
+              ),
+            ),
+          ),
+          Expanded(child: _gradientLine(false)),
+        ],
+      ),
+    );
+  }
+
+  Widget _gradientLine(bool reverse) {
+    return Container(
+      height: 3,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: reverse 
+            ? [Colors.transparent, const Color(0xffEC4899).withOpacity(0.6)]
+            : [const Color(0xffEC4899).withOpacity(0.6), Colors.transparent],
+        ),
+        borderRadius: BorderRadius.circular(10),
+      ),
+    );
+  }
+
+  Color _hexToColor(String hex) {
+    hex = hex.replaceAll('#', '');
+    if (hex.length == 6) {
+      hex = 'FF$hex';
+    }
+    return Color(int.parse(hex, radix: 16));
   }
 }

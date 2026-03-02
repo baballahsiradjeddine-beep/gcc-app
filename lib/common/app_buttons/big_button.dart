@@ -1,96 +1,154 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:tayssir/common/push_buttons/pushable_button.dart';
 import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
 import 'package:tayssir/resources/colors/app_colors.dart';
 
-enum ButtonType { primary, secondary }
-
-extension ButtonX on ButtonType {
-  List<Color> get colors {
-    switch (this) {
-      case ButtonType.primary:
-        return const [
-          Color(0xff00C9FF),
-          Color(0xff00A7FA),
-        ];
-      case ButtonType.secondary:
-        return const [Color(0xffECF6FF)];
-    }
-  }
-
-  Color get textColor {
-    switch (this) {
-      case ButtonType.primary:
-        return Colors.white;
-      case ButtonType.secondary:
-        return const Color(0xff00A7FA);
-    }
-  }
-}
+enum ButtonType { primary, secondary, outline }
 
 class BigButton extends HookConsumerWidget {
-  const BigButton(
-      {super.key,
-      this.onPressed,
-      required this.text,
-      this.hasBorder = true,
-      this.buttonType = ButtonType.primary});
+  const BigButton({
+    super.key,
+    this.onPressed,
+    required this.text,
+    this.buttonType = ButtonType.primary,
+    this.width,
+    this.height,
+    this.hasBorder = true,
+  });
 
   final Function()? onPressed;
   final String text;
   final ButtonType buttonType;
+  final double? width;
+  final double? height;
   final bool hasBorder;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isActive = onPressed != null;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final bool isActive = onPressed != null;
 
-    return PushableButton(
-        height: 40.h,
-        elevation: 4,
-        hslColor: HSLColor.fromColor(buttonType.colors.first),
-        gradiantColors: buttonType.colors,
-        hslDisabledColor: HSLColor.fromColor(const Color(0xffEEEEEE)),
-        onPressed: onPressed == null
-            ? null
-            : () {
-                ref.read(specialEffectServiceProvider).playEffects();
-                onPressed!();
-              },
-        hasBorder: onPressed == null,
-        borderRadius: 30,
-        shadows: const [
-          // BoxShadow(
-          //   color: Colors.black.withValues(alpha:0.3),
-          //   // blurRadius: 10,
-          //   offset: const Offset(
-          //     0,
-          //     4,
-          //   ),
-          // ),
-          // BoxShadow(
-          //   color: buttonType.colors.first,
-          //   blurRadius: 10,
-          //   spreadRadius: 1,
-          //   offset: const Offset(
-          //     0,
-          //     4,
-          //   ),
-          // )
-        ],
-        child: Center(
-          child: Text(
-            text,
-            style: TextStyle(
-              color:
-                  isActive ? buttonType.textColor : AppColors.disabledTextColor,
-              fontSize: 18,
-              decoration: TextDecoration.none,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'SomarSans',
+    Decoration decoration;
+    TextStyle textStyle;
+
+    switch (buttonType) {
+      case ButtonType.primary:
+        decoration = BoxDecoration(
+          gradient: AppColors.primaryGradient,
+          borderRadius: BorderRadius.circular(20.r), // 1.25rem
+          boxShadow: [
+            if (isActive)
+              BoxShadow(
+                color: AppColors.primaryColor.withOpacity(0.4),
+                blurRadius: 20,
+                offset: const Offset(0, 4),
+              ),
+          ],
+        );
+        textStyle = TextStyle(
+          color: Colors.white,
+          fontSize: 18.sp,
+          fontWeight: FontWeight.w900,
+          fontFamily: 'SomarSans',
+        );
+        break;
+      case ButtonType.secondary:
+        decoration = BoxDecoration(
+          color: isDark 
+              ? AppColors.primaryColor.withOpacity(0.1) 
+              : AppColors.primaryColor.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(20.r),
+          border: Border.all(
+            color: AppColors.primaryColor.withOpacity(0.2),
+          ),
+          boxShadow: [
+            if (isActive)
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+          ],
+        );
+        textStyle = TextStyle(
+          color: isDark ? AppColors.primaryColor : const Color(0xFF0077B6),
+          fontSize: 18.sp,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'SomarSans',
+        );
+        break;
+      case ButtonType.outline:
+        decoration = BoxDecoration(
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: BorderRadius.circular(20.r),
+          border: Border.all(
+            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+            width: 2,
+          ),
+        );
+        textStyle = TextStyle(
+          color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
+          fontSize: 16.sp,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'SomarSans',
+        );
+        break;
+    }
+
+    return AnimatedScale(
+      scale: isActive ? 1.0 : 1.0,
+      duration: const Duration(milliseconds: 100),
+      child: Opacity(
+        opacity: isActive ? 1.0 : 0.6,
+        child: Container(
+          width: width ?? double.infinity,
+          height: height ?? 56.h,
+          decoration: decoration,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: isActive
+                  ? () {
+                      ref.read(specialEffectServiceProvider).playEffects();
+                      onPressed!();
+                    }
+                  : null,
+              borderRadius: BorderRadius.circular(20.r),
+              child: Stack(
+                children: [
+                  // Premium Shine Effect
+                  Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20.r),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.white.withOpacity(0.0),
+                              Colors.white.withOpacity(0.2),
+                              Colors.white.withOpacity(0.0),
+                            ],
+                            stops: const [0.3, 0.5, 0.7],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: Text(
+                      text,
+                      style: textStyle,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

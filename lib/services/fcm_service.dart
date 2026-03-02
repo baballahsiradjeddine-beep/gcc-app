@@ -46,11 +46,14 @@ class FCMService {
 
     // Foreground Listener
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      AppLogger.logInfo("Message received in foreground: ${message.notification?.title}");
+      AppLogger.logInfo(
+          "Message received in foreground: ${message.notification?.title}");
       if (message.notification != null) {
         final isChallenge = message.data['type'] == 'challenge_invite';
-        String? imageUrl = message.notification?.android?.imageUrl ?? message.notification?.apple?.imageUrl ?? message.data['image'];
-        
+        String? imageUrl = message.notification?.android?.imageUrl ??
+            message.notification?.apple?.imageUrl ??
+            message.data['image'];
+
         toastification.showCustom(
           autoCloseDuration: const Duration(seconds: 10),
           alignment: Alignment.topCenter,
@@ -61,12 +64,20 @@ class FCMService {
                 _handleMessageNavigation(message);
               },
               child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
                 decoration: BoxDecoration(
-                  color: isChallenge ? Colors.pink[50]!.withOpacity(0.95) : const Color(0xFFE5E5E5).withOpacity(0.95),
+                  color: isChallenge
+                      ? Colors.pink[50]!.withOpacity(0.95)
+                      : const Color(0xFFE5E5E5).withOpacity(0.95),
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: isChallenge ? Colors.pink : Colors.black.withOpacity(0.04), width: 1.5),
+                  border: Border.all(
+                      color: isChallenge
+                          ? Colors.pink
+                          : Colors.black.withOpacity(0.04),
+                      width: 1.5),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.1),
@@ -85,7 +96,7 @@ class FCMService {
                         child: Container(
                           width: 44,
                           height: 44,
-                          color: Colors.transparent, 
+                          color: Colors.transparent,
                           child: SvgPicture.asset(
                             'assets/svg/good_tito.svg',
                             fit: BoxFit.contain,
@@ -130,7 +141,11 @@ class FCMService {
                       if (isChallenge) ...[
                         const SizedBox(width: 8),
                         ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.pink, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.pink,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12))),
                           onPressed: () {
                             toastification.dismiss(holder);
                             _handleMessageNavigation(message);
@@ -141,7 +156,8 @@ class FCMService {
                         const SizedBox(width: 14),
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.network(imageUrl, width: 38, height: 38, fit: BoxFit.cover),
+                          child: Image.network(imageUrl,
+                              width: 38, height: 38, fit: BoxFit.cover),
                         ),
                       ],
                     ],
@@ -155,9 +171,11 @@ class FCMService {
     });
 
     // Handle initial message (when app is opened from terminated state via notification)
-    RemoteMessage? initialMessage = await _firebaseMessaging.getInitialMessage();
+    RemoteMessage? initialMessage =
+        await _firebaseMessaging.getInitialMessage();
     if (initialMessage != null) {
-      AppLogger.logInfo("App opened from initial message: ${initialMessage.messageId}");
+      AppLogger.logInfo(
+          "App opened from initial message: ${initialMessage.messageId}");
       _handleMessageNavigation(initialMessage);
     }
 
@@ -172,25 +190,24 @@ class FCMService {
   }
 
   static void _handleMessageNavigation(RemoteMessage message) {
-     if (message.data['type'] == 'challenge_invite') {
-        final code = message.data['invitation_code'];
-        final unitId = int.tryParse(message.data['unit_id'] ?? '0') ?? 0;
-        final courseTitle = message.data['course_title'] ?? '';
-        
-        if (code != null && rootNavigatorKey.currentContext != null) {
-            rootNavigatorKey.currentContext!.pushNamed(
-                AppRoutes.challengeMatchmaking.name,
-                extra: {
-                  'unitId': unitId,
-                  'courseTitle': courseTitle,
-                  'initialSearchMode': 'join_private',
-                  'invitationCode': code,
-                },
-            );
-        }
-     }
-  }
+    if (message.data['type'] == 'challenge_invite') {
+      final code = message.data['invitation_code'];
+      final unitId = int.tryParse(message.data['unit_id'] ?? '0') ?? 0;
+      final courseTitle = message.data['course_title'] ?? '';
 
+      if (code != null && rootNavigatorKey.currentContext != null) {
+        rootNavigatorKey.currentContext!.pushNamed(
+          AppRoutes.challengeMatchmaking.name,
+          extra: {
+            'unitId': unitId,
+            'courseTitle': courseTitle,
+            'initialSearchMode': 'join_private',
+            'invitationCode': code,
+          },
+        );
+      }
+    }
+  }
 
   static Future<void> syncToken() async {
     print("FCM: syncToken() called");
@@ -235,11 +252,13 @@ class FCMService {
           AppLogger.logInfo('Successfully sent FCM token to backend');
         } else {
           print("FCM: Backend error: ${response.statusCode}");
-          AppLogger.logWarning('Failed to send FCM token to backend: ${response.statusCode} ${response.data}');
+          AppLogger.logWarning(
+              'Failed to send FCM token to backend: ${response.statusCode} ${response.data}');
         }
       } else {
         print("FCM: No authToken found in storage");
-        AppLogger.logWarning('FCM token NOT sent: User is not authenticated (authToken is null)');
+        AppLogger.logWarning(
+            'FCM token NOT sent: User is not authenticated (authToken is null)');
       }
     } catch (e) {
       print("FCM: Network error sending to backend: $e");

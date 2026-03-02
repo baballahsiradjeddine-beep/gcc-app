@@ -13,15 +13,17 @@ class PodiumUserWidget extends ConsumerWidget {
   final int place;
   final double size;
   final double offsetY;
+  final bool isDark;
 
   const PodiumUserWidget({
     required this.user,
     required this.place,
     required this.size,
     required this.offsetY,
+    required this.isDark,
     super.key,
   });
- 
+
   Color get placeColor {
     switch (place) {
       case 1:
@@ -37,128 +39,162 @@ class PodiumUserWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isMe = user.id == ref.watch(userNotifierProvider).requireValue!.id;
+    final isMe = user.id == ref.watch(userNotifierProvider).valueOrNull?.id;
     return Expanded(
       child: Padding(
         padding: EdgeInsets.only(top: offsetY),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Stack(
-              alignment: Alignment.bottomCenter,
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
               children: [
-                CachedNetworkImage(
-                  imageUrl: user.prodImage ?? AppConsts.defaultImageUrl,
-                  imageBuilder: (context, imageProvider) => Container(
-                    width: size,
-                    height: size,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: isMe ? Colors.blue : AppColors.primaryColor,
-                        width: isMe ? 3 : 2,
-                      ),
-                      image: DecorationImage(
-                        image: imageProvider,
-                        fit: BoxFit.cover,
-                      ),
+                // Avatar
+                Container(
+                  width: size,
+                  height: size,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isMe ? const Color(0xFF00B4D8).withOpacity(0.5) : Colors.grey.shade200,
+                      width: 2.w,
                     ),
                   ),
-                  placeholder: (context, url) => Shimmer.fromColors(
-                    baseColor: Colors.grey[300]!,
-                    highlightColor: Colors.grey[100]!,
-                    child: Container(
-                      width: size,
-                      height: size,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
+                  child: Padding(
+                    padding: EdgeInsets.all(2.w),
+                    child: CachedNetworkImage(
+                      imageUrl: user.prodImage ?? AppConsts.defaultImageUrl,
+                      imageBuilder: (context, imageProvider) => Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            image: imageProvider,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    width: size,
-                    height: size,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: AppColors.primaryColor,
-                        width: 2,
+                      placeholder: (context, url) => Shimmer.fromColors(
+                        baseColor: Colors.grey[200]!,
+                        highlightColor: Colors.grey[50]!,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
+                      errorWidget: (context, url, error) => const Icon(Icons.person),
                     ),
-                    child: const Icon(Icons.error),
                   ),
                 ),
+                
+                // Rank Badge
+                Positioned(
+                  bottom: -12.h,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                    decoration: BoxDecoration(
+                      color: placeColor,
+                      borderRadius: BorderRadius.circular(20.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: placeColor.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          place == 1 ? '🥇' : place == 2 ? '🥈' : '🥉',
+                          style: TextStyle(fontSize: 10.sp),
+                        ),
+                        4.horizontalSpace,
+                        Text(
+                          place == 1 ? 'المركز الأول' : place == 2 ? 'المركز الثاني' : 'المركز الثالث',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 10.sp,
+                            fontFamily: 'SomarSans',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Me Indicator
                 if (isMe)
                   Positioned(
                     top: 0,
                     right: 0,
                     child: Container(
-                      padding: EdgeInsets.all(4.r),
-                      decoration: const BoxDecoration(
-                        color: Colors.blue,
+                      width: 24.sp,
+                      height: 24.sp,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF00B4D8),
                         shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2.w),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF00B4D8).withOpacity(0.3),
+                            blurRadius: 10,
+                          ),
+                        ],
                       ),
-                      child: Icon(
-                        Icons.person,
-                        color: Colors.white,
-                        size: 14.r,
-                      ),
+                      child: Icon(Icons.person_rounded, color: Colors.white, size: 14.sp),
                     ),
                   ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: placeColor,
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: FittedBox(
-                    child: Text(
-                      place == 1
-                          ? '🥇 المركز الأول'
-                          : place == 2
-                              ? '🥈 المركز الثاني'
-                              : '🥉 المركز الثالث',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: size > 100 ? 11.sp : 10.sp,
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
-            10.verticalSpace,
+            20.verticalSpace,
+            // Name
             Text(
               isMe ? "أنت (${user.name})" : user.name,
               textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 15.sp,
-                color: isMe ? Colors.blue : Colors.black,
+                fontWeight: FontWeight.w900,
+                fontSize: size > 100 ? 16.sp : 14.sp,
+                color: isMe 
+                    ? const Color(0xFF00B4D8) 
+                    : (isDark ? Colors.white : const Color(0xFF1E293B)),
+                fontFamily: 'SomarSans',
               ),
             ),
-            // wilaya
+            // City
             Text(
               user.wilaya,
               style: TextStyle(
-                color: Colors.black.withValues(alpha: 0.5),
-                fontSize: 11.sp,
+                color: isDark ? Colors.white60 : const Color(0xFF64748B),
+                fontSize: 12.sp,
                 fontWeight: FontWeight.w700,
+                fontFamily: 'SomarSans',
               ),
             ),
+            // Points
             Text(
-              '${user.points} نقطة',
+              '${user.points} $pointsText',
               style: TextStyle(
-                fontSize: 10.sp,
-                fontWeight: FontWeight.w600,
-                color: isMe ? Colors.blue : AppColors.primaryColor,
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w900,
+                color: isMe ? const Color(0xFF00B4D8) : (isDark ? Colors.cyanAccent : const Color(0xFF0D9488)),
+                fontFamily: 'SomarSans',
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  String get pointsText {
+    if (user.points <= 10) return 'نقاط';
+    return 'نقطة';
   }
 }

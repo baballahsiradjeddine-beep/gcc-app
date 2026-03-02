@@ -30,8 +30,6 @@ class TokensModel {
     };
   }
 
-
-
   factory TokensModel.fromMap(Map<String, dynamic> map) {
     return TokensModel(
       accessToken: map['token'],

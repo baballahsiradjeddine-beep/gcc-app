@@ -58,119 +58,132 @@ class UserProgressWidget extends StatelessWidget {
         final progress =
             totalChapters > 0 ? (completedChapters / totalChapters) : 0.0;
         final userPoints =
-            ref.watch(userNotifierProvider).requireValue?.points ?? 0;
+            ref.watch(userNotifierProvider).valueOrNull?.points ?? 0;
 
         return Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: 20.w,
-            vertical: 10.h,
-          ),
-          margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 0.h),
+          width: double.infinity,
+          height: 120.h, // Exact match with SubscribeButton 
+          margin: EdgeInsets.symmetric(horizontal: 20.w), // Matched horizontal with ad banners
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16.r),
-            boxShadow: const [
-              // BoxShadow(
-              //   color: Colors.black.withOpacity(0.05),
-              //   blurRadius: 10,
-              //   offset: const Offset(0, 4),
-              // ),
-              // BoxShadow(
-              //   color: AppColors.primaryColor.withOpacity(0.1),
-              //   blurRadius: 6,
-              //   offset: const Offset(0, 2),
-              // ),
-            ],
-            border: Border.all(
-              color: AppColors.primaryColor.withOpacity(0.2),
-              width: 1.5,
+            gradient: const LinearGradient(
+              colors: [Color(0xFF702888), Color(0xFFF037A5)], // Purple to Pink gradient
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
+            borderRadius: BorderRadius.circular(32.r), // Matched EXACTLY with SubscribeButton (blue ad)
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          clipBehavior: Clip.antiAlias,
+          child: Stack(
             children: [
-              // Circular progress indicator
-
-              // Chapter completion info
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(0.w),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16.r),
-                      boxShadow: const [
-                        // BoxShadow(
-                        //   color: Colors.black.withOpacity(0.05),
-                        //   blurRadius: 10,
-                        //   offset: const Offset(0, 4),
-                        // ),
-                        // BoxShadow(
-                        //   color: AppColors.primaryColor.withOpacity(0.1),
-                        //   blurRadius: 6,
-                        //   offset: const Offset(0, 2),
-                        // ),
-                      ],
-                      // border: Border.all(
-                      // color: AppColors.primaryColor.withOpacity(0.2),
-                      // width: 1.5,
-                      // ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'الفصول المكتملة',
-                          style: TextStyle(
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        8.verticalSpace,
-                        Row(
-                          children: [
-                            Text(
-                              '$completedChapters / $totalChapters',
-                              style: TextStyle(
-                                fontSize: 20.sp,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textBlack,
-                              ),
-                            ),
-                            8.horizontalSpace,
-                            Icon(
-                              Icons.book_rounded,
-                              color: AppColors.primaryColor,
-                              size: 24.w,
-                            ),
-                          ],
-                        ),
-                        10.verticalSpace,
-                        Text(
-                          'واصل رحلة التعلم! 🚀',
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textBlack,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ],
+              // Dot Pattern
+              Positioned.fill(
+                child: Opacity(
+                  opacity: 0.2,
+                  child: CustomPaint(
+                    painter: DotPatternPainter(),
+                  ),
+                ),
+              ),
+              
+              // Background Glow
+              Positioned(
+                top: -50.h,
+                right: -50.w,
+                child: Container(
+                  width: 200.w,
+                  height: 200.h,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [Colors.white.withOpacity(0.12), Colors.transparent],
                     ),
                   ),
-                ],
+                ),
               ),
-              Align(
-                alignment: Alignment.center,
-                child: UnitCircleProgressWidget(
-                  progress: progress * 100,
-                  size: 80.w,
-                  borderWidth: 10.w,
-                  padding: 0,
-                  color: AppColors.primaryColor,
+
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 10.h), // Reduced vertical padding
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // 1. Progress Circle (On the LEFT)
+                    Align(
+                      alignment: Alignment.center,
+                      child: Container(
+                        padding: EdgeInsets.all(4.w),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.15),
+                        ),
+                        child: UnitCircleProgressWidget(
+                          progress: progress * 100,
+                          size: 60.w, // Slightly smaller
+                          borderWidth: 5.w,
+                          padding: 0,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+
+                    16.horizontalSpace,
+
+                    // 2. Chapter completion info (On the RIGHT)
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end, // Align right locally
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'الفصول المكتملة',
+                            style: TextStyle(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                              fontFamily: 'SomarSans',
+                            ),
+                          ),
+                          4.verticalSpace,
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 3.h),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(16.r),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.book_rounded,
+                                  color: Colors.white,
+                                  size: 16.w,
+                                ),
+                                8.horizontalSpace,
+                                Text(
+                                  '$completedChapters / $totalChapters',
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white,
+                                    fontFamily: 'SomarSans',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          4.verticalSpace,
+                          Text(
+                            'واصل رحلة التعلم 🚀',
+                            style: TextStyle(
+                              fontSize: 10.sp,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white.withOpacity(0.9),
+                              fontFamily: 'SomarSans',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -179,4 +192,22 @@ class UserProgressWidget extends StatelessWidget {
       },
     );
   }
+}
+
+class DotPatternPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = Colors.white;
+    const spacing = 18.0;
+    const radius = 1.2;
+
+    for (double x = 0; x < size.width; x += spacing) {
+      for (double y = 0; y < size.height; y += spacing) {
+        canvas.drawCircle(Offset(x, y), radius, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

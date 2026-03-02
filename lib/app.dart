@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tayssir/resources/resources.dart';
+import 'package:tayssir/resources/theme/app_theme.dart';
 import 'package:tayssir/router/routes_service.dart';
+import 'package:tayssir/providers/settings/settings_provider.dart';
 import 'router/app_router.dart';
 
 void initImages(context) async {
@@ -22,6 +24,8 @@ class Tayssir extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     initImages(context);
     final router = ref.watch(appRouterProvider);
+    final settings = ref.watch(settingsNotifierProvider);
+    
     return ScreenUtilInit(
       designSize: const Size(360, 690),
       builder: (_, child) {
@@ -82,10 +86,9 @@ class Tayssir extends ConsumerWidget {
               DefaultWidgetsLocalizations.delegate,
             ],
             debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-                primarySwatch: Colors.blue,
-                fontFamily: 'SomarSans',
-                scaffoldBackgroundColor: Colors.white),
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: settings.isDarkMode ? ThemeMode.dark : ThemeMode.light,
           ),
         );
       },

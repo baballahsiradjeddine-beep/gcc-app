@@ -40,7 +40,6 @@ class NavItem extends HookWidget {
               borderWidth: 0,
               borderColor: Colors.blue,
               onPressed: () {
-                
                 ontap(index);
               },
             )

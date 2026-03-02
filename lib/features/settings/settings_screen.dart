@@ -5,11 +5,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:tayssir/common/app_buttons/logout_button.dart';
 import 'package:tayssir/common/core/app_scaffold.dart';
-import 'package:tayssir/common/sliver_scrolling_widget.dart';
+import 'package:tayssir/common/core/custom_app_bar.dart';
+import 'package:tayssir/common/tayssir_icon.dart';
 import 'package:tayssir/constants/app_consts.dart';
 import 'package:tayssir/features/settings/widgets/custom_switch_button.dart';
 import 'package:tayssir/features/settings/widgets/settings_item.dart';
-import 'package:tayssir/resources/colors/app_colors.dart';
 import 'package:tayssir/router/app_router.dart';
 import 'package:tayssir/services/actions/snack_bar_service.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -48,159 +48,177 @@ class SettingsScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return AppScaffold(
+      topSafeArea: true,
+      extendBody: true,
+      bodyBackgroundColor: Colors.transparent,
+      paddingX: 0,
       paddingB: 0,
-      body: SliverScrollingWidget(
-        children: [
-          10.verticalSpace,
-          Text(
-            AppStrings.settings,
-            style: TextStyle(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.bold,
+      body: CustomScrollView(
+        physics: const ClampingScrollPhysics(),
+        slivers: [
+          // App Bar
+          SliverToBoxAdapter(
+              child: const CustomAppBar(showActions: false, showLogo: false),
+          ),
+          SliverToBoxAdapter(
+            child: SizedBox(height: 8.h), // This acts as the margin bottom
+          ),
+
+          SliverPadding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                15.verticalSpace,
+                Text(
+                  AppStrings.settings,
+                  style: TextStyle(
+                    fontSize: 22.sp,
+                    fontWeight: FontWeight.w900,
+                    color: isDark ? Colors.white : const Color(0xFF1E293B),
+                    fontFamily: 'SomarSans',
+                  ),
+                ),
+                15.verticalSpace,
+
+                // Account Section
+                _buildSectionHeader(isDark, 'الحساب'),
+                SettingsItem(
+                  title: AppStrings.personalInformations,
+                  pathName: AppRoutes.profile.name,
+                  icon: SVGs.icPerson,
+                ),
+                SettingsItem(
+                  title: AppStrings.security,
+                  pathName: AppRoutes.security.name,
+                  icon: SVGs.icSecurity,
+                ),
+                15.verticalSpace,
+
+                // Preferences Section
+                _buildSectionHeader(isDark, 'التفضيلات'),
+                const SettingsItem(
+                  title: AppStrings.audioEffects,
+                  actionWidget: AudioSoundSwitchButton(),
+                  icon: SVGs.icSound,
+                ),
+                15.verticalSpace,
+
+                // Support Section
+                _buildSectionHeader(isDark, 'الدعم والتواصل'),
+                SettingsItem(
+                  title: 'قيم التطبيق',
+                  onTap: () => requestReview(),
+                  iconData: Icons.star_rounded,
+                ),
+                SettingsItem(
+                  title: AppStrings.contactUs,
+                  pathName: AppRoutes.contactUs.name,
+                  icon: SVGs.icPhone,
+                ),
+                15.verticalSpace,
+
+                // About Us Card
+                Container(
+                  padding: EdgeInsets.all(20.w),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9), // Slate-100 instead of blue.shade50
+                    borderRadius: BorderRadius.circular(24.r),
+                    border: Border.all(
+                      color: isDark ? Colors.white10 : const Color(0xFFE2E8F0), // Slate-200
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.favorite_rounded,
+                        color: Colors.redAccent,
+                        size: 28.sp,
+                      ),
+                      12.verticalSpace,
+                      Text(
+                        'نحن فريق صغير من المطورين',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : const Color(0xFF1E293B),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      8.verticalSpace,
+                      Text(
+                        'لأي مشكلة أو استفسار، يرجى التواصل معنا. هذا سيساعدنا كثيراً، وشكراً لدعمكم.',
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          color: isDark ? Colors.white60 : Colors.black54,
+                          height: 1.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      20.verticalSpace,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildSocialIcon(SVGs.telegram, () => _launchUrl(AppConsts.telegramLink, context)),
+                          20.horizontalSpace,
+                          _buildSocialIcon(SVGs.instagram, () => _launchUrl(AppConsts.instagramLink, context)),
+                          20.horizontalSpace,
+                          _buildSocialIcon(SVGs.youtube, () => _launchUrl(AppConsts.youtubeLink, context)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                12.verticalSpace,
+                const LogoutButton(),
+                140.verticalSpace,
+              ]),
             ),
           ),
-          10.verticalSpace,
-          SettingsItem(
-            title: AppStrings.personalInformations,
-            pathName: AppRoutes.profile.name,
-            icon: SVGs.icPerson,
-          ),
-          // SettingsItem(
-          //   title: AppStrings.notifications,
-          //   pathName: AppRoutes.notifcations.name,
-          //   icon: SVGs.notification,
-          // ),
-          SettingsItem(
-            title: AppStrings.security,
-            pathName: AppRoutes.security.name,
-            icon: SVGs.icSecurity,
-          ),
-          // SettingsItem(
-          //   title: AppStrings.aboutApp,
-          //   pathName: AppRoutes.security.name,
-          //   icon: SVGs.icTime,
-          // ),
-          // SettingsItem(
-          //   title: AppStrings.version,
-          //   pathName: AppRoutes.security.name,
-          //   icon: SVGs.icTime,
-          // ),
-          // 20.verticalSpace,
-          const SettingsItem(
-            title: AppStrings.audioEffects,
-            actionWidget: AudioSoundSwitchButton(),
-            icon: SVGs.icSound,
-          ),
-          SettingsItem(
-            title: 'قيم التطبيق',
-            onTap: () {
-              requestReview();
-            },
-            actionWidget: GestureDetector(
-                onTap: () {},
-                child: const Icon(
-                  Icons.arrow_forward_ios,
-                  size: 20,
-                )),
-            iconData: Icons.star,
-          ),
-          SettingsItem(
-            title: AppStrings.contactUs,
-            pathName: AppRoutes.contactUs.name,
-            icon: SVGs.icPhone,
-          ),
-          20.verticalSpace,
-          if (true)
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 20.w),
-              padding: EdgeInsets.all(16.w),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.favorite,
-                    color: AppColors.primaryColor,
-                    size: 24.sp,
-                  ),
-                  8.verticalSpace,
-                  Text(
-                    'نحن فريق صغير من المطورين ',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade800,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  4.verticalSpace,
-                  Text(
-                    'لأي مشكلة أو استفسار، يرجى التواصل معنا',
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.grey.shade600,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  4.verticalSpace,
-                  Text(
-                    'هذا سيساعدنا كثيراً، وشكراً لدعمكم',
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.grey.shade600,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          10.verticalSpace,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: SvgPicture.asset(
-                  SVGs.telegram,
-                  width: 32.w,
-                  height: 32.h,
-                ),
-                onPressed: () {
-                  _launchUrl(AppConsts.telegramLink, context);
-                },
-              ),
-              IconButton(
-                icon: SvgPicture.asset(
-                  SVGs.instagram,
-                  width: 32.w,
-                  height: 32.h,
-                ),
-                onPressed: () {
-                  _launchUrl(AppConsts.instagramLink, context);
-                },
-              ),
-              IconButton(
-                icon: SvgPicture.asset(
-                  SVGs.youtube,
-                  width: 32.w,
-                  height: 32.h,
-                ),
-                onPressed: () {
-                  _launchUrl(AppConsts.youtubeLink, context);
-                },
-              ),
-            ],
-          ),
-          const Spacer(),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 70),
-            child: LogoutButton(),
-          ),
-          30.verticalSpace,
         ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(bool isDark, String title) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8.h, right: 4.w),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 14.sp,
+          fontWeight: FontWeight.bold,
+          color: isDark ? Colors.white38 : const Color(0xFF64748B), // Slate-500
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSocialIcon(String svg, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(10.r),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: SvgPicture.asset(
+          svg,
+          width: 24.w,
+          height: 24.h,
+        ),
       ),
     );
   }

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -291,7 +290,7 @@ class CardSwipperDataView extends HookConsumerWidget {
                     ),
                     SizedBox(width: 8.w),
                     Text(
-                      ref.watch(userNotifierProvider).requireValue!.isSub
+                      (ref.watch(userNotifierProvider).valueOrNull?.isSub == true)
                           ? '${filteredTopics.length} ${filteredTopics.length == 1 ? 'بطاقة' : 'بطاقات'} للمراجعة'
                           : 'لديك فقط ${filteredTopics.length} ${filteredTopics.length == 1 ? 'بطاقة' : 'بطاقات'} في الخطة المجانية',
                       style: TextStyle(
@@ -390,55 +389,35 @@ class CardSwipperDataView extends HookConsumerWidget {
                         FloatingActionButton(
                           heroTag: 'shuffle',
                           onPressed: () {
-                            if (!ref
-                                .watch(userNotifierProvider)
-                                .requireValue!
-                                .isSub) {
-                              DialogService.showNeedSubscriptionDialog(
-                                context,
-                              );
+                            final isSub = ref.watch(userNotifierProvider).valueOrNull?.isSub ?? false;
+                            if (!isSub) {
+                              DialogService.showNeedSubscriptionDialog(context);
                             } else {
-                              ref
-                                  .read(cardSwipperControllerProvider.notifier)
-                                  .shuffleCards();
+                              ref.read(cardSwipperControllerProvider.notifier).shuffleCards();
                             }
                           },
-                          backgroundColor: !ref
-                                  .watch(userNotifierProvider)
-                                  .requireValue!
-                                  .isSub
+                          backgroundColor: (ref.watch(userNotifierProvider).valueOrNull?.isSub != true)
                               ? Colors.grey.shade400
                               : currentColor,
                           mini: true,
-                          child: const Icon(Icons.shuffle_rounded,
-                              color: Colors.white),
+                          child: const Icon(Icons.shuffle_rounded, color: Colors.white),
                         ),
                         SizedBox(width: 8.w),
                         FloatingActionButton(
                           heroTag: 'reverseShuffle',
                           onPressed: () {
-                            if (!ref
-                                .watch(userNotifierProvider)
-                                .requireValue!
-                                .isSub) {
-                              DialogService.showNeedSubscriptionDialog(
-                                context,
-                              );
+                            final isSub = ref.watch(userNotifierProvider).valueOrNull?.isSub ?? false;
+                            if (!isSub) {
+                              DialogService.showNeedSubscriptionDialog(context);
                             } else {
-                              ref
-                                  .read(cardSwipperControllerProvider.notifier)
-                                  .reverseShuffleCards();
+                              ref.read(cardSwipperControllerProvider.notifier).reverseShuffleCards();
                             }
                           },
-                          backgroundColor: !ref
-                                  .watch(userNotifierProvider)
-                                  .requireValue!
-                                  .isSub
+                          backgroundColor: (ref.watch(userNotifierProvider).valueOrNull?.isSub != true)
                               ? Colors.grey.shade400
                               : currentColor,
                           mini: true,
-                          child: const Icon(Icons.sort_rounded,
-                              color: Colors.white),
+                          child: const Icon(Icons.sort_rounded, color: Colors.white),
                         ),
                       ],
                     ),

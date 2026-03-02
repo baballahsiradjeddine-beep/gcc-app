@@ -7,9 +7,11 @@ class TayssirIcon extends StatelessWidget {
   const TayssirIcon({
     super.key,
     required this.icon,
+    this.size,
   });
 
   final String icon;
+  final double? size;
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +19,8 @@ class TayssirIcon extends StatelessWidget {
       icon,
       colorFilter:
           const ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
-      height: 20.h,
+      height: size ?? 20.h,
+      width: size,
     );
   }
 }

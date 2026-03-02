@@ -11,6 +11,7 @@ import 'package:tayssir/features/exercice/presentation/state/exercice_controller
 import 'package:tayssir/utils/extensions/context.dart';
 
 import '../../../resources/resources.dart';
+import 'package:tayssir/common/core/app_assets/dynamic_app_asset.dart';
 import 'widgets/exercice_app_bar.dart';
 
 class MidResultScreen extends HookConsumerWidget {
@@ -24,8 +25,10 @@ class MidResultScreen extends HookConsumerWidget {
     getMiddle() {
       switch (exercisesState.resultStatus) {
         case ResultStatus.good:
-          return SvgPicture.asset(
-            SVGs.titoGoodExercise,
+          return DynamicAppAsset(
+            assetKey: 'tito_good_exercise',
+            fallbackAssetPath: SVGs.titoGoodExercise,
+            type: AppAssetType.svg,
             height: context.isSmallDevice ? 310.h : 360.h,
           );
         case ResultStatus.bad:
@@ -33,12 +36,16 @@ class MidResultScreen extends HookConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SvgPicture.asset(
-                SVGs.titoBadMessage,
+              DynamicAppAsset(
+                assetKey: 'tito_bad_message',
+                fallbackAssetPath: SVGs.titoBadMessage,
+                type: AppAssetType.svg,
                 height: context.isSmallDevice ? 100.h : 120.h,
               ),
-              SvgPicture.asset(
-                SVGs.titoBad,
+              DynamicAppAsset(
+                assetKey: 'tito_bad',
+                fallbackAssetPath: SVGs.titoBad,
+                type: AppAssetType.svg,
                 height: context.isSmallDevice ? 220.h : 280.h,
               ),
             ],
@@ -49,12 +56,16 @@ class MidResultScreen extends HookConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SvgPicture.asset(
-                SVGs.titoAverage,
+              DynamicAppAsset(
+                assetKey: 'tito_average',
+                fallbackAssetPath: SVGs.titoAverage,
+                type: AppAssetType.svg,
                 height: context.isSmallDevice ? 220.h : 270.h,
               ),
-              SvgPicture.asset(
-                SVGs.titoAverageMessage,
+              DynamicAppAsset(
+                assetKey: 'tito_average_message',
+                fallbackAssetPath: SVGs.titoAverageMessage,
+                type: AppAssetType.svg,
                 height: context.isSmallDevice ? 100.h : 120.h,
               ),
             ],

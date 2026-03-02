@@ -22,12 +22,12 @@ class ContactUsScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final canSubmit = useState(false);
-    final user = ref.watch(userNotifierProvider).requireValue!;
+    final user = ref.watch(userNotifierProvider).valueOrNull;
     final emailController = useTextEditingController(
-      text: user.email,
+      text: user?.email ?? '',
     );
     final fullNameController = useTextEditingController(
-      text: user.name,
+      text: user?.name ?? '',
     );
     final messageController = useTextEditingController();
 

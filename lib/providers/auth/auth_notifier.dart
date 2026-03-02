@@ -107,6 +107,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         setUnauthenticated();
         return;
       },
+      fireImmediately: true,
     );
   }
 

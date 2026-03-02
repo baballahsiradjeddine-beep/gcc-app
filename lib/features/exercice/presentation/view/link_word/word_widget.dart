@@ -22,84 +22,89 @@ class WordWidget extends StatelessWidget {
   final int index;
   final bool isFirst;
 
-  Color _getColorByStatus() {
-    final status =
-        isFirst ? state.getFirstStatus(index) : state.getSecondStatus(index);
-    switch (status) {
-      case PairTwoWordsStatus.done:
-        return AppColors.greyColor;
-      case PairTwoWordsStatus.correct:
-        return AppColors.greenColor;
-      case PairTwoWordsStatus.wrong:
-        return AppColors.redColor;
-      case PairTwoWordsStatus.selected:
-        return AppColors.primaryColor;
-      case PairTwoWordsStatus.unselected:
-        return AppColors.greyColor;
-      default:
-        return AppColors.greyColor;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final Color borderColor = _getColorByStatus();
-    final status =
-        isFirst ? state.getFirstStatus(index) : state.getSecondStatus(index);
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final status = isFirst ? state.getFirstStatus(index) : state.getSecondStatus(index);
+    
     final bool isSelected = status == PairTwoWordsStatus.selected;
+    final bool isCorrect = status == PairTwoWordsStatus.correct;
+    final bool isWrong = status == PairTwoWordsStatus.wrong;
+    final bool isDone = status == PairTwoWordsStatus.done;
+    
+    final Color color = isCorrect 
+        ? const Color(0xFF10B981) 
+        : (isWrong ? const Color(0xFFF43F5E) : AppColors.primaryColor);
 
     return GestureDetector(
-      onTap: () => onWordPressed(index),
-      child: Container(
+      onTap: isDone ? null : () => onWordPressed(index),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
         alignment: Alignment.center,
-        margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-        padding: const EdgeInsets.all(10),
+        margin: EdgeInsets.symmetric(vertical: 8.h, horizontal: 4.w),
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
         width: double.infinity,
-        height:
-            // word.is
-            // if word.length > 20
-            word.text.length > 20 ? 80.h : 50.h,
+        constraints: BoxConstraints(minHeight: 80.h),
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(
-            top: BorderSide(color: borderColor, width: 2),
-            left: BorderSide(color: borderColor, width: 2),
-            right: BorderSide(color: borderColor, width: 2),
-            bottom: BorderSide(color: borderColor, width: 4),
+          color: isSelected 
+              ? color.withOpacity(isDark ? 0.1 : 0.05)
+              : isCorrect
+                  ? const Color(0xFF10B981).withOpacity(0.1)
+                  : isWrong
+                      ? const Color(0xFFF43F5E).withOpacity(0.1)
+                      : isDone
+                          ? (isDark ? const Color(0xFF334155).withOpacity(0.3) : const Color(0xFFF1F5F9))
+                          : (isDark ? const Color(0xFF1E293B) : Colors.white),
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color: isSelected 
+                ? color 
+                : isCorrect
+                    ? const Color(0xFF10B981)
+                    : isWrong
+                        ? const Color(0xFFF43F5E)
+                        : isDone
+                            ? (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0))
+                            : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+            width: (isSelected || isCorrect || isWrong) ? 2.5 : 1,
           ),
-          borderRadius: BorderRadius.circular(10),
+          boxShadow: (isSelected || isCorrect || isWrong) 
+              ? [
+                  BoxShadow(
+                    color: color.withOpacity(0.35),
+                    blurRadius: 15,
+                    spreadRadius: 2,
+                  )
+                ]
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  )
+                ],
         ),
-        // child: Text(
-        //   word.text,
-        //   textAlign: TextAlign.center,
-        //   style: TextStyle(
-        //     color: status == PairTwoWordsStatus.done
-        //         ? AppColors.greyColor
-        //         : borderColor,
-        //     fontSize: 13.sp,
-        //     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        //   ),
-        // ),
-        child: LatextTextWidget(
-          text: word.cleanText,
-          isLatex: word.isLatex,
-          useFittedBox: false,
-          textStyle: TextStyle(
-            color: status == PairTwoWordsStatus.done
-                ? AppColors.greyColor
-                : status == PairTwoWordsStatus.correct
-                    ? AppColors.greenColor
-                    : status == PairTwoWordsStatus.wrong
-                        ? AppColors.redColor
-                        : status == PairTwoWordsStatus.selected
-                            ? AppColors.primaryColor
-                            : Colors.black,
-            fontSize: word.text.length > 20 ? 11.sp : 12.sp,
-            fontWeight: (isSelected ||
-                    status == PairTwoWordsStatus.correct ||
-                    status == PairTwoWordsStatus.wrong)
-                ? FontWeight.bold
-                : FontWeight.normal,
+        transform: isSelected ? (Matrix4.identity()..scale(1.03)) : (isDone ? (Matrix4.identity()..scale(0.95)) : Matrix4.identity()),
+        child: Opacity(
+          opacity: isDone ? 0.5 : 1.0,
+          child: LatextTextWidget(
+            text: word.cleanText,
+            isLatex: word.isLatex,
+            useFittedBox: true,
+            textAlign: TextAlign.center,
+            textStyle: TextStyle(
+              color: isSelected 
+                  ? (isDark ? AppColors.primaryColor : const Color(0xFF0077B6))
+                  : isCorrect
+                      ? const Color(0xFF10B981)
+                      : isWrong
+                          ? const Color(0xFFF43F5E)
+                          : (isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155)),
+              fontSize: 13.sp,
+              fontWeight: (isSelected || isCorrect || isWrong) ? FontWeight.w900 : FontWeight.bold,
+              fontFamily: 'SomarSans',
+            ),
           ),
         ),
       ),

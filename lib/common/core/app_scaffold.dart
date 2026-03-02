@@ -17,10 +17,14 @@ class AppScaffold extends StatelessWidget {
     this.includeBackButton = false,
     this.swipeBackEnabled = false,
     this.topSafeArea = true,
+    this.extendBody = false,
+    this.bodyBackgroundColor,
+    this.floatingActionButton,
   });
   final Widget? appBar;
   final Widget body;
   final Widget? bottomNavigationBar;
+  final Widget? floatingActionButton;
   final double? paddingX;
   final double? paddingY;
   final double? paddingB;
@@ -29,6 +33,8 @@ class AppScaffold extends StatelessWidget {
   final bool includeBackButton;
   final bool swipeBackEnabled;
   final bool topSafeArea;
+  final bool extendBody;
+  final Color? bodyBackgroundColor;
   final Function()? onPopScope;
 
   @override
@@ -43,15 +49,18 @@ class AppScaffold extends StatelessWidget {
       );
     }
 
-    Widget bodyWidget = Padding(
-      padding: EdgeInsets.fromLTRB(paddingX ?? 20.w, paddingY ?? 20.h,
-          paddingX ?? 20.w, isScroll ? 0 : paddingB ?? paddingY ?? 20.h),
-      child: appBar != null
-          ? Column(
-              children: [
-                appBar!,
-                10.verticalSpace,
-                Expanded(
+        Widget bodyWidget = Padding(
+          padding: EdgeInsets.fromLTRB(
+              paddingX ?? 20.w,
+              paddingY ?? 10.h, // Reduced from 20.h
+              paddingX ?? 20.w,
+              isScroll ? 0 : paddingB ?? paddingY ?? 10.h), // Reduced from 20.h
+          child: appBar != null
+              ? Column(
+                  children: [
+                    appBar!,
+                    5.verticalSpace, // Reduced from 10.verticalSpace
+                    Expanded(
                   child: isScroll
                       ? SingleChildScrollView(
                           child: body,
@@ -92,6 +101,8 @@ class AppScaffold extends StatelessWidget {
       child: Directionality(
         textDirection: TextDirection.rtl,
         child: Scaffold(
+            backgroundColor: bodyBackgroundColor ?? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0B1120) : const Color(0xFFF8FAFC)),
+            extendBody: extendBody,
             resizeToAvoidBottomInset: resizeToAvoidBottomInset,
             body: PopScope(
               canPop: onPopScope == null,
@@ -102,6 +113,7 @@ class AppScaffold extends StatelessWidget {
               },
               child: bodyWidget,
             ),
+            floatingActionButton: floatingActionButton,
             bottomNavigationBar: bottomNavigationBar),
       ),
     );

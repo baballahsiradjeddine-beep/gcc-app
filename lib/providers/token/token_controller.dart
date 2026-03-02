@@ -1,4 +1,3 @@
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/auth/data/local_auth_data_source.dart';
@@ -16,8 +15,8 @@ class TokensController extends StateNotifier<TokensModel> {
   TokensController(
     this.localRepository,
   ) : super(
-    TokensModel.empty(),
-  ) {
+          TokensModel.empty(),
+        ) {
     initListener();
   }
 

@@ -18,7 +18,7 @@ class DummySlider extends HookWidget {
         return SliderTheme(
           data: SliderTheme.of(context).copyWith(
             activeTrackColor: Colors.blue,
-            inactiveTrackColor: Colors.grey.withValues(alpha:.5),
+            inactiveTrackColor: Colors.grey.withValues(alpha: .5),
             trackShape: const RectangularSliderTrackShape(),
             trackHeight: 4.0,
             thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 0.0),

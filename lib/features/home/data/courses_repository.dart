@@ -33,10 +33,10 @@ class DataRepository {
     // this._localCoursesDataSource
   );
 
-  Future<DataResponse> getCourses() async {
+  Future<DataResponse> getCourses({int? divisionId}) async {
     try {
       // await Future.delayed(const Duration(seconds: 50));
-      final response = await _coursesDataSource.getCourses();
+      final response = await _coursesDataSource.getCourses(divisionId: divisionId);
       final modules = response.customData['modules'] as List;
       final units = response.customData['units'] as List;
       final chapters = response.customData['chapters'] as List;

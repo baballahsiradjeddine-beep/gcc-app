@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tayssir/common/app_buttons/big_button.dart';
 import 'package:tayssir/common/sliver_scrolling_widget.dart';
@@ -10,65 +11,41 @@ import 'package:tayssir/common/tayssir_wilaya_drop_down.dart';
 import 'package:tayssir/features/auth/presentation/register/state/register_controller.dart';
 import 'package:tayssir/providers/divisions/division_model.dart';
 import 'package:tayssir/providers/divisions/divisions.dart';
+import 'package:tayssir/services/geo/geo_service.dart';
 import 'package:tayssir/providers/user/commune.dart';
 import 'package:tayssir/providers/user/wilaya.dart';
 import 'package:tayssir/services/actions/snack_bar_service.dart';
-import 'package:tayssir/utils/extensions/context.dart';
-
 import '../../../../../common/core/app_scaffold.dart';
 import '../../../../../constants/strings.dart';
-import '../../../../../resources/colors/app_colors.dart';
-import '../../../../../services/geo/geo_service.dart';
 import '../../../../../utils/validators.dart';
 import '../../login/custom_text_form_field.dart';
 import '../../../../../common/tito_advice_widget.dart';
-
-// final specialities = [
-//   const Specitlity(name: "تقني رياضي", number: 1),
-//   const Specitlity(name: "رياضيات", number: 2),
-//   const Specitlity(name: "علوم تجريبية", number: 3),
-//   const Specitlity(name: "تسيير و اقتصاد", number: 4),
-//   const Specitlity(name: "لغات أجنبية", number: 5),
-//   const Specitlity(name: "آداب و فلسفة", number: 6),
-// ];
+import '../../common/header_text.dart';
 
 class PersonalInformationsView extends HookConsumerWidget {
   const PersonalInformationsView({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final registerController = ref.watch(registerControllerProvider);
-    final nameController = useTextEditingController(
-      text: registerController.userData.fullName,
-    );
+    final nameController = useTextEditingController(text: registerController.userData.fullName);
     final ageController = useTextEditingController();
     final phoneController = useTextEditingController();
     final wilayas = ref.watch(wilayasProvider).requireValue;
     final wilaya = useState<Wilaya>(wilayas.first);
-    final communes =
-        ref.watch(communesProvider(wilaya.value.number)).asData?.value ?? [];
+    final communes = ref.watch(communesProvider(wilaya.value.number)).asData?.value ?? [];
     final commune = useState<Commune?>(null);
     final speciality = useState<DivisionModel?>(null);
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final canSubmit = useState(false);
 
     void checkCanSubmit() {
-      if (nameController.text.isNotEmpty &&
+      canSubmit.value = nameController.text.isNotEmpty &&
           ageController.text.isNotEmpty &&
           phoneController.text.isNotEmpty &&
           commune.value != null &&
-          speciality.value != null) {
-        canSubmit.value = true;
-      } else {
-        canSubmit.value = false;
-      }
+          speciality.value != null;
     }
-
-    commune.addListener(() {
-      checkCanSubmit();
-    });
-    speciality.addListener(() {
-      checkCanSubmit();
-    });
 
     return AppScaffold(
       paddingB: 0,
@@ -77,60 +54,78 @@ class PersonalInformationsView extends HookConsumerWidget {
         onChanged: checkCanSubmit,
         child: SliverScrollingWidget(
           children: [
+            24.verticalSpace,
+            const HeaderText(text: "المعومات الشخصية")
+                .animate().fadeIn().slideY(begin: -0.1, end: 0),
+            
+            32.verticalSpace,
+            
             const TitoAdviceWidget(
-              text: AppStrings.enterPersonalInfo,
-            ),
-            20.verticalSpace,
+              text: "قم بإدخال المعلومات الشخصية الخاصة بك",
+              isHorizontal: false,
+            ).animate().fadeIn(delay: 100.ms).scale(curve: Curves.easeOutBack),
+            
+            40.verticalSpace,
+            
             CustomTextFormField(
               controller: nameController,
               labelText: AppStrings.name,
-              suffix: const Icon(Icons.person, color: AppColors.primaryColor),
-            ),
+              hintText: "الاسم الكامل",
+              prefix: const Icon(Icons.person_outline_rounded),
+            ).animate().fadeIn(delay: 200.ms).slideX(begin: 0.1, end: 0),
+            
             20.verticalSpace,
+            
             CustomTextFormField(
               controller: ageController,
               labelText: AppStrings.age,
-              keyboardType: TextInputType.phone,
-              suffix: const Icon(Icons.cake, color: AppColors.primaryColor),
+              hintText: "مثلاً: 18",
+              keyboardType: TextInputType.number,
+              prefix: const Icon(Icons.cake_outlined),
               validator: Validators.validateAge,
-            ),
+            ).animate().fadeIn(delay: 300.ms).slideX(begin: 0.1, end: 0),
+            
             20.verticalSpace,
+            
             CustomTextFormField(
               controller: phoneController,
               labelText: AppStrings.phoneNumber,
+              hintText: "06 / 07 / 05 ...",
               keyboardType: TextInputType.phone,
-              suffix: const Icon(Icons.phone, color: AppColors.primaryColor),
+              prefix: const Icon(Icons.phone_outlined),
               validator: Validators.phone,
-            ),
+            ).animate().fadeIn(delay: 400.ms).slideX(begin: 0.1, end: 0),
+            
             20.verticalSpace,
-            // TODO:REFECTOR THIS
-            TayssirWilayaDropDown(
-                wilaya: wilaya, commune: commune, wilayas: wilayas),
-            20.verticalSpace,
-            TayssirCommuneDropDown(
-                commune: commune, wilaya: wilaya, communes: communes),
-            20.verticalSpace,
+            
+            TayssirWilayaDropDown(wilaya: wilaya, commune: commune, wilayas: wilayas)
+                .animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0),
+            
+            16.verticalSpace,
+            
+            TayssirCommuneDropDown(commune: commune, wilaya: wilaya, communes: communes)
+                .animate().fadeIn(delay: 600.ms).slideY(begin: 0.1, end: 0),
+            
+            16.verticalSpace,
+            
             TayssirSpecialityDropDown(
-                division: speciality,
-                items: ref.watch(divisionsProvider).requireValue),
-            const Spacer(),
-            if (context.isSmallDevice) 20.verticalSpace,
+              division: speciality,
+              items: ref.watch(divisionsProvider).requireValue,
+            ).animate().fadeIn(delay: 700.ms).slideY(begin: 0.1, end: 0),
+            
+            40.verticalSpace,
+            
             BigButton(
               text: AppStrings.continueText,
               onPressed: registerController.isLoading || !canSubmit.value
                   ? null
                   : () {
                       if (nameController.text.length < 4) {
-                        SnackBarService.showErrorSnackBar(
-                            'يجب أن يكون الإسم أكبر من 3 أحرف',
-                            context: context);
+                        SnackBarService.showErrorSnackBar('يجب أن يكون الإسم أكبر من 3 أحرف', context: context);
                         return;
                       }
-
                       if (formKey.currentState!.validate()) {
-                        ref
-                            .read(registerControllerProvider.notifier)
-                            .setUserData(
+                        ref.read(registerControllerProvider.notifier).setUserData(
                               nameController.text,
                               int.parse(ageController.text),
                               phoneController.text,
@@ -140,8 +135,9 @@ class PersonalInformationsView extends HookConsumerWidget {
                             );
                       }
                     },
-            ),
-            20.verticalSpace,
+            ).animate().fadeIn(delay: 800.ms).scale(),
+            
+            40.verticalSpace,
           ],
         ),
       ),

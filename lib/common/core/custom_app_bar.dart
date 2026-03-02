@@ -1,63 +1,108 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:tayssir/common/core/profile_button.dart';
+import 'package:tayssir/providers/settings/settings_provider.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';
-import 'package:tayssir/resources/colors/app_colors.dart';
+import 'package:go_router/go_router.dart';
 import 'package:tayssir/router/app_router.dart';
-import 'package:badges/badges.dart' as badges;
-
 import 'app_logo.dart';
 
 class CustomAppBar extends ConsumerWidget {
-  const CustomAppBar({super.key});
+  final bool showActions;
+  final bool showLogo;
+  final bool reverse;
+  const CustomAppBar({
+    super.key,
+    this.showActions = true,
+    this.showLogo = true,
+    this.reverse = false,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userNotifierProvider).requireValue!;
-    return Row(
-      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            const ProfileButton(),
-            const SizedBox(width: 10),
-            badges.Badge(
-              position: badges.BadgePosition.topEnd(top: -5, end: -2),
-              showBadge: user.hasNewNotifications,
-              badgeContent: const Text(
-                '',
-                // user.newNotificationsCount.toString(),
-                style: TextStyle(color: Colors.white, fontSize: 10),
-              ),
-              badgeAnimation: const badges.BadgeAnimation.fade(
-                animationDuration: Duration(seconds: 2),
-                colorChangeAnimationDuration: Duration(seconds: 1),
-                loopAnimation: false,
-                curve: Curves.fastOutSlowIn,
-                colorChangeAnimationCurve: Curves.easeInCubic,
-              ),
-              badgeStyle: const badges.BadgeStyle(
-                badgeColor: AppColors.redColor,
-                padding: EdgeInsets.all(4),
-              ),
-              child: GestureDetector(
-                onTap: () {
-                  context.pushNamed(AppRoutes.notifcations.name);
-                },
-                child: const Icon(Icons.notifications_none_outlined,
-                    size: 30, color: Colors.black),
-              ),
-            ),
-          ],
-        ),
-        const Spacer(),
-        AppLogo(
-          width: 30.w,
-          height: 30.w,
-        ),
-      ],
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final settings = ref.watch(settingsNotifierProvider);
+
+    final user = ref.watch(userNotifierProvider).asData?.value;
+    final bool isGuest = user == null;
+
+    final Widget logo = showLogo ? const AppLogo(fontSize: 32) : const SizedBox.shrink();
+    
+    final Widget actions = showActions
+      ? Row(
+          children: reverse 
+            ? [
+                // Theme Toggle Button
+                GestureDetector(
+                  onTap: () => ref.read(settingsNotifierProvider.notifier).toggleDarkMode(),
+                  child: _buildActionIcon(
+                    context, 
+                    settings.isDarkMode ? Icons.wb_sunny_rounded : Icons.nightlight_round, 
+                    isDark,
+                    color: settings.isDarkMode ? Colors.yellow : null,
+                  ),
+                ),
+                12.horizontalSpace,
+                // Notification Button
+                GestureDetector(
+                  onTap: () => context.pushNamed(AppRoutes.notifcations.name),
+                  child: _buildActionIcon(context, Icons.notifications_none_rounded, isDark),
+                ),
+                if (!isGuest) ...[
+                  12.horizontalSpace,
+                  const ProfileButton(),
+                ],
+              ]
+            : [
+                 if (!isGuest) ...[
+                  const ProfileButton(),
+                  12.horizontalSpace,
+                ],
+                // Notification Button
+                GestureDetector(
+                  onTap: () => context.pushNamed(AppRoutes.notifcations.name),
+                  child: _buildActionIcon(context, Icons.notifications_none_rounded, isDark),
+                ),
+                12.horizontalSpace,
+                // Theme Toggle Button
+                GestureDetector(
+                  onTap: () => ref.read(settingsNotifierProvider.notifier).toggleDarkMode(),
+                  child: _buildActionIcon(
+                    context, 
+                    settings.isDarkMode ? Icons.wb_sunny_rounded : Icons.nightlight_round, 
+                    isDark,
+                    color: settings.isDarkMode ? Colors.yellow : null,
+                  ),
+                ),
+              ],
+        )
+      : const SizedBox.shrink();
+
+    return Container(
+      padding: showActions ? EdgeInsets.zero : EdgeInsets.symmetric(horizontal: 16.w),
+      child: Row(
+        mainAxisAlignment: showLogo && showActions ? MainAxisAlignment.spaceBetween : (showLogo || showActions ? (reverse ? MainAxisAlignment.start : MainAxisAlignment.end) : MainAxisAlignment.center),
+        children: reverse 
+          ? [actions, logo]
+          : [logo, actions],
+      ),
+    );
+  }
+
+  Widget _buildActionIcon(BuildContext context, IconData icon, bool isDark, {Color? color}) {
+    return Container(
+      width: 40.sp,
+      height: 40.sp,
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        icon,
+        size: 22.sp,
+        color: color ?? (isDark ? Colors.white : const Color(0xFF1E293B)),
+      ),
     );
   }
 }

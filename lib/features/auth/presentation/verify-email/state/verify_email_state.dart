@@ -54,6 +54,7 @@ class VerifyEmailState extends Equatable {
       value: AsyncValue.error(error, error.stackTrace ?? StackTrace.current),
     );
   }
+
   VerifyEmailState setCompleted() {
     return copyWith(isCompleted: true);
   }

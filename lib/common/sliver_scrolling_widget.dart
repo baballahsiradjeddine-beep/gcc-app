@@ -7,7 +7,7 @@ class SliverScrollingWidget extends StatelessWidget {
   final Widget? header;
   @override
   Widget build(BuildContext context) {
-    //TODO add app scaffold in here and add form field also 
+    //TODO add app scaffold in here and add form field also
     return CustomScrollView(
       slivers: [
         if (header != null)

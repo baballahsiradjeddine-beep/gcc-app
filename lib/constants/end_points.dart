@@ -41,6 +41,7 @@ class EndPoints {
   static const banners = '/v1/banners';
   static const knowOptions = '/referral-sources';
   static const googleLogin = '/v1/auth/google/login';
+  static const appAssets = '/v1/app-assets';
   static const googleRegister = '/v1/auth/google/register';
   static const sendVerifyEmailOtp = '/v1/email/send-verification-mail';
   static const verifyUser = '/v1/email/verify-email';

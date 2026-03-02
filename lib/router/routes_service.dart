@@ -13,11 +13,13 @@ import 'package:tayssir/providers/user/user_notifier.dart';
 import 'package:tayssir/services/actions/snack_bar_service.dart';
 
 import '../debug/app_logger.dart';
+import '../features/onboarding/onboarding_notifier.dart';
 import '../providers/auth/auth_notifier.dart';
 import '../providers/divisions/divisions.dart';
 import '../providers/settings/settings_provider.dart';
 import '../services/geo/geo_service.dart';
 import '../utils/enums/auth_state.dart';
+import 'package:tayssir/providers/app_assets/app_assets_provider.dart';
 
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -58,6 +60,8 @@ class RoutesManager {
   final authState = ValueNotifier<AuthStatus>(AuthStatus.unknown);
   final updateCheck = ValueNotifier<bool>(false);
   final isEmailVerified = ValueNotifier<bool>(false);
+  final isOnboardingComplete = ValueNotifier<bool>(false);
+  final isReadyForTour = ValueNotifier<bool>(false);
   // final shouldWatchBoarding = ValueNotifier<bool>(false);
   init() {
     ref.listen(
@@ -71,11 +75,7 @@ class RoutesManager {
     }, fireImmediately: true);
 
     ref.listen(initialLoadProvider, (prev, next) {
-      if (next is AsyncLoading || next is AsyncError) {
-        isLoading.value = true;
-      } else {
-        isLoading.value = false;
-      }
+      isLoading.value = next is AsyncLoading;
     }, fireImmediately: true);
 
     ref.listen(waitingUpdateProvider, (prev, next) {
@@ -88,6 +88,11 @@ class RoutesManager {
         return;
       }
       isEmailVerified.value = next.asData!.value!.isEmailVerified;
+    }, fireImmediately: true);
+
+    ref.listen(onboardingProvider, (prev, next) {
+      isOnboardingComplete.value = next.isCompleted;
+      isReadyForTour.value = next.isReadyForTour;
     }, fireImmediately: true);
 
     // ref.listen(onBoardingControllerProvider, (prev, next) {
@@ -106,8 +111,10 @@ class RoutesManager {
 
   FutureOr<String?> onRedirect(
       BuildContext context, GoRouterState state) async {
-    // final updater = ref.watch(waitingUpdateProvider);
     final path = state.uri.path;
+    
+    // Log every redirect attempt for debugging
+    AppLogger.logDebug('--- REDIRECT CHECK: path=$path, loading=${isLoading.value}, auth=${authState.value}, readyForTour=${isReadyForTour.value}, onboardDone=${isOnboardingComplete.value}');
 
     if (isLoading.value || authState.value == AuthStatus.unknown) {
       if (path == '/startup') return null;
@@ -115,10 +122,11 @@ class RoutesManager {
       return "/startup";
     }
     final isLoggedIn = authState.value == AuthStatus.authenticated;
+
+    // Logged-in users skip onboarding entirely
     if (isLoggedIn) {
-      if ((loginRoutes.contains(path) || path == '/startup') &&
+      if ((loginRoutes.contains(path) || path == '/startup' || path == '/onboarding') &&
           !homeRoutes.contains(path)) {
-        // final user = ref.read(userNotifierProvider).requireValue!;
         if (!isEmailVerified.value) {
           redirectLog(path, '/verify-email');
           return '/verify-email';
@@ -130,10 +138,36 @@ class RoutesManager {
         return null;
       }
     } else {
+      // Not logged in
+      if (!isOnboardingComplete.value) {
+        if (!isReadyForTour.value) {
+          // Allow login routes even during onboarding
+          if (loginRoutes.contains(path)) return null;
+
+          // Haven't given name+division yet → go to onboarding
+          if (path != '/onboarding') {
+            redirectLog(path, '/onboarding');
+            return '/onboarding';
+          }
+          return null;
+        } else {
+          // Name+division done → allow home for real tour. Block onboarding page.
+          if (path == '/onboarding' || path == '/startup') {
+            redirectLog(path, '/home');
+            return '/home';
+          }
+          // Keep them in home routes during tour, redirect from login routes
+          if (loginRoutes.contains(path) && path != '/welcome') {
+            redirectLog(path, '/home');
+            return '/home';
+          }
+          return null;
+        }
+      }
+      // Onboarding fully complete but not logged in → welcome
       if ((path == '/startup' || homeRoutes.contains(path)) &&
           !loginRoutes.contains(path)) {
-        AppLogger.logDebug(
-            'The user is in Authenticated Space and need to be logged in ');
+        redirectLog(path, '/welcome');
         return '/welcome';
       }
     }
@@ -142,7 +176,7 @@ class RoutesManager {
   }
 
   List<ChangeNotifier> get refreshables =>
-      [isLoading, authState, isEmailVerified];
+      [isLoading, authState, isEmailVerified, isOnboardingComplete, isReadyForTour];
 }
 
 Future<AuthStatus> waitForAuthState(Ref ref) async {
@@ -282,6 +316,8 @@ final initialLoadProvider = FutureProvider<bool>((ref) async {
       final authState = await waitForAuthState(ref);
       await ref.watch(wilayasProvider.future);
       await ref.watch(divisionsProvider.future);
+      await ref.watch(appAssetsProvider.future);
+      
       // await ref.watch(subscriptionOptionsProvider.future); //required auth
       await ref.watch(googleSignInInitProvider.future);
       await ref.watch(sharedPreferencesProvider.future);

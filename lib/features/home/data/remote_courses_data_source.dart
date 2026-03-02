@@ -13,9 +13,10 @@ class RemoteCoursesDataSource {
 
   RemoteCoursesDataSource({required dioClient}) : _dioClient = dioClient;
 
-  Future<Response> getCourses() async {
+  Future<Response> getCourses({int? divisionId}) async {
     final response = await _dioClient.get(
       EndPoints.getData,
+      queryParameters: divisionId != null ? {'division_id': divisionId} : null,
     );
     return response;
   }

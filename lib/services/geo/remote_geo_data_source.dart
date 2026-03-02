@@ -1,8 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:tayssir/providers/dio/dio.dart';
 
-class RemoteGeoDataSource
- {
+class RemoteGeoDataSource {
   final DioClient client;
 
   RemoteGeoDataSource({required this.client});

@@ -7,23 +7,28 @@ class SettingsModel extends Equatable {
   // is vibration enabled
   final bool isVibrationEnabled;
 
+  final bool isDarkMode;
+
   const SettingsModel({
     required this.isSoundEnabled,
     required this.isVibrationEnabled,
+    required this.isDarkMode,
   });
 
   factory SettingsModel.empty() {
     return const SettingsModel(
       isSoundEnabled: true,
       isVibrationEnabled: true,
+      isDarkMode: true,
     );
   }
 
   // from map
   factory SettingsModel.fromMap(Map<String, dynamic> map) {
     return SettingsModel(
-      isSoundEnabled: map['isSoundEnabled'],
-      isVibrationEnabled: map['isVibrationEnabled'],
+      isSoundEnabled: map['isSoundEnabled'] ?? true,
+      isVibrationEnabled: map['isVibrationEnabled'] ?? true,
+      isDarkMode: map['isDarkMode'] ?? true,
     );
   }
 
@@ -32,11 +37,12 @@ class SettingsModel extends Equatable {
     return {
       'isSoundEnabled': isSoundEnabled,
       'isVibrationEnabled': isVibrationEnabled,
+      'isDarkMode': isDarkMode,
     };
   }
 
   @override
-  List<Object> get props => [isSoundEnabled, isVibrationEnabled];
+  List<Object> get props => [isSoundEnabled, isVibrationEnabled, isDarkMode];
 
   @override
   bool get stringify => true;
@@ -44,10 +50,12 @@ class SettingsModel extends Equatable {
   SettingsModel copyWith({
     bool? isSoundEnabled,
     bool? isVibrationEnabled,
+    bool? isDarkMode,
   }) {
     return SettingsModel(
       isSoundEnabled: isSoundEnabled ?? this.isSoundEnabled,
       isVibrationEnabled: isVibrationEnabled ?? this.isVibrationEnabled,
+      isDarkMode: isDarkMode ?? this.isDarkMode,
     );
   }
 }

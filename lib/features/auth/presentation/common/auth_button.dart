@@ -14,7 +14,6 @@ class AuthButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return BigButton(
-      
       text: isLogin ? AppStrings.login : AppStrings.createAccount,
       onPressed: onPressed,
     );

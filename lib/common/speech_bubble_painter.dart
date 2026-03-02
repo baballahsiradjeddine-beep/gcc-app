@@ -21,7 +21,7 @@ class SpeechBubblePainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     var borderPaint = Paint()
-      ..color = AppColors.titoBorderColor
+      ..color = const Color(0xFFE2E8F0)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.w;
 

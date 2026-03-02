@@ -72,12 +72,32 @@ class ExerciseState extends Equatable {
     );
   }
 
-  ExerciseModel get currentExercise => exercises[currentExerciceIndex];
+  ExerciseModel get currentExercise => exercises.isEmpty
+      ? ExerciseModel.fromMap({
+          "id": -1,
+          "type": "multiple_choices",
+          "chapter_id": -1,
+          "points": 0,
+          "scope": "lesson",
+          "direction": "LTR",
+          "question": {"value": "", "is_latex": false},
+          "options": [],
+          "correctOptions": [],
+          "hint": [],
+          "explanation_text": {"value": "", "is_latex": false}
+        })
+      : exercises[currentExerciceIndex.clamp(0, exercises.length - 1)];
+
   double get progress =>
       exercises.isEmpty ? 0 : (currentPage + 1) / exercises.length.toDouble();
-  double get accuracy =>
-      numberofCorrectAnswers /
-      exercises.sublist(0, currentExerciceIndex + 1).length.toDouble();
+
+  double get accuracy => exercises.isEmpty
+      ? 0
+      : numberofCorrectAnswers /
+          exercises
+              .sublist(0, (currentExerciceIndex + 1).clamp(0, exercises.length))
+              .length
+              .toDouble();
 
   int get midResultIndex {
     if (exercises.length < 3) {

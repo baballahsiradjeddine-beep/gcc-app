@@ -24,7 +24,7 @@ class MatchmakingService {
     _botTimer = null;
     _queueSub?.cancel();
     _queueSub = null;
-    
+
     if (_currentQueueRef != null) {
       await _currentQueueRef!.onDisconnect().cancel();
       await _currentQueueRef!.remove();
@@ -39,90 +39,96 @@ class MatchmakingService {
   }
 
   Future<String> createPrivateMatch(int unitId, String courseTitle) async {
-     final user = _ref.read(userNotifierProvider).value;
-     if (user == null) throw Exception('User not logged in');
-     final String myUid = user.id.toString();
+    final user = _ref.read(userNotifierProvider).value;
+    if (user == null) throw Exception('User not logged in');
+    final String myUid = user.id.toString();
 
-     final code = _generateCode();
-     final matchRef = _db.child('challenges/matches').push();
-     final matchId = matchRef.key!;
+    final code = _generateCode();
+    final matchRef = _db.child('challenges/matches').push();
+    final matchId = matchRef.key!;
 
-     final challengeRepo = _ref.read(challengeRepositoryProvider);
-     final questionsData = await challengeRepo.getQuestions(unitId);
-     final questionsList = (questionsData['questions'] as List?) ?? [];
+    final challengeRepo = _ref.read(challengeRepositoryProvider);
+    final questionsData = await challengeRepo.getQuestions(unitId);
+    final questionsList = (questionsData['questions'] as List?) ?? [];
 
-     await matchRef.set({
-        'status': 'waiting_for_opponent',
-        'courseTitle': courseTitle,
-        'unitId': unitId,
-        'isPrivate': true,
-        'inviteCode': code,
-        'players': {
-          myUid: {
-            'uid': myUid,
-            'name': user.name,
-            'avatar': user.completeProfilePic,
-            'score': 0,
-            'status': 'ready',
-            'emoji': '',
-          },
+    await matchRef.set({
+      'status': 'waiting_for_opponent',
+      'courseTitle': courseTitle,
+      'unitId': unitId,
+      'isPrivate': true,
+      'inviteCode': code,
+      'players': {
+        myUid: {
+          'uid': myUid,
+          'name': user.name,
+          'avatar': user.completeProfilePic,
+          'badgeIconUrl': user.badge?.completeIconUrl,
+          'badgeColor': user.badge?.color,
+          'score': 0,
+          'status': 'ready',
+          'emoji': '',
         },
-        'questions': questionsList,
-        'currentQuestionIndex': 0,
-        'createdAt': ServerValue.timestamp,
-     });
+      },
+      'questions': questionsList,
+      'currentQuestionIndex': 0,
+      'createdAt': ServerValue.timestamp,
+    });
 
-     // Map code to matchId for quick lookup
-     await _db.child('challenges/private_codes/$code').set(matchId);
-     // Clean up if creator disconnects before anyone joins
-     await _db.child('challenges/private_codes/$code').onDisconnect().remove();
-     await matchRef.onDisconnect().remove();
+    // Map code to matchId for quick lookup
+    await _db.child('challenges/private_codes/$code').set(matchId);
+    // Clean up if creator disconnects before anyone joins
+    await _db.child('challenges/private_codes/$code').onDisconnect().remove();
+    await matchRef.onDisconnect().remove();
 
-     return code;
+    return code;
   }
 
   Future<String?> joinPrivateMatch(String code) async {
-     final user = _ref.read(userNotifierProvider).value;
-     if (user == null) throw Exception('User not logged in');
-     final String myUid = user.id.toString();
+    final user = _ref.read(userNotifierProvider).value;
+    if (user == null) throw Exception('User not logged in');
+    final String myUid = user.id.toString();
 
-     final codeSnap = await _db.child('challenges/private_codes/$code').get();
-     if (!codeSnap.exists) {
-        throw Exception('الكود غير صحيح أو انتهت صلاحيته');
-     }
+    final codeSnap = await _db.child('challenges/private_codes/$code').get();
+    if (!codeSnap.exists) {
+      throw Exception('الكود غير صحيح أو انتهت صلاحيته');
+    }
 
-     final matchId = codeSnap.value as String;
-     final matchRef = _db.child('challenges/matches/$matchId');
-     final matchSnap = await matchRef.get();
+    final matchId = codeSnap.value as String;
+    final matchRef = _db.child('challenges/matches/$matchId');
+    final matchSnap = await matchRef.get();
 
-     if (!matchSnap.exists) {
-        throw Exception('المباراة لم تعد موجودة');
-     }
+    if (!matchSnap.exists) {
+      throw Exception('المباراة لم تعد موجودة');
+    }
 
-     final data = matchSnap.value as Map<dynamic, dynamic>;
-     if (data['players'].length >= 2) {
-        throw Exception('هذه الغرفة مكتملة بالفعل');
-     }
+    final data = matchSnap.value as Map<dynamic, dynamic>;
+    if (data['players'].length >= 2) {
+      throw Exception('هذه الغرفة مكتملة بالفعل');
+    }
 
-     // Join match
-     await matchRef.child('players/$myUid').set({
-        'uid': myUid,
-        'name': user.name,
-        'avatar': user.completeProfilePic,
-        'score': 0,
-        'status': 'ready',
-        'emoji': '',
-     });
+    // Join match
+    await matchRef.child('players/$myUid').set({
+      'uid': myUid,
+      'name': user.name,
+      'avatar': user.completeProfilePic,
+      'badgeIconUrl': user.badge?.completeIconUrl,
+      'badgeColor': user.badge?.color,
+      'score': 0,
+      'status': 'ready',
+      'emoji': '',
+    });
 
-     await matchRef.update({
-        'status': 'starting',
-     });
+    await matchRef.update({
+      'status': 'starting',
+    });
 
-     // Remove the code since match started
-     await _db.child('challenges/private_codes/$code').remove();
-     await matchRef.onDisconnect().cancel(); // Don't remove anymore, match is live
+    // Remove the code since match started
+    await _db.child('challenges/private_codes/$code').remove();
+    await matchRef
+        .onDisconnect()
+        .cancel(); // Don't remove anymore, match is live
 
-     return matchId;
+    return matchId;
   }
 
   Future<String?> findMatchOrJoinQueue(int unitId, String courseTitle) async {
@@ -131,27 +137,28 @@ class MatchmakingService {
 
     final String myUid = user.id.toString();
     final String queuePath = 'challenges/queue/$unitId';
-    
+
     // Check if there's someone in queue
-    final snapshot = await _db.child(queuePath).orderByKey().limitToFirst(1).get();
-    
+    final snapshot =
+        await _db.child(queuePath).orderByKey().limitToFirst(1).get();
+
     if (snapshot.exists && snapshot.value != null) {
       final map = snapshot.value as Map<dynamic, dynamic>;
       final opponentKey = map.keys.first as String;
       final opponentData = map[opponentKey] as Map<dynamic, dynamic>;
-      
+
       if (opponentData['uid'] != myUid) {
         // Found opponent, remove them from queue and create a match
         await _db.child(queuePath).child(opponentKey).remove();
-        
+
         // Generate match ID
         final matchId = _db.child('challenges/matches').push().key!;
-        
+
         // Fetch questions from backend
         final challengeRepo = _ref.read(challengeRepositoryProvider);
         final questionsData = await challengeRepo.getQuestions(unitId);
         final questionsList = (questionsData['questions'] as List?) ?? [];
-        
+
         // Create Match in Firebase
         await _db.child('challenges/matches/$matchId').set({
           'status': 'starting',
@@ -162,6 +169,8 @@ class MatchmakingService {
               'uid': myUid,
               'name': user.name,
               'avatar': user.completeProfilePic,
+              'badgeIconUrl': user.badge?.completeIconUrl,
+              'badgeColor': user.badge?.color,
               'score': 0,
               'status': 'ready',
               'emoji': '',
@@ -170,6 +179,8 @@ class MatchmakingService {
               'uid': opponentData['uid'],
               'name': opponentData['name'],
               'avatar': opponentData['avatar'],
+              'badgeIconUrl': opponentData['badgeIconUrl'],
+              'badgeColor': opponentData['badgeColor'],
               'score': 0,
               'status': 'ready',
               'emoji': '',
@@ -185,7 +196,7 @@ class MatchmakingService {
         await _db.child('challenges/queue_responses/$opponentKey').set({
           'matchId': matchId,
         });
-        
+
         return matchId;
       }
     }
@@ -193,7 +204,7 @@ class MatchmakingService {
     // No opponent found, join queue
     final myQueueRef = _db.child(queuePath).push();
     _currentQueueRef = myQueueRef;
-    
+
     // Immediately tell Firebase to remove me if network drops
     await myQueueRef.onDisconnect().remove();
 
@@ -201,13 +212,16 @@ class MatchmakingService {
       'uid': myUid,
       'name': user.name,
       'avatar': user.completeProfilePic ?? '',
+      'badgeIconUrl': user.badge?.completeIconUrl,
+      'badgeColor': user.badge?.color,
       'joinedAt': ServerValue.timestamp,
     });
 
     // Wait for match or timeout (Ghost mode after 10-15s)
     final completer = Completer<String?>();
-    final responseRef = _db.child('challenges/queue_responses/${myQueueRef.key}');
-    
+    final responseRef =
+        _db.child('challenges/queue_responses/${myQueueRef.key}');
+
     _queueSub = responseRef.onValue.listen((event) {
       if (event.snapshot.exists) {
         final data = event.snapshot.value as Map<dynamic, dynamic>;
@@ -226,9 +240,10 @@ class MatchmakingService {
         _currentQueueRef?.onDisconnect().cancel();
         myQueueRef.remove();
         _currentQueueRef = null;
-        
+
         try {
-          final botMatchId = await _createBotMatch(unitId, courseTitle, myUid, user.name, user.completeProfilePic);
+          final botMatchId = await _createBotMatch(
+              unitId, courseTitle, myUid, user.name, user.completeProfilePic);
           completer.complete(botMatchId);
         } catch (e) {
           completer.completeError(e);
@@ -239,11 +254,12 @@ class MatchmakingService {
     return completer.future;
   }
 
-  Future<String> _createBotMatch(int unitId, String courseTitle, String myUid, String? myName, String? myAvatar) async {
+  Future<String> _createBotMatch(int unitId, String courseTitle, String myUid,
+      String? myName, String? myAvatar) async {
     final matchRef = _db.child('challenges/matches').push();
     final matchId = matchRef.key!;
     final challengeRepo = _ref.read(challengeRepositoryProvider);
-    
+
     // Safety net: if app crashes during bot match, completely wipe the match!
     await matchRef.onDisconnect().remove();
 
@@ -259,10 +275,10 @@ class MatchmakingService {
             'question': 'أين تقع عاصمة الجزائر؟',
             'question_type': 'multiple_choices',
             'options': [
-               {'id': 1, 'text': 'وهران', 'is_correct': 0},
-               {'id': 2, 'text': 'الجزائر العاصمة', 'is_correct': 1},
-               {'id': 3, 'text': 'قسنطينة', 'is_correct': 0},
-               {'id': 4, 'text': 'عنابة', 'is_correct': 0},
+              {'id': 1, 'text': 'وهران', 'is_correct': 0},
+              {'id': 2, 'text': 'الجزائر العاصمة', 'is_correct': 1},
+              {'id': 3, 'text': 'قسنطينة', 'is_correct': 0},
+              {'id': 4, 'text': 'عنابة', 'is_correct': 0},
             ]
           },
           {
@@ -274,9 +290,9 @@ class MatchmakingService {
         ]
       };
     }
-    
+
     final questionsList = (questionsData['questions'] as List?) ?? [];
-    
+
     final botNames = ['Tito Bot 🐧', 'Ahmed 🤓', 'Sara 📚', 'Amine ⭐'];
     final botName = botNames[Random().nextInt(botNames.length)];
 
@@ -290,6 +306,8 @@ class MatchmakingService {
           'uid': myUid,
           'name': myName ?? 'Guest',
           'avatar': myAvatar ?? '',
+          'badgeIconUrl': _ref.read(userNotifierProvider).value?.badge?.completeIconUrl,
+          'badgeColor': _ref.read(userNotifierProvider).value?.badge?.color,
           'score': 0,
           'status': 'ready',
           'emoji': '',
@@ -307,7 +325,8 @@ class MatchmakingService {
       'currentQuestionIndex': 0,
       'createdAt': ServerValue.timestamp,
     }).timeout(const Duration(seconds: 3), onTimeout: () {
-      throw Exception('Firebase Realtime Database is not enabled or missing from config.');
+      throw Exception(
+          'Firebase Realtime Database is not enabled or missing from config.');
     });
     return matchId;
   }

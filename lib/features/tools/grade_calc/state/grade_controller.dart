@@ -108,7 +108,7 @@ final specialityProvider = Provider<List<SpecialityModel>>((ref) {
         Subject(id: 2, name: 'العربية', coefficient: 6),
         Subject(id: 5, name: 'اجتماعيات', coefficient: 4),
         Subject(id: 3, name: 'الفرنسية', coefficient: 3),
-        Subject(id: 4, name: 'الانجليزية', coefficient:3),
+        Subject(id: 4, name: 'الانجليزية', coefficient: 3),
         Subject(id: 6, name: 'الرياضيات', coefficient: 2),
         Subject(id: 7, name: 'التربية الإسلامية', coefficient: 2),
         Subject(id: 8, name: 'الرياضة', coefficient: 1),

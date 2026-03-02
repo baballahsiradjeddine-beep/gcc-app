@@ -26,7 +26,6 @@ class CustomCachedImage extends StatelessWidget {
       child: CachedNetworkImage(
         imageUrl: imageUrl,
         fit: fit,
-        
         placeholder: (context, url) => const Center(
           child: CircularProgressIndicator(),
         ),

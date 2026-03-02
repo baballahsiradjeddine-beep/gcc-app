@@ -75,8 +75,12 @@ class SVGs {
   static const String titoSusbscriptionPending =
       'assets/svg/tito_susbscription_pending.svg';
   static const String youtube = 'assets/svg/youtube.svg';
-  static const String icStreakAchievement = 'assets/svg/ic_streak_achievement.svg';
-  static const String icPointsAchievement = 'assets/svg/ic_points_achievement.svg';
-  static const String icLessonsAchievement = 'assets/svg/ic_lessons_achievement.svg';
-  static const String icPerfectAchievement = 'assets/svg/ic_perfect_achievement.svg';
+  static const String icStreakAchievement =
+      'assets/svg/ic_streak_achievement.svg';
+  static const String icPointsAchievement =
+      'assets/svg/ic_points_achievement.svg';
+  static const String icLessonsAchievement =
+      'assets/svg/ic_lessons_achievement.svg';
+  static const String icPerfectAchievement =
+      'assets/svg/ic_perfect_achievement.svg';
 }

@@ -36,10 +36,23 @@ class AnimatedCircularProgressWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Determine the complete Image URL
+    String fullImageUrl = '';
+    if (imageUrl != null && imageUrl!.isNotEmpty) {
+      fullImageUrl = imageUrl!.startsWith('http') 
+          ? imageUrl! 
+          : 'https://gcc.tayssir-bac.com/storage/${imageUrl!.replaceAll(RegExp(r'^/'), '')}';
+    }
+
     return GestureDetector(
       onTap: onTap,
-      child: CircularPercentIndicator(
-        radius: size / 2,
+      child: Container(
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.white,
+        ),
+        child: CircularPercentIndicator(
+          radius: size / 2,
         lineWidth: borderWidth,
         percent: percentage / 100,
         backgroundColor: const Color(0xffEEEEEE),
@@ -47,15 +60,21 @@ class AnimatedCircularProgressWidget extends StatelessWidget {
         circularStrokeCap: CircularStrokeCap.round,
         animation: true,
         animationDuration: animationDuration.inMilliseconds,
-        center: Padding(
-          padding: EdgeInsets.all(padding), // Add padding around the content
+        center: Container(
+          width: size - (2 * borderWidth), // Outer diameter minus its borders 
+          height: size - (2 * borderWidth),
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white,
+          ),
+          padding: EdgeInsets.all(padding), // Move the padding here onto the white background
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Image or placeholder - now with padding
-              imageUrl != null && imageUrl!.isNotEmpty
+              // Image or placeholder
+              fullImageUrl.isNotEmpty
                   ? CachedNetworkImage(
-                      imageUrl: imageUrl!,
+                      imageUrl: fullImageUrl,
                       imageBuilder: (context, imageProvider) => Container(
                         width: size - (2 * borderWidth) - (2 * padding),
                         height: size - (2 * borderWidth) - (2 * padding),
@@ -187,6 +206,7 @@ class AnimatedCircularProgressWidget extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

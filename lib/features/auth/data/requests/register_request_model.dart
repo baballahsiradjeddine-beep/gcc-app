@@ -1,4 +1,3 @@
-
 class RegisterRequestModel {
   String username;
   String email;

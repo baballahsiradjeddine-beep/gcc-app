@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tayssir/common/app_buttons/big_button.dart';
 import 'package:tayssir/common/core/app_logo.dart';
 import 'package:tayssir/common/core/app_scaffold.dart';
+import 'package:tayssir/features/onboarding/onboarding_notifier.dart';
 import 'package:tayssir/utils/enums/triangle_side.dart';
 import 'package:tayssir/constants/strings.dart';
-import 'package:tayssir/resources/resources.dart';
 import 'package:tayssir/router/app_router.dart';
 import 'package:tayssir/utils/extensions/context.dart';
-
 import '../../../common/tito_bubble_talk_widget.dart';
 
 class AuthScreen extends ConsumerWidget {
@@ -19,65 +18,107 @@ class AuthScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return AppScaffold(
-        paddingB: 0.r,
-        isScroll: false,
-        topSafeArea: false,
-        body: CustomScrollView(
-          slivers: [
-            SliverFillRemaining(
-                hasScrollBody: false,
-                child: Column(
-                  children: [
-                    50.verticalSpace,
-                    const AppLogo(),
-                    20.verticalSpace,
-                    const TitoBubbleTalkWidget(
-                      text: AppStrings.heyImTito,
-                      triangleSide: TriangleSide.bottom,
-                    ),
-                    Container(
-                      color: Colors.transparent,
-                      child: SvgPicture.asset(
-                        SVGs.titoBoarding,
-                        height: context.isSmallDevice ? 120.h : 150.h,
-                      ),
-                    ),
-                    20.verticalSpace,
-                    Text(
-                      AppStrings.welcome,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: context.isSmallDevice ? 15.sp : 17.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    20.verticalSpace,
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          BigButton(
-                            buttonType: ButtonType.primary,
-                            text: AppStrings.startNow,
-                            onPressed: () {
-                              context.goNamed(AppRoutes.register.name);
-                            },
-                          ),
-                          10.verticalSpace,
-                          BigButton(
-                              buttonType: ButtonType.secondary,
-                              text: AppStrings.iHaveAccount,
-                              onPressed: () {
-                                context.goNamed(AppRoutes.login.name);
-                              }),
-                        ],
-                      ),
-                    ),
-                    20.verticalSpace,
-                  ],
-                )),
+      paddingB: 0.r,
+      isScroll: false,
+      topSafeArea: true,
+      body: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: 32.w),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            20.verticalSpace,
+            // Logo Section
+            const AppLogo(fontSize: 45)
+                .animate()
+                .fadeIn(duration: 600.ms)
+                .slideY(begin: -0.2, end: 0, curve: Curves.easeOutCubic),
+            
+            40.verticalSpace,
+            
+            // Tito & Bubble Section
+            Column(
+              children: [
+                const TitoBubbleTalkWidget(
+                  text: "مرحبا أنا تيتو",
+                  triangleSide: TriangleSide.bottom,
+                ).animate().fadeIn(delay: 200.ms).scale(curve: Curves.elasticOut),
+                
+                8.verticalSpace,
+                
+                Text(
+                  "🐬",
+                  style: TextStyle(fontSize: 120.sp),
+                )
+                .animate(onPlay: (controller) => controller.repeat())
+                .moveY(begin: -8, end: 8, duration: 2.seconds, curve: Curves.easeInOutSine),
+              ],
+            ),
+            
+            40.verticalSpace,
+            
+            // Welcome Description
+            Text(
+              "تعلم بسهولة مع تمارين تفاعلية ومراجعات شاملة مليئة بالمرح والتشويق ، في أي وقت وأينما كنت!",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w600,
+                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
+                fontFamily: 'SomarSans',
+                height: 1.6,
+              ),
+            ).animate().fadeIn(delay: 400.ms),
+            
+            const Spacer(),
+            
+            // Action Buttons
+            Column(
+              children: [
+                BigButton(
+                  buttonType: ButtonType.primary,
+                  text: "إبدأ الآن",
+                  onPressed: () {
+                    context.goNamed(AppRoutes.register.name);
+                  },
+                ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.2, end: 0),
+                
+                16.verticalSpace,
+                
+                BigButton(
+                  buttonType: ButtonType.secondary,
+                  text: "لدي حساب بالفعل",
+                  onPressed: () {
+                    context.goNamed(AppRoutes.login.name);
+                  },
+                ).animate().fadeIn(delay: 700.ms).slideY(begin: 0.2, end: 0),
+              ],
+            ),
+            
+            // 🧪 DEV ONLY: Reset onboarding (remove before production)
+            GestureDetector(
+              onTap: () async {
+                await ref.read(onboardingProvider.notifier).resetOnboarding();
+                if (context.mounted) context.goNamed(AppRoutes.onboarding.name);
+              },
+              child: Text(
+                '← تجربة شاشة الـ Onboarding',
+                style: TextStyle(
+                  color: const Color(0xFF334155),
+                  fontSize: 11.sp,
+                  fontFamily: 'SomarSans',
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+
+            20.verticalSpace,
           ],
-        ));
+        ),
+      ),
+    );
   }
 }

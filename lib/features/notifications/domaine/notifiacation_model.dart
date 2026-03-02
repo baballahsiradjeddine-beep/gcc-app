@@ -15,14 +15,12 @@ class NotificationModel {
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
     return NotificationModel(
-      id: json['id'],
-      title: json['title'],
-      body: json['body'],
-      isRead: json['is_read'],
-      time: json['time']
-    );
+        id: json['id'],
+        title: json['title'],
+        body: json['body'],
+        isRead: json['is_read'],
+        time: json['time']);
   }
-
 
   NotificationModel copyWith({
     String? id,
@@ -39,5 +37,4 @@ class NotificationModel {
       time: time ?? this.time,
     );
   }
-  
 }

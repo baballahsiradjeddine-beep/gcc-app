@@ -1,4 +1,3 @@
-
 class ExceptionData {
   final String title;
   final String message;

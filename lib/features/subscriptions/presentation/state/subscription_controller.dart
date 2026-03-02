@@ -23,19 +23,19 @@ final paymentsMethodesProvider = Provider<List<PayementModel>>((ref) {
       path: AppRoutes.subCard.name,
       payementMethod: PayementMethod.card,
     ),
-      PayementModel(
-        icon: SVGs.ccp,
-        value: 'عن طريق ccp',
-        path: AppRoutes.subscriptionPaper.name,
-        payementMethod: PayementMethod.ccp,
-      ),
-    if (configs.isChargilyActive)
     PayementModel(
-      icon: SVGs.icAlgeriePoste,
-      value: 'بريدي موب',
-      path: AppRoutes.chargilyInit.name,
-      payementMethod: PayementMethod.baridiMob,
-    )
+      icon: SVGs.ccp,
+      value: 'عن طريق ccp',
+      path: AppRoutes.subscriptionPaper.name,
+      payementMethod: PayementMethod.ccp,
+    ),
+    if (configs.isChargilyActive)
+      PayementModel(
+        icon: SVGs.icAlgeriePoste,
+        value: 'بريدي موب',
+        path: AppRoutes.chargilyInit.name,
+        payementMethod: PayementMethod.baridiMob,
+      )
   ];
 });
 

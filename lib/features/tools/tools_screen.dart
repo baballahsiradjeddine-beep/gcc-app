@@ -27,77 +27,107 @@ class ToolsScreen extends HookConsumerWidget {
     final viewStyle = useState<ViewStyle>(ViewStyle.list);
     final tools = ref.watch(toolsProvider);
     return AppScaffold(
-      appBar: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w),
-        child: const CustomAppBar(),
-      ),
-      isScroll: true,
-      paddingX: 0,
       topSafeArea: true,
-      body: Column(
-        children: [
-          const SubscribeSection(),
-          15.verticalSpace,
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w),
-            child: HomeHeader(title: 'الأدوات المتاحة', viewStyle: viewStyle),
-          ),
-          15.verticalSpace,
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w),
-            child: viewStyle.value == ViewStyle.list
-                ? HomeListView<ToolModel>(
-                    items: tools,
-                    itemBuilder: (tool) => Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 0, vertical: 10),
+      extendBody: true,
+      bodyBackgroundColor: Colors.transparent,
+      paddingX: 0,
+      paddingB: 0,
+      body: RefreshIndicator(
+        onRefresh: () async => ref.invalidate(toolsProvider),
+        color: const Color(0xFF00B4D8),
+        child: CustomScrollView(
+          physics: const ClampingScrollPhysics(),
+          slivers: [
+            // App Bar
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+                child: const CustomAppBar(),
+              ),
+            ),
+
+            // Hero Banner Section
+            SliverToBoxAdapter(
+              child: SubscribeSection(),
+            ),
+
+            // Section Header
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
+                child: HomeHeader(title: 'الأدوات المتاحة', viewStyle: viewStyle),
+              ),
+            ),
+
+            // Tools Content
+            SliverPadding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 0),
+              sliver: viewStyle.value == ViewStyle.list
+                  ? SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.h),
                           child: CardWidget(
-                            title: tool.name,
-                            subTitle: tool.description,
+                            title: tools[index].name,
+                            subTitle: tools[index].description,
                             onPressed: () {
+                              final userEmail = ref.read(userNotifierProvider).valueOrNull?.email;
+                              if (userEmail != null) {
+                                AppLogger.sendLog(
+                                  email: userEmail,
+                                  content: 'Opened tool: ${tools[index].name}',
+                                  type: LogType.tools,
+                                );
+                              }
+                              context.pushNamed(tools[index].pathName);
+                            },
+                            startColor: tools[index].startColor,
+                            toolImage: tools[index].toolImage,
+                            endColor: tools[index].endColor,
+                            isLocked: tools[index].isLocked,
+                            isStartBottomColor: tools[index].isStartBottomColor,
+                          ),
+                        ),
+                        childCount: tools.length,
+                      ),
+                    )
+                  : SliverGrid(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 16.h,
+                        crossAxisSpacing: 16.w,
+                        childAspectRatio: 1.1,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => CardWidget(
+                          title: tools[index].name,
+                          subTitle: tools[index].description,
+                          onPressed: () {
+                            final userEmail = ref.read(userNotifierProvider).valueOrNull?.email;
+                            if (userEmail != null) {
                               AppLogger.sendLog(
-                                email: ref
-                                    .watch(userNotifierProvider)
-                                    .requireValue!
-                                    .email,
-                                content: 'Opened tool: ${tool.name}',
+                                email: userEmail,
+                                content: 'Opened tool: ${tools[index].name}',
                                 type: LogType.tools,
                               );
-                              context.pushNamed(tool.pathName);
-                            },
-                            startColor: tool.startColor,
-                            toolImage: tool.toolImage,
-                            endColor: tool.endColor,
-                            isLocked: tool.isLocked,
-                            isStartBottomColor: tool.isStartBottomColor,
-                          ),
-                        ))
-                : HomeGridView<ToolModel>(
-                    items: tools,
-                    itemBuilder: (tool) => CardWidget(
-                      title: tool.name,
-                      subTitle: tool.description,
-                      onPressed: () {
-                        AppLogger.sendLog(
-                          email: ref
-                              .watch(userNotifierProvider)
-                              .requireValue!
-                              .email,
-                          content: 'Opened tool: ${tool.name}',
-                          type: LogType.tools,
-                        );
-                        context.pushNamed(tool.pathName);
-                      },
-                      startColor: tool.startColor,
-                      endColor: tool.endColor,
-                      isGrid: true,
-                      isStartBottomColor: tool.isStartBottomColor,
-                      toolImage: tool.toolImage,
-                      isLocked: tool.isLocked,
+                            }
+                            context.pushNamed(tools[index].pathName);
+                          },
+                          startColor: tools[index].startColor,
+                          endColor: tools[index].endColor,
+                          isGrid: true,
+                          isStartBottomColor: tools[index].isStartBottomColor,
+                          toolImage: tools[index].toolImage,
+                          isLocked: tools[index].isLocked,
+                        ),
+                        childCount: tools.length,
+                      ),
                     ),
-                  ),
-          ),
-        ],
+            ),
+
+            SliverToBoxAdapter(child: 120.verticalSpace),
+          ],
+        ),
       ),
     );
   }

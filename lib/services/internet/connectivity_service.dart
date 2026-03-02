@@ -2,7 +2,8 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
-final internetConnectionCheckerProvider = StreamProvider.autoDispose<bool>((ref) {
+final internetConnectionCheckerProvider =
+    StreamProvider.autoDispose<bool>((ref) {
   final connectivityService = ref.watch(connectivityProvider);
   return connectivityService.onConnectivityChanged;
 });

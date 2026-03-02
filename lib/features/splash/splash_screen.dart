@@ -7,7 +7,11 @@ import 'package:tayssir/utils/extensions/context.dart';
 
 import '../../common/core/app_logo.dart';
 import '../../resources/resources.dart';
+import 'package:tayssir/common/core/app_assets/dynamic_app_asset.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:tayssir/providers/app_assets/app_assets_provider.dart';
 
 class SplashScreen extends HookConsumerWidget {
   const SplashScreen({super.key});
@@ -15,6 +19,19 @@ class SplashScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final size = context.isSmallDevice ? 220.h : 250.h;
+    final assetsState = ref.watch(appAssetsProvider);
+
+    // Pre-cache assets when they arrive to stop the flicker
+    useEffect(() {
+      assetsState.whenData((assetsMap) {
+        for (var asset in assetsMap.values) {
+          if (asset.url.isNotEmpty && !asset.url.toLowerCase().contains('.svg')) {
+            precacheImage(CachedNetworkImageProvider(asset.url), context);
+          }
+        }
+      });
+      return null;
+    }, [assetsState.valueOrNull]);
 
     return SafeArea(
       top: false,
@@ -32,8 +49,10 @@ class SplashScreen extends HookConsumerWidget {
             ),
             Column(
               children: [
-                SvgPicture.asset(
-                  SVGs.titoLogin,
+                DynamicAppAsset(
+                  assetKey: 'home_hero',
+                  fallbackAssetPath: SVGs.titoLogin,
+                  type: AppAssetType.svg,
                   height: size,
                 ),
                 20.verticalSpace,

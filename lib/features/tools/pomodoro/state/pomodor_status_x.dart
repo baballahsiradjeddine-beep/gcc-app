@@ -22,11 +22,24 @@ extension PomodorStatusX on PomodoroStatus {
       case PomodoroStatus.initial:
         return SVGs.titoPomodoroFirst;
       case PomodoroStatus.running:
-          return SVGs.titoPomodoroFirst; 
+        return SVGs.titoPomodoroFirst;
       case PomodoroStatus.paused:
         return SVGs.titoPomodoroStop;
       case PomodoroStatus.stopped:
         return SVGs.titoPomodoroStop;
+    }
+  }
+
+  String get statusAssetKey {
+    switch (this) {
+      case PomodoroStatus.initial:
+        return 'tito_pomodoro_first';
+      case PomodoroStatus.running:
+        return 'tito_pomodoro_first';
+      case PomodoroStatus.paused:
+        return 'tito_pomodoro_stop';
+      case PomodoroStatus.stopped:
+        return 'tito_pomodoro_stop';
     }
   }
 

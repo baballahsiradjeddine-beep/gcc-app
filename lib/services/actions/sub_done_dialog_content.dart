@@ -7,6 +7,7 @@ import 'package:tayssir/common/app_buttons/big_button.dart';
 import 'package:tayssir/constants/strings.dart';
 import 'package:tayssir/resources/resources.dart';
 import 'package:tayssir/services/actions/dialog_service.dart';
+import 'package:tayssir/common/core/app_assets/dynamic_app_asset.dart';
 
 class SubDoneDialogContent extends StatelessWidget {
   const SubDoneDialogContent({
@@ -31,6 +32,17 @@ class SubDoneDialogContent extends StatelessWidget {
       }
     }
 
+    String getAssetKey() {
+      switch (status) {
+        case SubscrptionStatus.pending:
+          return 'tito_sub_pending';
+        case SubscrptionStatus.failure:
+          return 'tito_sub_failure';
+        case SubscrptionStatus.success:
+          return 'tito_sub_good';
+      }
+    }
+
     return BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
         child: Column(
@@ -50,8 +62,10 @@ class SubDoneDialogContent extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  SvgPicture.asset(
-                    getSvg(),
+                  DynamicAppAsset(
+                    assetKey: getAssetKey(),
+                    fallbackAssetPath: getSvg(),
+                    type: AppAssetType.svg,
                     height: 200.h,
                   ),
                   10.verticalSpace,

@@ -169,7 +169,12 @@ class ExerciseNotifier extends StateNotifier<ExerciseState> {
     final submittedPoints = response.totalPoints;
     state = state.setResultPoints(submittedPoints);
     state = state.setBestProgress(response.bestProgress);
-    ref.read(userNotifierProvider.notifier).updateUserPoints(submittedPoints);
+    
+    // Only update points if we have a real user logged in
+    final user = ref.read(userNotifierProvider).valueOrNull;
+    if (user != null) {
+      ref.read(userNotifierProvider.notifier).updateUserPoints(submittedPoints);
+    }
 
     // Ping streak async, listeners like ResultScreen will catch it if successful
     ref.read(streakNotifierProvider.notifier).pingStreak();

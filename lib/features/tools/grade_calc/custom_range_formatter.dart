@@ -19,8 +19,8 @@
 //           value % 1 != 0.25 &&
 //           value % 1 != 0.5 &&
 //           value % 1 != 0.75
-//           value 
-          
+//           value
+
 //           ) {
 //         return oldValue;
 //       }

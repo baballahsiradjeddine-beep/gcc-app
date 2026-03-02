@@ -1,15 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:tayssir/common/push_buttons/pushable_button.dart';
 import 'package:tayssir/features/chapters/widgets/custom_check_mark.dart';
 import 'package:tayssir/features/units/widgets/animated_circular_progress_widget.dart';
 import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';
-import 'package:tayssir/resources/colors/app_colors.dart';
 import 'package:tayssir/services/actions/dialog_service.dart';
 
-//todo refector this to 2 seperate widgets , one for units and one for chapters and then all the nessesary changes done in here
 class CustomLessonWidget extends ConsumerWidget {
   const CustomLessonWidget({
     super.key,
@@ -27,103 +25,130 @@ class CustomLessonWidget extends ConsumerWidget {
   final double progress;
   final String? imageUrl;
   final bool isPremium;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isComplete = progress >= 50;
-    final shouldShowMark =
-        isCurrent || isComplete || onPressed == null || isPremium;
-    final user = ref.watch(userNotifierProvider).requireValue!;
+    final user = ref.watch(userNotifierProvider).valueOrNull;
+    final isSub = user?.isSub ?? false;
+    final bool isLocked = onPressed == null;
+
+    IconData getLessonIcon() {
+      if (isLocked) return Icons.lock_rounded;
+      if (progress >= 100) return Icons.check_circle_rounded;
+      if (progress > 0) return Icons.timelapse_rounded;
+      return Icons.play_arrow_rounded;
+    }
+
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          AnimatedCircularProgressWidget(
-            // isFull: progress > 0,
-            color: isPremium ? const Color(0xffFFAF00) : AppColors.primaryColor,
-            imageUrl: imageUrl,
-            showPercentage: false,
-            isLocked: onPressed == null || isPremium,
-            percentage: isPremium ? 0 : progress,
-
-            // child: const Icon(Icons.play_arrow),
-          ),
-          16.horizontalSpace,
-          Expanded(
-              child: PushableButton(
-            height: 50.h,
-            elevation: 4,
-            onPressed: () {
-              if (isPremium && !user.isSub) {
-                DialogService.showNeedSubscriptionDialog(context);
-                return;
-              }
-              if (onPressed != null) {
-                ref.read(specialEffectServiceProvider).playEffects();
-                onPressed!();
-              } else {
-                DialogService.showChapterLockedDialog(context);
-              }
-            },
-
-            hslColor: HSLColor.fromColor(
-              isPremium
-                  ? const Color(0xffFFAF00)
-                  : isCurrent || isComplete
-                      ? AppColors.primaryColor
-                      : Colors.white,
+      margin: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+      // dynamic height to support multiple lines
+      constraints: BoxConstraints(minHeight: 84.h),
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // 1. Progress Avatar (RIGHT side in RTL)
+            AnimatedCircularProgressWidget(
+              percentage: progress,
+              color: const Color(0xffEC4899),
+              imageUrl: imageUrl,
+              size: 80,
+              borderWidth: 5.0,
+              padding: 5.0,
+              isLocked: isLocked,
             ),
-            hslDisabledColor: HSLColor.fromColor(const Color(0xffEEEEEE)),
-            // hslDisabledColor: HSLColor.fromColor(),
-            gradiantColors: isPremium
-                ? [
-                    const Color(0xffFF6F00),
-                    const Color(0xffFFAF00),
-                  ]
-                : null,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
 
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 0.5.sw,
-                    child: Text(title,
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            color: isPremium
-                                ? Colors.white
-                                : onPressed == null
-                                    ? AppColors.disabledTextColor
-                                    : isCurrent || isComplete
-                                        ? Colors.white
-                                        : const Color(0xff4B4B4B),
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.bold)),
+            12.horizontalSpace,
+
+            // 2. Text Information Card (LEFT side in RTL)
+            Expanded(
+              child: Container(
+                constraints: BoxConstraints(minHeight: 50.h),
+                padding: EdgeInsets.symmetric(vertical: 8.h),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14.r),
+                  gradient: isLocked
+                      ? null
+                      : const LinearGradient(
+                          colors: [Color(0xff00B4D8), Color(0xff0077B6)],
+                          begin: Alignment.centerRight,
+                          end: Alignment.centerLeft,
+                        ),
+                  color: isLocked ? const Color(0xffE2E8F0) : null,
+                  boxShadow: [
+                    BoxShadow(
+                      color: isLocked 
+                          ? Colors.black.withOpacity(0.04)
+                          : const Color(0xff00B4D8).withOpacity(0.2),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: InkWell(
+                  onTap: () {
+                    if (isPremium && !isSub) {
+                      DialogService.showNeedSubscriptionDialog(context);
+                      return;
+                    }
+                    if (onPressed != null) {
+                      ref.read(specialEffectServiceProvider).playEffects();
+                      onPressed!();
+                    } else {
+                      DialogService.showChapterLockedDialog(context);
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(14.r),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 14.w),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Lesson Title (Starts at Right inside card)
+                        Expanded(
+                          child: Text(
+                            title,
+                            textAlign: TextAlign.start,
+                            maxLines: 2,
+                            overflow: TextOverflow.visible,
+                            style: TextStyle(
+                              color: isLocked ? const Color(0xff64748B) : Colors.white,
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w900,
+                              fontFamily: 'SomarSans',
+                              height: 1.15,
+                            ),
+                          ),
+                        ),
+                        
+                        12.horizontalSpace,
+
+                        // Action Icon (Ends at Left inside the card)
+                        Container(
+                          width: 32.w,
+                          height: 32.h,
+                          decoration: BoxDecoration(
+                            color: isLocked 
+                                ? const Color(0xffCBD5E0).withOpacity(0.5)
+                                : Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                          child: Icon(
+                            getLessonIcon(),
+                            color: isLocked ? const Color(0xff64748B) : Colors.white,
+                            size: 18.sp,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  if (shouldShowMark) ...[
-                    const Spacer(),
-                    CustomCheckMark(
-                        color: isPremium
-                            ? const Color(0xffFFAF00)
-                            : onPressed == null
-                                ? AppColors.disabledTextColor
-                                : AppColors.primaryColor,
-                        icon: isPremium
-                            ? Icons.star
-                            : isCurrent
-                                ? Icons.hourglass_bottom
-                                : isComplete
-                                    ? Icons.check
-                                    : Icons.lock),
-                  ]
-                ],
+                ),
               ),
             ),
-          )),
-        ],
+          ],
       ),
-    );
+    ));
   }
 }

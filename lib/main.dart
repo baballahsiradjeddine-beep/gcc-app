@@ -64,7 +64,6 @@ void main() async {
   );
 }
 
-
 // Intro(
 //   /// Padding of the highlighted area and the widget
 //   padding: const EdgeInsets.all(8),

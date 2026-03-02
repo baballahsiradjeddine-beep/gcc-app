@@ -39,7 +39,7 @@ class UserNotifier extends StateNotifier<AsyncValue<UserModel?>> {
           clearUser();
         }
       },
-      // fireImmediately: true
+      fireImmediately: true,
     );
   }
 

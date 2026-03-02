@@ -1,4 +1,3 @@
-
 import 'blank_word_status.dart';
 
 class BlankWord {

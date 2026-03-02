@@ -11,34 +11,11 @@ import 'package:tayssir/providers/user/user_notifier.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 final bannerItemsProvider = FutureProvider<List<BannerModel>>((ref) async {
-  // Simulate fetching banners from an API or database
-  final res = await ref.watch(bannerRepositoryProvider).getBanners();
+  // Don't fetch banners if user is not authenticated (guest/tour mode)
+  final user = ref.watch(userNotifierProvider).valueOrNull;
+  if (user == null) return [];
 
-  // // Example banners
-  // return [
-  //   const BannerModel(
-  //     id: 1,
-  //     title: 'Welcome to Tayssir',
-  //     description: 'Your journey to learning starts here.',
-  //     actionUrl: '/subscribe',
-  //     actionLabel: 'Subscribe Now',
-  //     gradientStart: '#FF5733',
-  //     gradientEnd: '#FFC300',
-  //     image: 'https://example.com/image1.png',
-  //     createdAt: '2023-10-01T00:00:00Z',
-  //   ),
-  //   const BannerModel(
-  //     id: 2,
-  //     title: 'New Courses Available',
-  //     description: 'Check out our latest courses and start learning today.',
-  //     actionUrl: '/courses',
-  //     actionLabel: 'View Courses',
-  //     gradientStart: '#33FF57',
-  //     gradientEnd: '#C300FF',
-  //     image: 'https://example.com/image2.png',
-  //     createdAt: '2023-10-02T00:00:00Z',
-  //   ),
-  // ];
+  final res = await ref.watch(bannerRepositoryProvider).getBanners();
   return res;
 });
 
@@ -75,10 +52,10 @@ class SubscribeSection extends HookConsumerWidget {
     // final items = ref.watch(carouselItemsProvider);
     final isLoading = ref.watch(bannerItemsProvider).isLoading;
     final List<Widget> items = [
-      if (!ref.watch(userNotifierProvider).requireValue!.isSub)
+      if (ref.watch(userNotifierProvider).valueOrNull?.isSub != true)
         const SubscribeButton(),
       if (!isLoading)
-        ...ref.watch(bannerItemsProvider).requireValue.map((banner) {
+        ...ref.watch(bannerItemsProvider).valueOrNull?.map((banner) {
           return BannerWidget(
             title: banner.title,
             description: banner.description,
@@ -87,56 +64,36 @@ class SubscribeSection extends HookConsumerWidget {
             gradientEnd: banner.gradientEnd,
             image: banner.image,
           );
-        }),
+        }) ?? [],
       const UserProgressWidget(),
     ];
 
     return items.isNotEmpty
         ? Column(
             children: [
-              10.verticalSpace,
               ref.watch(bannerItemsProvider).when(
                     data: (banners) {
                       return Directionality(
                         textDirection: TextDirection.ltr,
-                        child: Stack(
-                          alignment: Alignment.bottomLeft,
-                          children: [
-                            CarouselSlider(
-                              items: items,
-                              options: CarouselOptions(
-                                height: 125.h,
-                                viewportFraction: 0.96,
-                                autoPlay: true,
-                                enableInfiniteScroll: items.length > 1,
-                                autoPlayInterval: const Duration(seconds: 3),
-                                onPageChanged: (i, _) => index.value = i,
+                        child: SizedBox(
+                          height: 130.h,
+                          child: Stack(
+                            alignment: Alignment.bottomLeft,
+                            children: [
+                              CarouselSlider(
+                                key: ValueKey('carousel_${items.length}'), 
+                                items: items,
+                                options: CarouselOptions(
+                                  height: 128.h,
+                                  viewportFraction: 1.0,
+                                  autoPlay: true,
+                                  enableInfiniteScroll: items.length > 1,
+                                  autoPlayInterval: const Duration(seconds: 4),
+                                  onPageChanged: (i, _) => index.value = i,
+                                ),
                               ),
-                            ),
-                            // if (banners.isNotEmpty)
-                            //   Padding(
-                            //     padding:
-                            //         EdgeInsets.only(left: 30.w, bottom: 15.h),
-                            //     child: SliderIndicator(
-                            //       itemsCount: items.length,
-                            //       itemIndex: index.value,
-                            //       selectedChild: Container(
-                            //         margin: const EdgeInsets.only(right: 10),
-                            //         width: 37,
-                            //         height: 2,
-                            //         decoration: const BoxDecoration(
-                            //             color: Colors.white),
-                            //       ),
-                            //       unselectedChild: Container(
-                            //         margin: const EdgeInsets.only(right: 10),
-                            //         width: 10,
-                            //         height: 2,
-                            //         decoration:
-                            //             const BoxDecoration(color: Colors.grey),
-                            //       ),
-                            //     ),
-                            // ),
-                          ],
+                            ],
+                          ),
                         ),
                       );
                     },
@@ -167,6 +124,7 @@ class SliderIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min, // Keep indicators compact
       children: [
         ...List.generate(itemsCount, (index) {
           bool isSelected = index == itemIndex;

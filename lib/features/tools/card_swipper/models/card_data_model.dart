@@ -34,9 +34,8 @@ class CardDataModel {
       categories: categoriesData
           .map<CategoryModel>((category) => CategoryModel.fromMap(category))
           .toList(),
-      cards: cardsData
-          .map<CardModel>((card) => CardModel.fromMap(card))
-          .toList(),
+      cards:
+          cardsData.map<CardModel>((card) => CardModel.fromMap(card)).toList(),
     );
   }
 

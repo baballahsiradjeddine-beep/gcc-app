@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tayssir/constants/end_points.dart';
 import 'package:tayssir/debug/app_logger.dart';
 import 'package:tayssir/providers/dio/dio.dart';
+
 final bannerRemoteDataSourceProvider = Provider<BannerRemoteDataSource>((ref) {
   final dioClient = ref.watch(dioClientProvider);
   return BannerRemoteDataSource(dioClient: dioClient);

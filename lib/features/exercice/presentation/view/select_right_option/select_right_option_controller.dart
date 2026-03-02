@@ -43,14 +43,14 @@ class SelectRightOptionNotifier extends StateNotifier<SelectRightOptionState> {
     final isCorrect = exercise.checkAnswer(resultIds);
     AppLogger.logInfo('isCorrect: $isCorrect');
     ref.read(exercicesProvider.notifier).checkAnswer(
-      context,
-      isCorrect,
-      // onSuccess: () {
-      //   // clearSelectedAnswer();
-      // },
-      // onError: () {
-      //   // clearSelectedAnswer();
-      // },
-    );
+          context,
+          isCorrect,
+          // onSuccess: () {
+          //   // clearSelectedAnswer();
+          // },
+          // onError: () {
+          //   // clearSelectedAnswer();
+          // },
+        );
   }
 }

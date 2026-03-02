@@ -18,25 +18,16 @@ class UnitCircleProgressWidget extends StatelessWidget {
   final double borderWidth;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(
-        padding,
-      ),
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white,
-      ),
-      child: AnimatedCircularProgressWidget(
-        color: color,
-        percentage: progress,
-        size: size.w,
-        borderWidth: borderWidth.w,
-        padding: padding,
-        showText: true,
-        showImageIcon: false,
-        animationDuration: const Duration(milliseconds: 1500),
-        showPercentage: false,
-      ),
+    return AnimatedCircularProgressWidget(
+      color: color,
+      percentage: progress,
+      size: size.w,
+      borderWidth: borderWidth.w,
+      padding: padding,
+      showText: true,
+      showImageIcon: false,
+      animationDuration: const Duration(milliseconds: 1500),
+      showPercentage: false,
     );
   }
 }

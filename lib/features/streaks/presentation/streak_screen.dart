@@ -8,6 +8,7 @@ import 'package:tayssir/features/streaks/utils/streak_share_utils.dart';
 import 'package:tayssir/router/app_router.dart';
 import 'package:tayssir/resources/resources.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tayssir/common/core/app_assets/dynamic_app_asset.dart';
 
 class StreakScreen extends StatelessWidget {
   final StreakModel streak;
@@ -50,7 +51,7 @@ class StreakScreen extends StatelessWidget {
                   fontFamily: 'SomarSans',
                 ),
               ),
-              
+
               const Spacer(flex: 1),
 
               // Glowing Fire Section - Adds visual depth
@@ -93,7 +94,8 @@ class StreakScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20.r),
-                  border: Border.all(color: const Color(0xFFE0E0E0), width: 1.2),
+                  border:
+                      Border.all(color: const Color(0xFFE0E0E0), width: 1.2),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.04),
@@ -138,8 +140,10 @@ class StreakScreen extends StatelessWidget {
               // The Mascot (Tito) Cheering - Fills the gap beautifully
               SizedBox(
                 height: 110.h,
-                child: SvgPicture.asset(
-                  SVGs.titoGood,
+                child: DynamicAppAsset(
+                  assetKey: 'tito_good',
+                  fallbackAssetPath: SVGs.titoGood,
+                  type: AppAssetType.svg,
                   fit: BoxFit.contain,
                 ),
               ),
@@ -218,7 +222,8 @@ class StreakScreen extends StatelessWidget {
               color: isCompleted ? const Color(0xFF00C4F6) : Colors.white,
               borderRadius: BorderRadius.circular(10.r),
               border: Border.all(
-                color: const Color(0xFF00C4F6).withValues(alpha: isCompleted ? 1 : 0.3),
+                color: const Color(0xFF00C4F6)
+                    .withValues(alpha: isCompleted ? 1 : 0.3),
                 width: 2,
               ),
             ),

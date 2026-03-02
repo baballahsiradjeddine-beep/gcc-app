@@ -21,75 +21,70 @@ class AnomalyWordWidget extends ConsumerWidget {
   final Function onTap;
   final bool isCorrectWord;
   final double fontSize;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isShowResult = ref.watch(exercicesProvider).isShowResult;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     Color getBorderColor() {
       if (isShowResult) {
-        if (isSelected && isCorrectWord) {
-          return Colors.green;
-        } else if (isSelected) {
-          return Colors.red;
-        }
-        return AppColors.greyColor;
-      } else {
-        if (isSelected) {
-          return AppColors.primaryColor;
-        }
-        return AppColors.greyColor;
+        if (isSelected && isCorrectWord) return const Color(0xFF10B981);
+        if (isSelected) return const Color(0xFFF43F5E);
+        return isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
       }
-    }
-
-    // text color
-    Color getTextColor() {
-      if (isShowResult) {
-        if (isCorrectWord && isSelected) {
-          return Colors.green;
-        } else if (isSelected) {
-          return Colors.red;
-        }
-        return Colors.black;
-      } else {
-        if (isSelected) {
-          return AppColors.primaryColor;
-        }
-
-        return Colors.black;
-      }
+      return isSelected ? AppColors.primaryColor : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0));
     }
 
     return GestureDetector(
-      onTap: () {
-        onTap();
-      },
-      child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10.r),
-            border: Border.all(
-              color: getBorderColor(),
-              width: 1.5,
-            ),
+      onTap: () => onTap(),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+        margin: EdgeInsets.all(6.r),
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          gradient: isSelected ? AppColors.primaryGradient : null,
+          color: isSelected 
+              ? null 
+              : (isDark ? const Color(0xFF1E293B) : Colors.white),
+          borderRadius: BorderRadius.circular(99.r), // Standard Pill
+          border: Border.all(
+            color: getBorderColor(),
+            width: isSelected ? 2 : 1,
           ),
-          // child: Text(
-          //   word.text,
-          //   style: TextStyle(
-          //     color: getTextColor(),
-          //     fontSize: 20,
-          //   ),
-          // ),
-          child: LatextTextWidget(
-            text: word.cleanText,
-            isLatex: word.isLatex,
-            useFittedBox: true,
-            textStyle: TextStyle(
-              color: getTextColor(),
-              fontSize: fontSize,
-            ),
-          )),
+          boxShadow: isSelected 
+              ? [
+                  BoxShadow(
+                    color: AppColors.primaryColor.withOpacity(0.4),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
+                  )
+                ]
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  )
+                ],
+        ),
+        transform: isSelected ? (Matrix4.identity()..scale(1.08)) : Matrix4.identity(),
+        child: LatextTextWidget(
+          text: word.cleanText,
+          isLatex: word.isLatex,
+          useFittedBox: true,
+          textAlign: TextAlign.center,
+          textStyle: TextStyle(
+            color: isSelected 
+                ? Colors.white 
+                : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569)),
+            fontSize: 14.sp,
+            fontWeight: isSelected ? FontWeight.w900 : FontWeight.bold,
+            fontFamily: 'SomarSans',
+          ),
+        ),
+      ),
     );
   }
 }

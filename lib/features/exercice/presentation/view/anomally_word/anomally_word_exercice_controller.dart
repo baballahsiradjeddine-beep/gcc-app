@@ -51,14 +51,14 @@ class AnomallyWordNotifier extends StateNotifier<AnomallyWordState> {
   void submitAnswer(BuildContext context) {
     final isCorrect = _checkAnswer();
     ref.read(exercicesProvider.notifier).checkAnswer(
-      context,
-      isCorrect,
-      // onSuccess: () {
-      //   clearSelectedAnswer();
-      // },
-      // onError: () {
-      //   clearSelectedAnswer();
-      // },
-    );
+          context,
+          isCorrect,
+          // onSuccess: () {
+          //   clearSelectedAnswer();
+          // },
+          // onError: () {
+          //   clearSelectedAnswer();
+          // },
+        );
   }
 }

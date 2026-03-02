@@ -42,8 +42,9 @@ class UpdateUserRequest {
     final bytes = image!.readAsBytesSync();
     return base64Encode(bytes);
   }
+
   //if division id is changed
-  bool get shouldUpadateData => devisionId != null;  
+  bool get shouldUpadateData => devisionId != null;
 
   // method field that check that each field is different from the current user fields and return new object
   UpdateUserRequest checkFields(UserModel user) {

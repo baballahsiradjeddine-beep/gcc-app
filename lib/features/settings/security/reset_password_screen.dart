@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tayssir/common/app_buttons/big_button.dart';
 import 'package:tayssir/common/core/app_scaffold.dart';
@@ -26,87 +27,92 @@ class ResetPasswordScreen extends HookConsumerWidget {
     final confirmPasswordController = useTextEditingController();
     final canSubmit = useState(false);
     final formKey = useMemoized(() => GlobalKey<FormState>());
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     void checker() {
-      if (oldPasswordController.text.isNotEmpty &&
+      canSubmit.value = oldPasswordController.text.isNotEmpty &&
           passwordController.text.isNotEmpty &&
-          confirmPasswordController.text.isNotEmpty) {
-        canSubmit.value = true;
-      } else {
-        canSubmit.value = false;
-      }
+          confirmPasswordController.text.isNotEmpty;
     }
 
     ref.listen(resetPasswordController, (prev, next) {
       next.handleSideThings(context, () {
         SnackBarService.showSuccessSnackBar(
-            AppStrings.passwordChangedSuccessfully, context: context);
+            AppStrings.passwordChangedSuccessfully,
+            context: context);
       });
     });
-    const isKeyboardOpen = false;
+
     return AppScaffold(
-        paddingB: 0,
-        resizeToAvoidBottomInset: false,
-        body: Form(
-          key: formKey,
-          onChanged: checker,
-          child: SliverScrollingWidget(
-            children: [
-              const HeaderText(
-                text: AppStrings.changingPassword,
-              ),
-              10.verticalSpace,
-              !isKeyboardOpen
-                  ? TitoAdviceWidget(
-                      text: AppStrings.enterCredentials,
-                      isHorizontal: false,
-                      size: context.isSmallDevice ? 150.h : 180.h,
-                    )
-                  : const SizedBox.shrink(),
-              20.verticalSpace,
-              CustomTextFormField(
-                controller: oldPasswordController,
-                labelText: AppStrings.password,
-                isPassword: true,
-                prefix: const Icon(Icons.lock),
-                validator: Validators.validatePassword,
-              ),
-              20.verticalSpace,
-              CustomTextFormField(
-                controller: passwordController,
-                labelText: AppStrings.password,
-                isPassword: true,
-                prefix: const Icon(Icons.lock),
-                validator: Validators.validatePassword,
-              ),
-              20.verticalSpace,
-              Padding(
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom),
-                child: CustomTextFormField(
-                  controller: confirmPasswordController,
-                  labelText: AppStrings.confirmPassword,
-                  isPassword: true,
-                  prefix: const Icon(Icons.lock),
-                  validator: (value) => Validators.validateConfirmPassword(
-                      value, passwordController.text),
-                ),
-              ),
-              const Spacer(),
-              BigButton(
-                  text: AppStrings.check,
-                  onPressed: canSubmit.value && !controller.isLoading
-                      ? () {
-                          if (formKey.currentState!.validate()) {
-                            ref
-                                .read(resetPasswordController.notifier)
-                                .resetPassword(oldPasswordController.text,
-                                    passwordController.text);
-                          }
-                        }
-                      : null),
-              10.verticalSpace,
-            ],
-          ),
-        ));
+      paddingB: 0,
+      resizeToAvoidBottomInset: true,
+      body: Form(
+        key: formKey,
+        onChanged: checker,
+        child: SliverScrollingWidget(
+          children: [
+            24.verticalSpace,
+            const HeaderText(text: AppStrings.changingPassword)
+                .animate().fadeIn().slideY(begin: -0.1, end: 0),
+            
+            32.verticalSpace,
+            
+            const TitoAdviceWidget(
+              text: AppStrings.enterCredentials,
+              isHorizontal: false,
+            ).animate().fadeIn(delay: 100.ms).scale(curve: Curves.easeOutBack),
+            
+            40.verticalSpace,
+            
+            CustomTextFormField(
+              controller: oldPasswordController,
+              labelText: "كلمة السر الحالية",
+              isPassword: true,
+              prefix: const Icon(Icons.lock_outline_rounded),
+              validator: Validators.validatePassword,
+            ).animate().fadeIn(delay: 200.ms).slideX(begin: 0.1, end: 0),
+            
+            20.verticalSpace,
+            
+            CustomTextFormField(
+              controller: passwordController,
+              labelText: "كلمة السر الجديدة",
+              isPassword: true,
+              prefix: const Icon(Icons.lock_reset_rounded),
+              validator: Validators.validatePassword,
+            ).animate().fadeIn(delay: 300.ms).slideX(begin: 0.1, end: 0),
+            
+            20.verticalSpace,
+            
+            CustomTextFormField(
+              controller: confirmPasswordController,
+              labelText: AppStrings.confirmPassword,
+              isPassword: true,
+              prefix: const Icon(Icons.check_circle_outline_rounded),
+              validator: (value) => Validators.validateConfirmPassword(
+                  value, passwordController.text),
+            ).animate().fadeIn(delay: 400.ms).slideX(begin: 0.1, end: 0),
+            
+            60.verticalSpace,
+            
+            BigButton(
+              text: "تغيير كلمة السر",
+              onPressed: canSubmit.value && !controller.isLoading
+                  ? () {
+                      if (formKey.currentState!.validate()) {
+                        ref
+                            .read(resetPasswordController.notifier)
+                            .resetPassword(oldPasswordController.text,
+                                passwordController.text);
+                      }
+                    }
+                  : null,
+            ).animate().fadeIn(delay: 600.ms).scale(),
+            
+            40.verticalSpace,
+          ],
+        ),
+      ),
+    );
   }
 }

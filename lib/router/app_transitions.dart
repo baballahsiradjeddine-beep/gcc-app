@@ -9,14 +9,14 @@ class AppTransitions {
     required BuildContext context,
     required GoRouterState state,
     required Widget child,
-    Duration duration = const Duration(milliseconds: 300),
+    Duration duration = const Duration(milliseconds: 400),
   }) {
     return CustomTransitionPage<T>(
       key: state.pageKey,
       child: child,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeTransition(
-          opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
+          opacity: CurveTween(curve: Curves.easeInOutCubic).animate(animation),
           child: child,
         );
       },
@@ -30,7 +30,7 @@ class AppTransitions {
     required GoRouterState state,
     required Widget child,
     SlideDirection direction = SlideDirection.right,
-    Duration duration = const Duration(milliseconds: 300),
+    Duration duration = const Duration(milliseconds: 450),
   }) {
     Offset begin;
 
@@ -59,7 +59,7 @@ class AppTransitions {
             end: Offset.zero,
           ).animate(CurvedAnimation(
             parent: animation,
-            curve: Curves.easeInOut,
+            curve: Curves.easeOutQuart,
           )),
           child: child,
         );
@@ -73,14 +73,14 @@ class AppTransitions {
     required BuildContext context,
     required GoRouterState state,
     required Widget child,
-    Duration duration = const Duration(milliseconds: 300),
+    Duration duration = const Duration(milliseconds: 400),
   }) {
     return CustomTransitionPage<T>(
       key: state.pageKey,
       child: child,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return ScaleTransition(
-          scale: CurveTween(curve: Curves.easeInOut).animate(animation),
+          scale: CurveTween(curve: Curves.easeOutBack).animate(animation),
           child: child,
         );
       },
@@ -93,7 +93,7 @@ class AppTransitions {
     required BuildContext context,
     required GoRouterState state,
     required Widget child,
-    Duration duration = const Duration(milliseconds: 400),
+    Duration duration = const Duration(milliseconds: 500),
   }) {
     return CustomTransitionPage<T>(
       key: state.pageKey,
@@ -103,7 +103,7 @@ class AppTransitions {
           opacity: Tween<double>(begin: 0.0, end: 1.0).animate(
             CurvedAnimation(
               parent: animation,
-              curve: const Interval(0.0, 0.7, curve: Curves.easeInOut),
+              curve: const Interval(0.0, 0.7, curve: Curves.easeInOutCubic),
             ),
           ),
           child: SlideTransition(
@@ -113,7 +113,7 @@ class AppTransitions {
             ).animate(
               CurvedAnimation(
                 parent: animation,
-                curve: Curves.easeInOut,
+                curve: Curves.easeOutQuart,
               ),
             ),
             child: child,
@@ -129,7 +129,7 @@ class AppTransitions {
     required BuildContext context,
     required GoRouterState state,
     required Widget child,
-    Duration duration = const Duration(milliseconds: 400),
+    Duration duration = const Duration(milliseconds: 500),
   }) {
     return CustomTransitionPage<T>(
       key: state.pageKey,
@@ -166,7 +166,7 @@ class AppTransitions {
                 begin: 0.0,
                 end: flipDirection == FlipDirection.horizontal ? 1.0 : 0.5)
             .animate(CurvedAnimation(
-                parent: animation, curve: Curves.easeInOutBack));
+                parent: animation, curve: Curves.easeInOutQuart));
 
         return AnimatedBuilder(
           animation: rotate,
@@ -195,7 +195,7 @@ class AppTransitions {
     required BuildContext context,
     required GoRouterState state,
     required Widget child,
-    Duration duration = const Duration(milliseconds: 400),
+    Duration duration = const Duration(milliseconds: 500),
     SharedAxisTransitionType type = SharedAxisTransitionType.horizontal,
   }) {
     return CustomTransitionPage<T>(
@@ -209,7 +209,7 @@ class AppTransitions {
             const double end = 0.0;
             final double fadeValue = Tween<double>(begin: 0.0, end: 1.0)
                 .animate(
-                    CurvedAnimation(parent: animation, curve: Curves.easeInOut))
+                    CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic))
                 .value;
 
             double dx = 0.0;
@@ -218,21 +218,21 @@ class AppTransitions {
 
             switch (type) {
               case SharedAxisTransitionType.horizontal:
-                dx = Tween<double>(begin: 30.0 * begin, end: 0.0)
+                dx = Tween<double>(begin: 40.0 * begin, end: 0.0)
                     .animate(CurvedAnimation(
-                        parent: animation, curve: Curves.fastOutSlowIn))
+                        parent: animation, curve: Curves.easeOutQuart))
                     .value;
                 break;
               case SharedAxisTransitionType.vertical:
-                dy = Tween<double>(begin: 30.0 * begin, end: 0.0)
+                dy = Tween<double>(begin: 40.0 * begin, end: 0.0)
                     .animate(CurvedAnimation(
-                        parent: animation, curve: Curves.fastOutSlowIn))
+                        parent: animation, curve: Curves.easeOutQuart))
                     .value;
                 break;
               case SharedAxisTransitionType.scaled:
-                scale = Tween<double>(begin: 0.9, end: 1.0)
+                scale = Tween<double>(begin: 0.92, end: 1.0)
                     .animate(CurvedAnimation(
-                        parent: animation, curve: Curves.easeOut))
+                        parent: animation, curve: Curves.easeOutQuart))
                     .value;
                 break;
             }
@@ -439,6 +439,7 @@ class TayssirCustomGoRoute extends GoRoute {
     required super.path,
     required super.name,
     super.routes,
+    GlobalKey<NavigatorState>? parentNavigatorKey,
     required Widget Function(BuildContext, GoRouterState) pageBuilder,
     this.transitionType = TransitionType.fade,
     this.slideDirection = SlideDirection.right,
@@ -446,86 +447,88 @@ class TayssirCustomGoRoute extends GoRoute {
     this.sharedAxisType = SharedAxisTransitionType.horizontal,
     this.containerAlignment = Alignment.center,
     this.duration = const Duration(milliseconds: 300),
-  }) : super(pageBuilder: (context, state) {
-          final page = pageBuilder(context, state);
-          switch (transitionType) {
-            case TransitionType.fade:
-              return AppTransitions.fadeTransition(
-                context: context,
-                state: state,
-                child: page,
-                duration: duration,
-              );
-            case TransitionType.slide:
-              return AppTransitions.slideTransition(
-                context: context,
-                state: state,
-                child: page,
-                direction: slideDirection,
-                duration: duration,
-              );
-            case TransitionType.scale:
-              return AppTransitions.scaleTransition(
-                context: context,
-                state: state,
-                child: page,
-                duration: duration,
-              );
-            case TransitionType.cool:
-              return AppTransitions.coolTransition(
-                context: context,
-                state: state,
-                child: page,
-                duration: duration,
-              );
-            case TransitionType.blur:
-              return AppTransitions.blurTransition(
-                context: context,
-                state: state,
-                child: page,
-                duration: duration,
-              );
-            case TransitionType.flip:
-              return AppTransitions.flipTransition(
-                context: context,
-                state: state,
-                child: page,
-                flipDirection: flipDirection,
-                duration: duration,
-              );
-            case TransitionType.sharedAxis:
-              return AppTransitions.sharedAxisTransition(
-                context: context,
-                state: state,
-                child: page,
-                type: sharedAxisType,
-                duration: duration,
-              );
-            case TransitionType.fadeThrough:
-              return AppTransitions.fadeThroughTransition(
-                context: context,
-                state: state,
-                child: page,
-                duration: duration,
-              );
-            case TransitionType.containerTransform:
-              return AppTransitions.containerTransformTransition(
-                context: context,
-                state: state,
-                child: page,
-                alignment: containerAlignment,
-                duration: duration,
-              );
-            case TransitionType.slideFade:
-              return AppTransitions.slideFadeTransition(
-                context: context,
-                state: state,
-                child: page,
-                direction: slideDirection,
-                duration: duration,
-              );
-          }
-        });
+  }) : super(
+            parentNavigatorKey: parentNavigatorKey,
+            pageBuilder: (context, state) {
+              final page = pageBuilder(context, state);
+              switch (transitionType) {
+                case TransitionType.fade:
+                  return AppTransitions.fadeTransition(
+                    context: context,
+                    state: state,
+                    child: page,
+                    duration: duration,
+                  );
+                case TransitionType.slide:
+                  return AppTransitions.slideTransition(
+                    context: context,
+                    state: state,
+                    child: page,
+                    direction: slideDirection,
+                    duration: duration,
+                  );
+                case TransitionType.scale:
+                  return AppTransitions.scaleTransition(
+                    context: context,
+                    state: state,
+                    child: page,
+                    duration: duration,
+                  );
+                case TransitionType.cool:
+                  return AppTransitions.coolTransition(
+                    context: context,
+                    state: state,
+                    child: page,
+                    duration: duration,
+                  );
+                case TransitionType.blur:
+                  return AppTransitions.blurTransition(
+                    context: context,
+                    state: state,
+                    child: page,
+                    duration: duration,
+                  );
+                case TransitionType.flip:
+                  return AppTransitions.flipTransition(
+                    context: context,
+                    state: state,
+                    child: page,
+                    flipDirection: flipDirection,
+                    duration: duration,
+                  );
+                case TransitionType.sharedAxis:
+                  return AppTransitions.sharedAxisTransition(
+                    context: context,
+                    state: state,
+                    child: page,
+                    type: sharedAxisType,
+                    duration: duration,
+                  );
+                case TransitionType.fadeThrough:
+                  return AppTransitions.fadeThroughTransition(
+                    context: context,
+                    state: state,
+                    child: page,
+                    duration: duration,
+                  );
+                case TransitionType.containerTransform:
+                  return AppTransitions.containerTransformTransition(
+                    context: context,
+                    state: state,
+                    child: page,
+                    alignment: containerAlignment,
+                    duration: duration,
+                  );
+                case TransitionType.slideFade:
+                  return AppTransitions.slideFadeTransition(
+                    context: context,
+                    state: state,
+                    child: page,
+                    direction: slideDirection,
+                    duration: duration,
+                  );
+              }
+            });
 }
 
 enum TransitionType {

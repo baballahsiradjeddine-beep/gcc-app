@@ -1,16 +1,16 @@
-import 'package:dio/dio.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tayssir/common/app_buttons/app_button.dart';
-import 'package:tayssir/common/core/app_scaffold.dart';
 import 'package:tayssir/features/challanges/data/matchmaking_service.dart';
 import 'package:tayssir/router/app_router.dart';
 import 'package:tayssir/resources/resources.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class MatchmakingScreen extends HookConsumerWidget {
   final int unitId;
@@ -29,196 +29,387 @@ class MatchmakingScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final statusText = useState<String>('');
-    final matchId = useState<String?>(null);
     final error = useState<String?>(null);
-    final searchMode = useState<String>(initialSearchMode ?? 'initial'); // initial, random, create_private, join_private
+    final searchMode = useState<String>(initialSearchMode ?? 'initial'); 
     final privateCode = useState<String?>(invitationCode);
     final codeController = useTextEditingController();
 
     void goToArena(String id) {
-       if (!context.mounted) return;
-       context.pushReplacementNamed(
-          AppRoutes.challengeArena.name,
-          extra: {
-            'matchId': id,
-            'unitId': unitId,
-            'courseTitle': courseTitle,
-          },
-       );
+      if (!context.mounted) return;
+      context.pushReplacementNamed(
+        AppRoutes.challengeArena.name,
+        extra: {
+          'matchId': id,
+          'unitId': unitId,
+          'courseTitle': courseTitle,
+        },
+      );
     }
 
-    // Listener for Private match starting (for the creator)
     useEffect(() {
-       if (searchMode.value == 'create_private' && privateCode.value != null) {
-          final db = FirebaseDatabase.instance.ref();
-          // We need matchId to listen. Let's find it.
-          db.child('challenges/private_codes/${privateCode.value}').get().then((snap) {
-             if (snap.exists) {
-                final mid = snap.value as String;
-                final sub = db.child('challenges/matches/$mid/status').onValue.listen((event) {
-                    if (event.snapshot.value == 'starting') {
-                        goToArena(mid);
-                    }
-                });
-                return sub.cancel;
-             }
-          });
-       }
-       return null;
+      if (searchMode.value == 'create_private' && privateCode.value != null) {
+        final db = FirebaseDatabase.instance.ref();
+        db.child('challenges/private_codes/${privateCode.value}').get().then((snap) {
+          if (snap.exists) {
+            final mid = snap.value as String;
+            final sub = db.child('challenges/matches/$mid/status').onValue.listen((event) {
+              if (event.snapshot.value == 'starting') {
+                goToArena(mid);
+              }
+            });
+            return sub.cancel;
+          }
+        });
+      }
+      return null;
     }, [searchMode.value, privateCode.value]);
 
     Future<void> startRandomSearch() async {
-       searchMode.value = 'random';
-       statusText.value = 'جاري البحث عن خصم قوي...';
-       try {
-         final service = ref.read(matchmakingServiceProvider);
-         final id = await service.findMatchOrJoinQueue(unitId, courseTitle);
-         if (id != null) {
-           statusText.value = 'تم العثور على خصم! ⚔️';
-           await Future.delayed(const Duration(seconds: 1));
-           goToArena(id);
-         }
-       } catch (e) {
-         if (e is DioException && e.response?.data != null) {
-            error.value = e.response?.data['message'] ?? 'حدث خطأ في جلب الأسئلة من السيرفر';
-         } else {
-            error.value = 'حدث خطأ أثناء البحث: $e';
-         }
-       }
+      searchMode.value = 'random';
+      statusText.value = 'جاري البحث عن خصم قوي...';
+      try {
+        final service = ref.read(matchmakingServiceProvider);
+        final id = await service.findMatchOrJoinQueue(unitId, courseTitle);
+        if (id != null) {
+          statusText.value = 'تم العثور على خصم! ⚔️';
+          await Future.delayed(const Duration(seconds: 1));
+          goToArena(id);
+        }
+      } catch (e) {
+        error.value = 'حدث خطأ أثناء البحث: $e';
+      }
     }
 
     Future<void> handleCreatePrivate() async {
-       searchMode.value = 'create_private';
-       try {
-          final service = ref.read(matchmakingServiceProvider);
-          final code = await service.createPrivateMatch(unitId, courseTitle);
-          privateCode.value = code;
-       } catch (e) {
-          if (e is DioException && e.response?.data != null) {
-             error.value = e.response?.data['message'] ?? 'فشل إنشاء الغرفة: خطأ من السيرفر';
-          } else {
-             error.value = 'خطأ في إنشاء الغرفة: $e';
-          }
-       }
+      searchMode.value = 'create_private';
+      try {
+        final service = ref.read(matchmakingServiceProvider);
+        final code = await service.createPrivateMatch(unitId, courseTitle);
+        privateCode.value = code;
+      } catch (e) {
+        error.value = 'خطأ في إنشاء الغرفة: $e';
+      }
     }
 
     Future<void> handleJoinPrivate() async {
-       if (codeController.text.length < 4) return;
-       try {
-          statusText.value = 'جاري الانضمام للغرفة...';
-          final service = ref.read(matchmakingServiceProvider);
-          final id = await service.joinPrivateMatch(codeController.text);
-          if (id != null) {
-             goToArena(id);
-          }
-       } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
-       }
+      if (codeController.text.length < 4) return;
+      try {
+        statusText.value = 'جاري الانضمام للغرفة...';
+        final service = ref.read(matchmakingServiceProvider);
+        final id = await service.joinPrivateMatch(codeController.text);
+        if (id != null) goToArena(id);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      }
     }
 
-    return PopScope(
-      canPop: true,
-      onPopInvoked: (didPop) {
-        ref.read(matchmakingServiceProvider).cancelSearch();
-      },
-      child: AppScaffold(
-        topSafeArea: true,
-        body: SingleChildScrollView(
-          child: Container(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: PopScope(
+        onPopInvoked: (didPop) {
+          if (didPop) ref.read(matchmakingServiceProvider).cancelSearch();
+        },
+        child: Scaffold(
+          backgroundColor: const Color(0xFF0B1120),
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+          ),
+          body: Container(
             width: double.infinity,
-            padding: EdgeInsets.all(24.w),
-            child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SvgPicture.asset(
-                SVGs.titoBoarding,
-                height: 150.h,
+            height: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF0B1120), Color(0xFF111827)],
               ),
-              30.verticalSpace,
-              
-              if (error.value != null) ...[
-                 Text(error.value!, style: TextStyle(color: Colors.red, fontSize: 16.sp), textAlign: TextAlign.center),
-                 20.verticalSpace,
-                 SmallButton(text: 'إعادة المحاولة', onPressed: () => context.pop()),
-              ]
-              else if (searchMode.value == 'initial') ...[
-                 Text('جاهز للتحدي؟ 🔥', style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold)),
-                 10.verticalSpace,
-                 Text('اختر طريقة اللعب المفضلة لديك', style: TextStyle(color: Colors.grey[600])),
-                 40.verticalSpace,
-                 
-                 SmallButton(
-                   text: '🚀 بحث عشوائي (1 ضد 1)', 
-                   width: double.infinity,
-                   onPressed: startRandomSearch,
-                 ),
-                 15.verticalSpace,
-                 SmallButton(
-                   text: '🤝 تحدي صديق (عبر كود)', 
-                   color: Colors.blue,
-                   width: double.infinity,
-                   onPressed: handleCreatePrivate,
-                 ),
-                 15.verticalSpace,
-                 TextButton(
-                   onPressed: () => searchMode.value = 'join_private',
-                   child: Text('لديك كود تحدي؟ أدخله هنا', style: TextStyle(color: Colors.pink, fontWeight: FontWeight.bold)),
-                 ),
-              ]
-              else if (searchMode.value == 'random') ...[
-                 const CircularProgressIndicator(color: Colors.pink),
-                 20.verticalSpace,
-                 Text(statusText.value, style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
-              ]
-              else if (searchMode.value == 'create_private') ...[
-                 if (privateCode.value == null)
-                    const CircularProgressIndicator()
-               else ...[
-                  Text('كود التحدي الخاص بك هو:', style: TextStyle(fontSize: 18.sp)),
-                  10.verticalSpace,
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 20.h),
-                    decoration: BoxDecoration(
-                       color: Colors.grey[100],
-                       borderRadius: BorderRadius.circular(15),
-                       border: Border.all(color: Colors.pink.withOpacity(0.3))
+            ),
+            child: SafeArea(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 25.w),
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        icon: const CircleAvatar(
+                            backgroundColor: Colors.white10,
+                            child: Icon(Icons.arrow_back, color: Colors.white)),
+                        onPressed: () => context.pop(),
+                      ),
                     ),
-                    child: Text(
-                      privateCode.value!, 
-                      style: TextStyle(fontSize: 48.sp, fontWeight: FontWeight.bold, letterSpacing: 8, color: Colors.pink)
-                    ),
-                  ),
-                  20.verticalSpace,
-                  Text('أرسل هذا الكود لصديقك لينضم إليك!', style: TextStyle(color: Colors.grey[600]), textAlign: TextAlign.center),
-                  30.verticalSpace,
-                  const CircularProgressIndicator(strokeWidth: 2),
-                  10.verticalSpace,
-                  Text('في انتظار انضمام المنافس...', style: TextStyle(fontStyle: FontStyle.italic)),
-               ]
-            ]
-            else if (searchMode.value == 'join_private') ...[
-               Text('أدخل كود التحدي 🔑', style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
-               20.verticalSpace,
-               TextField(
-                 controller: codeController,
-                 textAlign: TextAlign.center,
-                 keyboardType: TextInputType.number,
-                 maxLength: 4,
-                 style: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold, letterSpacing: 10),
-                 decoration: InputDecoration(
-                    hintText: '0000',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-                 ),
-               ),
-               20.verticalSpace,
-               SmallButton(text: 'انطلاق! ⚔️', width: double.infinity, onPressed: handleJoinPrivate),
-               TextButton(onPressed: () => searchMode.value = 'initial', child: Text('تراجع')),
-            ]
-          ],
+                    _buildVisualHeader(),
+                    40.verticalSpace,
+                    if (error.value != null)
+                      _buildErrorState(context, error.value!)
+                    else if (searchMode.value == 'initial')
+                      _buildInitialState(startRandomSearch, handleCreatePrivate,
+                          () => searchMode.value = 'join_private')
+                    else if (searchMode.value == 'random')
+                      _buildLoadingState(statusText.value)
+                    else if (searchMode.value == 'create_private')
+                      _buildPrivateCreatedState(privateCode.value)
+                    else if (searchMode.value == 'join_private')
+                      _buildJoinPrivateState(codeController, handleJoinPrivate,
+                          () => searchMode.value = 'initial'),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
       ),
-    ),
-    ),
+    );
+  }
+
+  Widget _buildVisualHeader() {
+    return Column(
+      children: [
+        SvgPicture.asset(SVGs.titoBoarding, height: 180.h)
+            .animate(onPlay: (c) => c.repeat(reverse: true))
+            .moveY(begin: 0, end: -10, duration: 2000.ms, curve: Curves.easeInOut),
+        25.verticalSpace,
+        Text(
+          "الاستعداد للمعركة ⚔️",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 26.sp,
+            fontWeight: FontWeight.w900,
+            fontFamily: 'SomarSans',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInitialState(VoidCallback onRandom, VoidCallback onCreate, VoidCallback onJoin) {
+    return Column(
+      children: [
+        Text(
+          "اختر كيف تريد مواجهة منافسك اليوم",
+          style: TextStyle(
+            color: Colors.white60,
+            fontSize: 15.sp,
+            fontFamily: 'SomarSans',
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        40.verticalSpace,
+        _buildPremiumMenuButton(
+          "بحث عشوائي (1 ضد 1) 🚀",
+          [const Color(0xFF1CB0F6), const Color(0xFF00C6E0)],
+          onRandom,
+        ),
+        20.verticalSpace,
+        _buildPremiumMenuButton(
+          "تحدي صديق مقرب 🤝",
+          [const Color(0xFFEC4899), const Color(0xFFF43F5E)],
+          onCreate,
+        ),
+        25.verticalSpace,
+        TextButton(
+          onPressed: onJoin,
+          child: Text(
+            "لديك كود تحدي؟ انضم هنا 🔑",
+            style: TextStyle(
+              color: const Color(0xFF00C6E0),
+              fontWeight: FontWeight.w900,
+              fontFamily: 'SomarSans',
+              fontSize: 14.sp,
+            ),
+          ),
+        ),
+      ],
+    ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0);
+  }
+
+  Widget _buildPremiumMenuButton(String label, List<Color> gradient, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        height: 62.h,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: gradient),
+          borderRadius: BorderRadius.circular(20),
+          border: const Border(
+            bottom: BorderSide(color: Colors.black26, width: 4),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: gradient.first.withOpacity(0.3),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w900,
+            fontFamily: 'SomarSans',
+            shadows: const [Shadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 4)],
+          ),
+        ),
+      ),
+    ).animate().scale(begin: const Offset(1, 1), end: const Offset(1.02, 1.02), duration: 200.ms);
+  }
+
+  Widget _buildLoadingState(String text) {
+    return Column(
+      children: [
+        const CircularProgressIndicator(color: Color(0xFF00C6E0)),
+        25.verticalSpace,
+        Text(text, style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
+  Widget _buildPrivateCreatedState(String? code) {
+    return Column(
+      children: [
+        Text(
+          "كود الغرفة الخاص بك 🗝️",
+          style: TextStyle(
+            color: Colors.white60,
+            fontSize: 16.sp,
+            fontFamily: 'SomarSans',
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        20.verticalSpace,
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 25.h),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E293B),
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(color: const Color(0xFF00C6E0).withOpacity(0.5), width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF00C6E0).withOpacity(0.1),
+                blurRadius: 20,
+              ),
+            ],
+          ),
+          child: Text(
+            code ?? "....",
+            style: TextStyle(
+              color: const Color(0xFF00C6E0),
+              fontSize: 52.sp,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 12,
+              fontFamily: 'SomarSans',
+            ),
+          ),
+        ),
+        30.verticalSpace,
+        Text(
+          "أرسل هذا الكود لمنافسك وانتظره هنا...",
+          style: TextStyle(
+            color: Colors.white38,
+            fontStyle: FontStyle.italic,
+            fontFamily: 'SomarSans',
+            fontSize: 13.sp,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        40.verticalSpace,
+        const CircularProgressIndicator(strokeWidth: 3, color: Color(0xFFEC4899))
+            .animate(onPlay: (c) => c.repeat())
+            .shimmer(duration: 2000.ms),
+      ],
+    );
+  }
+
+  Widget _buildJoinPrivateState(TextEditingController controller, VoidCallback onJoin, VoidCallback onBack) {
+    return Column(
+      children: [
+        Text(
+          "أدخل كود التحدي",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20.sp,
+            fontWeight: FontWeight.w900,
+            fontFamily: 'SomarSans',
+          ),
+        ),
+        10.verticalSpace,
+        Text(
+          "المكون من 4 أرقام",
+          style: TextStyle(color: Colors.white38, fontSize: 14.sp, fontFamily: 'Cairo'),
+        ),
+        30.verticalSpace,
+        TextField(
+          controller: controller,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: const Color(0xFF00C6E0),
+            fontSize: 40.sp,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 15,
+            fontFamily: 'SomarSans',
+          ),
+          keyboardType: TextInputType.number,
+          maxLength: 4,
+          decoration: InputDecoration(
+            hintText: "0000",
+            hintStyle: TextStyle(color: Colors.white.withOpacity(0.05)),
+            filled: true,
+            fillColor: const Color(0xFF1E293B),
+            counterText: "",
+            contentPadding: EdgeInsets.symmetric(vertical: 20.h),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25),
+              borderSide: const BorderSide(color: Colors.white10),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25),
+              borderSide: const BorderSide(color: Colors.white10),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25),
+              borderSide: const BorderSide(color: Color(0xFF00C6E0), width: 2),
+            ),
+          ),
+        ),
+        35.verticalSpace,
+        _buildPremiumMenuButton(
+          "انطلاق! ⚔️",
+          [const Color(0xFF00C6E0), const Color(0xFF1CB0F6)],
+          onJoin,
+        ),
+        20.verticalSpace,
+        TextButton(
+          onPressed: onBack,
+          child: Text(
+            "تراجع",
+            style: TextStyle(
+              color: Colors.white38,
+              fontSize: 14.sp,
+              fontFamily: 'SomarSans',
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context, String msg) {
+    return Column(
+      children: [
+        const Icon(Icons.error_outline, color: Colors.red, size: 50),
+        15.verticalSpace,
+        Text(msg, style: const TextStyle(color: Colors.white70, fontFamily: 'SomarSans'), textAlign: TextAlign.center),
+        20.verticalSpace,
+        SmallButton(text: "العودة", onPressed: () => context.pop()),
+      ],
     );
   }
 }
+

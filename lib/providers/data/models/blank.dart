@@ -1,4 +1,3 @@
-
 class Blank {
   // final LatexField<String> correctWord;
   final String correctWord;

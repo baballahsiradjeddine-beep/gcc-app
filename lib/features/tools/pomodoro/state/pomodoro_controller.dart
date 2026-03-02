@@ -51,19 +51,19 @@ class PomodoroController extends StateNotifier<PomodoroState> {
   }
 
   void _handlePhaseCompletion() {
-    // Play notification sound or vibrate here maybe 
-    
+    // Play notification sound or vibrate here maybe
+
     if (state.isBreak) {
       int nextCycle = state.currentCycle;
       int completedSessions = state.completedSessions;
-      
+
       if (state.currentCycle < state.totalCycles) {
         nextCycle = state.currentCycle + 1;
       } else {
         nextCycle = 1;
         completedSessions = state.completedSessions + 1;
       }
-      
+
       state = state.copyWith(
         isBreak: false,
         currentCycle: nextCycle,
@@ -73,8 +73,9 @@ class PomodoroController extends StateNotifier<PomodoroState> {
       );
     } else {
       bool isLongBreak = state.currentCycle % state.cyclesBeforeLongBreak == 0;
-      int breakDuration = isLongBreak ? state.longBreakDuration : state.shortBreakDuration;
-      
+      int breakDuration =
+          isLongBreak ? state.longBreakDuration : state.shortBreakDuration;
+
       state = state.copyWith(
         isBreak: true,
         remainingTime: breakDuration,

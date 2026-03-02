@@ -1,4 +1,3 @@
-
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tayssir/constants/app_consts.dart';
@@ -53,7 +52,7 @@ class CardSwipperNotifier extends StateNotifier<CardSwipperState> {
 
   Future<void> _initialize() async {
     final data = configData;
-    final isSubscriber = ref.watch(userNotifierProvider).requireValue!.isSub;
+    final isSubscriber = ref.watch(userNotifierProvider).valueOrNull?.isSub ?? false;
     // final topicsData = data.to as List;
     // final topics = topicsData
     //     .map<DummyTopicModel>((topic) => DummyTopicModel.fromMap(topic))

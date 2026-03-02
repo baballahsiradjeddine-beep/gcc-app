@@ -12,5 +12,4 @@ class SvgUtils {
   static Future precacheSvgPictures(List<String> svgPaths) async {
     await Future.wait(svgPaths.map((svgPath) => precacheSvgPicture(svgPath)));
   }
-
 }

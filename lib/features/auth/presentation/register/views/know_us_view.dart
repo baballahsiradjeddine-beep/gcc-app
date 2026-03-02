@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tayssir/common/app_buttons/big_button.dart';
 import 'package:tayssir/common/core/app_scaffold.dart';
@@ -9,10 +10,9 @@ import 'package:tayssir/constants/strings.dart';
 import 'package:tayssir/features/auth/data/know_options/know_option_model.dart';
 import 'package:tayssir/features/auth/data/know_options/know_option_repository.dart';
 import 'package:tayssir/features/auth/presentation/register/state/register_controller.dart';
-import 'package:tayssir/utils/extensions/context.dart';
-
 import '../widgets/option_selection.dart';
 import '../../../../../common/tito_advice_widget.dart';
+import '../../common/header_text.dart';
 
 final knowOptionsProvider = FutureProvider<List<KnowOptionModel>>((ref) async {
   final repository = ref.watch(knowOptionRepositoryProvider);
@@ -24,25 +24,26 @@ class KnowUsView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final List<KnowOption> knowOptions = [
-    //   const KnowOption(value: AppStrings.facebook, icon: SVGs.icFacebook),
-    //   const KnowOption(value: AppStrings.instagram, icon: SVGs.icInstagram),
-    //   const KnowOption(value: AppStrings.youtube, icon: SVGs.icYoutube),
-    //   const KnowOption(value: AppStrings.tiktok, icon: SVGs.icTiktok),
-    //   const KnowOption(value: AppStrings.teachers, icon: SVGs.icTeacher),
-    //   const KnowOption(
-    //       value: AppStrings.contentCreators, icon: SVGs.icContentCreator),
-    // ];
     final knowOptions = ref.watch(knowOptionsProvider);
     final selectedKnowOption = useState<int?>(null);
+
     return AppScaffold(
       body: knowOptions.when(
         data: (options) => SliverScrollingWidget(
-          header: const TitoAdviceWidget(
-            text: AppStrings.fromWhereYouKnowTayssir,
-          ),
           children: [
-            10.verticalSpace,
+            24.verticalSpace,
+            const HeaderText(text: "من أين عرفتنا ؟")
+                .animate().fadeIn().slideY(begin: -0.1, end: 0),
+            
+            32.verticalSpace,
+            
+            const TitoAdviceWidget(
+              text: AppStrings.fromWhereYouKnowTayssir,
+              isHorizontal: false,
+            ).animate().fadeIn(delay: 100.ms).scale(curve: Curves.easeOutBack),
+            
+            40.verticalSpace,
+            
             ...List.generate(
               options.length,
               (index) => OptionSelection(
@@ -51,27 +52,35 @@ class KnowUsView extends HookConsumerWidget {
                 onPressed: () {
                   selectedKnowOption.value = options[index].id;
                 },
-                isSelected: selectedKnowOption.value != null &&
-                    selectedKnowOption.value == options[index].id,
-              ),
+                isSelected: selectedKnowOption.value == options[index].id,
+              ).animate().fadeIn(delay: (200 + index * 100).ms).slideX(begin: 0.1, end: 0),
             ),
-            const Spacer(),
-            if (context.isMediumDevice || context.isSmallDevice)
-              50.verticalSpace,
+            
+            40.verticalSpace,
+            
             BigButton(
               text: AppStrings.continueText,
               onPressed: selectedKnowOption.value != null &&
                       !ref.watch(registerControllerProvider).isLoading
                   ? () {
-                      ref
-                          .read(registerControllerProvider.notifier)
-                          .setKnowOption(selectedKnowOption.value!);
+                      ref.read(registerControllerProvider.notifier).setKnowOption(selectedKnowOption.value!);
                     }
                   : null,
-            ),
+            ).animate().fadeIn(delay: 800.ms).scale(),
+            
+            40.verticalSpace,
           ],
         ),
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(color: Color(0xFF00B4D8)),
+              16.verticalSpace,
+              const Text("جاري تحميل الخيارات...", style: TextStyle(fontFamily: 'SomarSans', fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ),
         error: (error, stack) => Center(child: Text('Error: $error')),
       ),
     );

@@ -27,6 +27,5 @@ class UserService {
   Future<UserModel> updateUser(UpdateUserRequest userReq) async {
     // can do optional validation here
     return await userRepository.updateUser(userReq);
-
   }
 }

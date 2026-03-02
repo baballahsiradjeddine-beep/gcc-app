@@ -47,6 +47,18 @@ extension doubleX on double {
     }
   }
 
+  String resultAssetKey() {
+    if (this < 0.5) {
+      return 'tito_angry';
+    } else if (this < 0.7) {
+      return 'tito_angry';
+    } else if (this < 0.9) {
+      return 'tito_good';
+    } else {
+      return 'tito_perfect';
+    }
+  }
+
   String toPercentage() {
     return "${(this * 100).toStringAsFixed(0)}%";
   }

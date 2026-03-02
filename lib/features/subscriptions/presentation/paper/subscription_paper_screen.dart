@@ -1,36 +1,33 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tayssir/common/app_buttons/big_button.dart';
 import 'package:tayssir/common/core/app_scaffold.dart';
 import 'package:tayssir/common/data/configs.dart';
-import 'package:tayssir/common/push_buttons/pushable_button.dart';
 import 'package:tayssir/common/sliver_scrolling_widget.dart';
+import 'package:tayssir/common/tito_advice_widget.dart';
+import 'package:tayssir/common/tito_bubble_talk_widget.dart';
 import 'package:tayssir/constants/strings.dart';
-import 'package:tayssir/features/subscriptions/presentation/paper/custom_back_button.dart';
 import 'package:tayssir/features/subscriptions/presentation/paper/upload_button.dart';
 import 'package:tayssir/features/subscriptions/presentation/paper/upload_button_failure.dart';
 import 'package:tayssir/features/subscriptions/presentation/paper/upload_button_successful.dart';
 import 'package:tayssir/features/subscriptions/presentation/paper/upload_progress_button.dart';
 import 'package:tayssir/features/subscriptions/presentation/state/paper/subscription_paper_controller.dart';
 import 'package:tayssir/providers/user/subscription_model.dart';
-import 'package:tayssir/resources/resources.dart';
+import 'package:tayssir/resources/colors/app_colors.dart';
 import 'package:tayssir/router/app_router.dart';
 import 'package:tayssir/services/actions/dialog_service.dart';
+import 'package:tayssir/utils/enums/triangle_side.dart';
 import 'package:tayssir/utils/extensions/async_value.dart';
 
-enum UploadStatus {
-  uploading,
-  uploaded,
-  error,
-  none,
-}
+enum UploadStatus { uploading, uploaded, error, none }
 
 class SubscriptionPaperScreen extends HookConsumerWidget {
   const SubscriptionPaperScreen({super.key, required this.subscription});
@@ -38,35 +35,34 @@ class SubscriptionPaperScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    return _SubscriptionPaperView(subscription: subscription);
+  }
+}
+
+class _SubscriptionPaperView extends HookConsumerWidget {
+  const _SubscriptionPaperView({required this.subscription});
+  final SubscriptionModel subscription;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final status = useState<UploadStatus>(UploadStatus.none);
     final progress = useState<double>(0);
     final file = useState<PlatformFile?>(null);
+    final nameController = useTextEditingController();
     final promotorCodeController = useTextEditingController();
-    final price = subscription.price;
     final configs = ref.watch(configsProvider).requireValue;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
-    ref.listen(subscriptionPaperControllerProvider.select((v) => v.state),
-        (prv, nxt) {
+    ref.listen(subscriptionPaperControllerProvider.select((v) => v.state), (prv, nxt) {
       nxt.handleSideThings(context, () {
         DialogService.showSubscriptionDialog(context, () {
           context.goNamed(AppRoutes.home.name);
         }, SubscrptionStatus.pending);
       }, shouldShowError: true);
     });
+
     pickFile() async {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.media,
-        // allowedExtensions: [
-        //   'jpg',
-        //   'pdf',
-        //   'doc',
-        //   'png',
-        //   'jpeg',
-        //   'docx',
-
-        // ],
-      );
-
+      final result = await FilePicker.platform.pickFiles(type: FileType.any); // Changed to any for PDFs
       if (result != null) {
         file.value = result.files.single;
         if (file.value!.size > 10 * 1024 * 1024) {
@@ -80,11 +76,7 @@ class SubscriptionPaperScreen extends HookConsumerWidget {
     Widget getStatusWidget({required UploadStatus uploadStatus}) {
       switch (uploadStatus) {
         case UploadStatus.none:
-          return UploadButton(
-            onTap: () async {
-              pickFile();
-            },
-          );
+          return UploadButton(onTap: pickFile);
         case UploadStatus.uploading:
           return UploadProgressButton(
             current: progress.value,
@@ -101,10 +93,7 @@ class SubscriptionPaperScreen extends HookConsumerWidget {
             fileSize: file.value?.size.toDouble() ?? 0,
           );
         case UploadStatus.error:
-          return UploadButtonFailure(
-            filename: file.value?.name ?? "",
-            onTap: pickFile,
-          );
+          return UploadButtonFailure(filename: file.value?.name ?? "", onTap: pickFile);
       }
     }
 
@@ -113,7 +102,7 @@ class SubscriptionPaperScreen extends HookConsumerWidget {
       if (status.value == UploadStatus.uploading) {
         timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
           if (progress.value < 100) {
-            progress.value += 5;
+            progress.value += 10;
           } else {
             status.value = UploadStatus.uploaded;
             timer.cancel();
@@ -125,290 +114,308 @@ class SubscriptionPaperScreen extends HookConsumerWidget {
 
     return AppScaffold(
       paddingY: 0,
-      topSafeArea: false,
-      body: SliverScrollingWidget(
+      topSafeArea: true,
+      body: Column(
         children: [
-          50.verticalSpace,
-          const CustomBackButton(),
-          // const TitoAdviceWidget(text: AppStrings.goodChoice),
-          10.verticalSpace,
-          PushableButton(
-            height: 120.h,
-            elevation: 7,
-            onPressed: null,
-            hasBorder: false,
-            hslColor: HSLColor.fromColor(const Color(0XFF175DC7)),
-            borderRadius: 20,
-            hslDisabledColor: HSLColor.fromColor(const Color(0XFF175DC7)),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(
-                20,
-                15,
-                20,
-                10,
-              ),
-              decoration: const BoxDecoration(
-                //gradiant
-                gradient: LinearGradient(
-                  colors: [
-                    Color(0XFF175DC7),
-                    Color(0XFF00C4F6),
-                  ],
-                ),
-                //RADIUS
-                borderRadius: BorderRadius.all(
-                  Radius.circular(20),
-                ),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // Header
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                RichText(
+                  text: TextSpan(
+                    style: TextStyle(
+                      fontSize: 32.sp,
+                      fontWeight: FontWeight.w900,
+                      fontFamily: 'SomarSans',
+                    ),
                     children: [
-                      Text(
-                        'ادفع لهذا الحساب :',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      TextSpan(
+                        text: "Tay",
+                        style: TextStyle(color: isDark ? Colors.white : const Color(0xFF1E293B)),
                       ),
-                      SvgPicture.asset(
-                        SVGs.latestLogo,
-                      )
+                      const TextSpan(
+                        text: "ssir",
+                        style: TextStyle(color: Color(0xFF00B4D8)),
+                      ),
                     ],
                   ),
-                  // 5.verticalSpace,
-                  // // text of 2500 da
-                  // Align(
-                  //   alignment: Alignment.centerRight,
-                  //   child: Text(
-                  //     // '2500 دج',
-                  //     // convert to price
-                  //     '${price.toStringAsFixed(0)} دج',
-                  //     style: TextStyle(
-                  //       color: Colors.white.withValues(alpha: 0.6),
-                  //       fontSize: 18.sp,
-                  //       fontWeight: FontWeight.w900,
-                  //     ),
-                  //   ),
-                  // ),
-                  12.verticalSpace,
-
-                  // Container(
-                  //   height: 35.h,
-                  //   alignment: Alignment.center,
-                  //   padding: EdgeInsets.symmetric(horizontal: 10.w),
-                  //   decoration: BoxDecoration(
-                  //     color: Colors.white,
-                  //     borderRadius: BorderRadius.circular(8),
-                  //   ),
-                  //   child: TextField(
-                  //     textAlignVertical: TextAlignVertical.center,
-                  //     keyboardType: TextInputType.number,
-                  //     maxLength: 12,
-                  //     onChanged: (value) {
-                  //       controller.text = value;
-                  //     },
-                  //     style: TextStyle(
-                  //         color: hasError ? Colors.red : Colors.black,
-                  //         fontSize: 16,
-                  //         letterSpacing: 10),
-                  //     textAlign: TextAlign.center,
-                  //     controller: controller,
-                  //     decoration: const InputDecoration(
-                  //       counterText: '',
-                  //       contentPadding: EdgeInsets.only(bottom: 10),
-                  //       border: InputBorder.none,
-                  //       hintText: 'أدخل رقم البطاقة',
-                  //       hintStyle: TextStyle(
-                  //           color: Colors.grey, fontSize: 14, letterSpacing: 1),
-                  //     ),
-                  //   ),
-                  // ),
-                  // 10.verticalSpace,
-                  // const Spacer(),
-                  // Align(
-                  //   alignment: Alignment.center,
-                  //   child: Text(
-                  //     'مع تيسيير الباك في الجيب Sur! 🚀✨',
-                  //     style: TextStyle(
-                  //       color: Colors.white,
-                  //       fontSize: 16.sp,
-                  //       fontWeight: FontWeight.bold,
-                  //     ),
-                  //   ),
-                  // ),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 15.w,
-                      vertical: 2.h,
-                    ),
+                ),
+                GestureDetector(
+                  onTap: () => context.pop(),
+                  child: Container(
+                    padding: EdgeInsets.all(10.r),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8.r),
+                      color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                      shape: BoxShape.circle,
                     ),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'الاسم :',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              // 'SIRADJ EDDINE BABALLAH',
-                              configs.paymentName ?? 'BAYAN E-LEARNING',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        8.verticalSpace,
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'الحساب:',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              // '00799999002888539926',
-                              configs.paymentNumber ?? '0022500000000',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                    child: Icon(
+                      Icons.arrow_back_rounded,
+                      color: isDark ? Colors.white : const Color(0xFF64748B),
+                      size: 22.sp,
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          20.verticalSpace,
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 0.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'رفع إيصال الدفع',
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                20.verticalSpace,
-                getStatusWidget(uploadStatus: status.value),
               ],
             ),
-          ),
-          20.verticalSpace,
-          Container(
-            padding: EdgeInsets.all(16.w),
-            decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: Colors.grey[200]!),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          ).animate().fadeIn(),
+
+          Expanded(
+            child: SliverScrollingWidget(
               children: [
+                20.verticalSpace,
+                
+                // Dolphin & Speech Bubble
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      Icons.card_giftcard,
-                      size: 20.w,
-                      color: Colors.blue[600],
-                    ),
-                    8.horizontalSpace,
                     Text(
-                      'كود المروج (اختياري)',
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey[800],
+                      "🐬",
+                      style: TextStyle(fontSize: 70.sp),
+                    ).animate(onPlay: (c) => c.repeat(reverse: true))
+                     .moveY(begin: 0, end: -6, duration: 4.seconds, curve: Curves.easeInOutSine),
+                    
+                    8.horizontalSpace,
+                    
+                    SizedBox(
+                      width: 180.w,
+                      child: const TitoBubbleTalkWidget(
+                        text: "أحسنت الإختيار! تيسير رفيقك نحو التفوق 😉",
+                        triangleSide: TriangleSide.right,
                       ),
                     ),
                   ],
-                ),
-                12.verticalSpace,
-                TextFormField(
-                  controller: promotorCodeController,
-                  textAlign: TextAlign.right,
-                  decoration: InputDecoration(
-                    hintText: 'أدخل كود المروج',
-                    hintStyle: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 14.sp,
+                ).animate().fadeIn(delay: 100.ms),
+                
+                20.verticalSpace,
+                
+                // Virtual Card with RIP
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(24.r),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF00B4D8), Color(0xFF005B8C)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.r),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.r),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.r),
-                      borderSide:
-                          BorderSide(color: Colors.blue[600]!, width: 2),
-                    ),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 12.h,
-                    ),
-                    prefixIcon: Icon(
-                      Icons.discount,
-                      color: Colors.grey[400],
-                      size: 20.w,
-                    ),
+                    borderRadius: BorderRadius.circular(24.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF00B4D8).withOpacity(0.35),
+                        blurRadius: 25,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Stack(
+                    children: [
+                      // Glow effect
+                      Positioned(
+                        top: -50,
+                        left: -50,
+                        child: Container(
+                          width: 200,
+                          height: 200,
+                          decoration: BoxDecoration(
+                            gradient: RadialGradient(
+                              colors: [Colors.white.withOpacity(0.15), Colors.transparent],
+                            ),
+                          ),
+                        ),
+                      ),
+                      
+                      Column(
+                        children: [
+                          Text(
+                            'قم بالدفع لهذا الحساب',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.9),
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'SomarSans',
+                            ),
+                          ),
+                          8.verticalSpace,
+                          Text(
+                            '${subscription.realPrice} دج',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 28.sp,
+                              fontWeight: FontWeight.w900,
+                              fontFamily: 'SomarSans',
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                          24.verticalSpace,
+                          Container(
+                            padding: EdgeInsets.all(20.r),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(16.r),
+                              border: Border.all(color: Colors.white.withOpacity(0.15)),
+                            ),
+                            child: Column(
+                              children: [
+                                _buildInfoRow("الإسم :", configs.paymentName ?? 'SIRADJ EDDINE BABALLAH', isDark, isName: true),
+                                16.verticalSpace,
+                                _buildInfoRow("الحساب (RIP) :", configs.paymentNumber ?? '00799999002888539926', isDark, isRIP: true),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ).animate().fadeIn(delay: 200.ms).scale(curve: Curves.easeOutBack),
+                
+                32.verticalSpace,
+                
+                // Form Section
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'إكمال عملية الدفع :',
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w900,
+                          color: isDark ? Colors.white : const Color(0xFF1E293B),
+                          fontFamily: 'SomarSans',
+                        ),
+                      ),
+                      16.verticalSpace,
+                      
+                      // Receipt upload
+                      getStatusWidget(uploadStatus: status.value).animate().fadeIn(delay: 300.ms),
+                      
+                      16.verticalSpace,
+                      
+                      // Name Input
+                      _buildPremiumInput(
+                        controller: nameController,
+                        hint: "الإسم واللقب",
+                        icon: Icons.person_rounded,
+                        isDark: isDark,
+                      ).animate().fadeIn(delay: 400.ms),
+                      
+                      16.verticalSpace,
+                      
+                      // Promotor Code
+                      _buildPremiumInput(
+                        controller: promotorCodeController,
+                        hint: "كود المروج (اختياري)",
+                        icon: Icons.card_giftcard_rounded,
+                        isDark: isDark,
+                      ).animate().fadeIn(delay: 500.ms),
+                    ],
                   ),
                 ),
+                
+                40.verticalSpace,
               ],
             ),
           ),
-          const Spacer(),
-          BigButton(
-            text: AppStrings.check,
-            onPressed: status.value == UploadStatus.uploaded
-                ? () {
-                    ref
-                        .read(subscriptionPaperControllerProvider.notifier)
-                        .subscribeWithPaper(
+          
+          // Fixed Bottom Action
+          ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                padding: EdgeInsets.fromLTRB(24.r, 12.r, 24.r, 32.r),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF0F172A).withOpacity(0.9) : Colors.white.withOpacity(0.9),
+                  border: Border(top: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9))),
+                ),
+                child: BigButton(
+                  text: "تحقق من المعلومات",
+                  onPressed: status.value == UploadStatus.uploaded
+                      ? () => ref.read(subscriptionPaperControllerProvider.notifier).subscribeWithPaper(
                           subscription: subscription,
-                          promotorCode: promotorCodeController.text.isEmpty
-                              ? null
-                              : promotorCodeController.text,
+                          promotorCode: promotorCodeController.text.isEmpty ? null : promotorCodeController.text,
                           file: File(file.value!.path!),
-                        );
-                  }
-                : null,
+                        )
+                      : null,
+                ).animate().fadeIn(delay: 700.ms).scale(curve: Curves.easeOutBack),
+              ),
+            ),
           ),
-
-          20.verticalSpace,
         ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value, bool isDark, {bool isRIP = false, bool isName = false}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13.sp, fontWeight: FontWeight.bold),
+        ),
+        8.verticalSpace,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: SelectableText(
+                value,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: isRIP ? 16.sp : 14.sp,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: isRIP ? 1.5 : 0,
+                  fontFamily: isRIP ? 'monospace' : 'SomarSans',
+                ),
+              ),
+            ),
+            IconButton(
+              icon: Icon(Icons.copy_rounded, color: Colors.white.withOpacity(0.7), size: 20.sp),
+              onPressed: () {
+                // Future: Add clipboard logic
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPremiumInput({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    required bool isDark,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+      ),
+      child: TextField(
+        controller: controller,
+        textAlign: TextAlign.right,
+        style: TextStyle(
+          color: isDark ? Colors.white : const Color(0xFF1E293B),
+          fontWeight: FontWeight.bold,
+          fontFamily: 'SomarSans',
+        ),
+        decoration: InputDecoration(
+          hintText: hint,
+          prefixIcon: Icon(icon, color: const Color(0xFF00B4D8)),
+          hintStyle: TextStyle(
+            color: const Color(0xFF94A3B8),
+            fontWeight: FontWeight.bold,
+          ),
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+        ),
       ),
     );
   }

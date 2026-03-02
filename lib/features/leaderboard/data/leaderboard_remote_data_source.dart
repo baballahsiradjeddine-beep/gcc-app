@@ -11,13 +11,14 @@ class LeaderboardRemoteDataSource {
     required this.dioClient,
   });
 
-  Future<Response> getLeaderboard(int page) async {
+  Future<Response> getLeaderboard(int page, {int? divisionId}) async {
     try {
       final response = await dioClient.get(
         EndPoints.leaderboard,
         queryParameters: {
           'page': page.toString(),
           'per_page': '100',
+          if (divisionId != null) 'division_id': divisionId.toString(),
         },
       );
       return response;
