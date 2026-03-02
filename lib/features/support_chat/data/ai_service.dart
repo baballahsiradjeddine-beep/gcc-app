@@ -13,20 +13,53 @@ final aiServiceProvider = Provider((ref) {
   final apiKey = configs?.titoApiKey ?? _kGeminiApiKey;
   final persona = configs?.titoPersona ?? AIService.systemPrompt;
   
-  return AIService(apiKey: apiKey, persona: persona);
+  return AIService(
+    apiKey: apiKey, 
+    persona: persona,
+    appGoal: configs?.titoAppGoal ?? '',
+    subscriptionPrice: configs?.titoSubscriptionPrice ?? '',
+    availableMaterials: configs?.titoAvailableMaterials ?? '',
+    socialLinks: configs?.titoSocialLinks ?? '',
+    strictMode: configs?.titoStrictMode ?? true,
+  );
 });
 
 class AIService {
   final String apiKey;
   final String persona;
+  final String appGoal;
+  final String subscriptionPrice;
+  final String availableMaterials;
+  final String socialLinks;
+  final bool strictMode;
   late final GenerativeModel model;
 
-  AIService({required this.apiKey, required this.persona}) {
+  AIService({
+    required this.apiKey, 
+    required this.persona,
+    this.appGoal = '',
+    this.subscriptionPrice = '',
+    this.availableMaterials = '',
+    this.socialLinks = '',
+    this.strictMode = true,
+  }) {
+    final fullInstructions = '''
+$persona
+
+معلومات إضافية عن التطبيق:
+- هدف التطبيق: $appGoal
+- أسعار الاشتراك: $subscriptionPrice
+- المواد المتوفرة: $availableMaterials
+- حساباتنا: $socialLinks
+
+${strictMode ? 'قاعدة صارمة: لا تجب على أي سؤال خارج نطاق الدراسة أو تطبيق تيسير. إذا سألك المستخدم عن الطقس أو الرياضة أو أي شيء آخر غير متعلق بالتعليم، أخبره بلباقة أنك مخصص للدراسة فقط والنجاح في البكالوريا.' : ''}
+''';
+
     model = GenerativeModel(
       model: 'gemini-flash-latest',
       apiKey: apiKey,
       requestOptions: const RequestOptions(apiVersion: 'v1beta'),
-      systemInstruction: Content.system(persona),
+      systemInstruction: Content.system(fullInstructions),
     );
   }
 

@@ -20,6 +20,12 @@ class ConfigModel {
   final String titoPersona;
   final String titoWelcomeMessage;
   final String titoApiKey;
+  final List<String> titoQaList;
+  final String titoAppGoal;
+  final String titoSubscriptionPrice;
+  final String titoAvailableMaterials;
+  final String titoSocialLinks;
+  final bool titoStrictMode;
 
   ConfigModel({
     required this.cardsActive,
@@ -37,6 +43,12 @@ class ConfigModel {
     required this.titoPersona,
     required this.titoWelcomeMessage,
     required this.titoApiKey,
+    required this.titoQaList,
+    required this.titoAppGoal,
+    required this.titoSubscriptionPrice,
+    required this.titoAvailableMaterials,
+    required this.titoSocialLinks,
+    required this.titoStrictMode,
   });
   factory ConfigModel.fromMap(Map<String, dynamic> map) {
     return ConfigModel(
@@ -55,6 +67,12 @@ class ConfigModel {
       titoPersona: map['tito_persona'] ?? '',
       titoWelcomeMessage: map['tito_welcome_message'] ?? '',
       titoApiKey: map['tito_api_key'] ?? '',
+      titoQaList: List<String>.from(map['tito_qa_list'] ?? []),
+      titoAppGoal: map['tito_app_goal'] ?? '',
+      titoSubscriptionPrice: map['tito_subscription_price'] ?? '',
+      titoAvailableMaterials: map['tito_available_materials'] ?? '',
+      titoSocialLinks: map['tito_social_links'] ?? '',
+      titoStrictMode: map['tito_strict_mode'] ?? true,
     );
   }
 }
@@ -83,19 +101,14 @@ final configsProvider = FutureProvider<ConfigModel>((ref) async {
       titoPersona: '''
 أنت "تيتو" (Tito)، المساعد الذكي لتطبيق "تيسير" (Tayssir) التعليمي لطلبة البكالوريا في الجزائر.
 مهمتك هي الإجابة على أسئلة الطلاب بذكاء وبطريقة مشجعة ومحفزة.
-
-معلومات عن التطبيق:
-1. الأسعار: اشتراك الفصل الواحد بـ {1000 دج}، أو اشتراك العام كاملاً بـ {2500 دج}.
-2. طريقة الاشتراك: الدفع عبر البطاقة الذهبية، CIB، أو عبر بطاقات تيسير المتوفرة في المكتبات.
-3. المحتوى: فيديوهات، دروس، تمارين تفاعلية، ومخططات ذهنية.
-4. المدربين: أساتذة ذوي خبرة في البكالوريا.
-
-قواعد الإجابة:
-- استخدم اللهجة الجزائرية الخفيفة الممزوجة بالفصحى.
-- كن مختصراً ومفيداً وشجع الطالب دائماً (برافو، راكم قدها).
-- إذا سأل عن شيء لا تعرفه، وجهه للتواصل مع الدعم الفني.
 ''',
       titoApiKey: '',
+      titoQaList: ["كم سعر الاشتراك؟", "ما هي المواد المتاحة؟", "ما هو هدف التطبيق؟", "كيف أتواصل معكم؟"],
+      titoAppGoal: 'تطبيق تيسير يهدف لتبسيط دروس البكالوريا لجميع الشعب في الجزائر عبر فيديوهات وتمارين تفاعلية.',
+      titoSubscriptionPrice: 'اشتراك الفصل الواحد بـ 1000 دج، أو العام كاملاً بـ 2500 دج.',
+      titoAvailableMaterials: 'كل مواد البكالوريا حسب الشعبة: رياضيات، علوم، فيزياء، لغات، أدب...',
+      titoSocialLinks: 'فيسبوك وتيك توك تحت اسم: Tayssir Bac',
+      titoStrictMode: true,
     );
   }
 });

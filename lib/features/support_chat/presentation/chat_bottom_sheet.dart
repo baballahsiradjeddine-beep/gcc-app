@@ -56,6 +56,11 @@ class ChatBottomSheet extends HookConsumerWidget {
             ),
           ),
 
+          // Suggestion Chips
+          _QuickSuggestions(
+            onSelect: (q) => ref.read(chatNotifierProvider.notifier).sendMessage(q),
+          ),
+
           // Input Area
           _ChatInput(controller: textController, isLoading: chatState.isLoading),
           16.verticalSpace,
@@ -228,6 +233,50 @@ class _ChatInput extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _QuickSuggestions extends ConsumerWidget {
+  final Function(String) onSelect;
+  const _QuickSuggestions({required this.onSelect});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final configs = ref.watch(configsProvider).valueOrNull;
+    final questions = configs?.titoQaList ?? [];
+    
+    if (questions.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      height: 50.h,
+      padding: EdgeInsets.symmetric(vertical: 8.h),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        reverse: true, // For RTL feel
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        itemCount: questions.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: EdgeInsets.only(left: 8.w),
+            child: ActionChip(
+              label: Text(
+                questions[index],
+                style: TextStyle(
+                  color: const Color(0xFF00B4D8),
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'SomarSans',
+                ),
+              ),
+              backgroundColor: const Color(0xFF00B4D8).withOpacity(0.1),
+              side: BorderSide(color: const Color(0xFF00B4D8).withOpacity(0.3)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+              onPressed: () => onSelect(questions[index]),
+            ),
+          );
+        },
       ),
     );
   }
