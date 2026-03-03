@@ -76,10 +76,11 @@ class DataService {
     return await _coursesRepository.submitAnswers(chapterId, answers);
   }
 
-  // bool isChapterAlreadySubmitted(int chapterId) {
-  //   final chapter = chapters.firstWhere((element) => element.id == chapterId);
-  //   bool isSubmitted = chapter.isSubmitted;
-  //   AppLogger.logInfo('isChapterAlreadySubmitted isSubmitted: $isSubmitted');
-  //   return isSubmitted;
-  // }
+  Future<List<ExerciseModel>> getReviewQuestions() async {
+    return await _coursesRepository.getTodayReview();
+  }
+
+  Future<void> submitReview(List<SubmissionAnswer> results) async {
+    await _coursesRepository.submitReview(results);
+  }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:tayssir/common/data/configs.dart';
 import '../logic/chat_notifier.dart';
 
 class ChatBottomSheet extends HookConsumerWidget {
@@ -42,24 +43,29 @@ class ChatBottomSheet extends HookConsumerWidget {
 
           // Messages List
           Expanded(
-            child: ListView.builder(
+            child: ListView(
               controller: scrollController,
               padding: EdgeInsets.all(20.w),
-              itemCount: chatState.messages.length + (chatState.isLoading ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == chatState.messages.length && chatState.isLoading) {
-                  return _TitoTypingIndicator();
-                }
-                final message = chatState.messages[index];
-                return _MessageBubble(message: message);
-              },
+              children: [
+                ...chatState.messages.map((m) => _MessageBubble(message: m)).toList(),
+                if (chatState.isLoading) _TitoTypingIndicator(),
+                if (chatState.messages.length <= 1 && !chatState.isLoading)
+                  Padding(
+                    padding: EdgeInsets.only(top: 20.h),
+                    child: _QuickSuggestions(
+                      showCentered: true,
+                      onSelect: (q) => ref.read(chatNotifierProvider.notifier).sendMessage(q),
+                    ),
+                  ),
+              ],
             ),
           ),
 
-          // Suggestion Chips
-          _QuickSuggestions(
-            onSelect: (q) => ref.read(chatNotifierProvider.notifier).sendMessage(q),
-          ),
+          // Bottom Suggestions (only when there is a conversation)
+          if (chatState.messages.length > 1)
+            _QuickSuggestions(
+              onSelect: (q) => ref.read(chatNotifierProvider.notifier).sendMessage(q),
+            ),
 
           // Input Area
           _ChatInput(controller: textController, isLoading: chatState.isLoading),
@@ -240,44 +246,61 @@ class _ChatInput extends ConsumerWidget {
 
 class _QuickSuggestions extends ConsumerWidget {
   final Function(String) onSelect;
-  const _QuickSuggestions({required this.onSelect});
+  final bool showCentered;
+  const _QuickSuggestions({required this.onSelect, this.showCentered = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final configs = ref.watch(configsProvider).valueOrNull;
-    final questions = configs?.titoQaList ?? [];
+    final List<String> questions = (configs?.titoQaList != null && configs!.titoQaList.isNotEmpty)
+        ? configs.titoQaList
+        : [
+            "كم سعر الاشتراك؟",
+            "ما هي المواد المتاحة؟",
+            "ما هو هدف التطبيق؟",
+            "كيف أتواصل معكم؟"
+          ];
     
-    if (questions.isEmpty) return const SizedBox.shrink();
-
-    return Container(
-      height: 50.h,
-      padding: EdgeInsets.symmetric(vertical: 8.h),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        reverse: true, // For RTL feel
-        padding: EdgeInsets.symmetric(horizontal: 16.w),
-        itemCount: questions.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: EdgeInsets.only(left: 8.w),
-            child: ActionChip(
-              label: Text(
-                questions[index],
-                style: TextStyle(
-                  color: const Color(0xFF00B4D8),
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'SomarSans',
-                ),
-              ),
-              backgroundColor: const Color(0xFF00B4D8).withOpacity(0.1),
-              side: BorderSide(color: const Color(0xFF00B4D8).withOpacity(0.3)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-              onPressed: () => onSelect(questions[index]),
+    final content = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: questions.map((q) => Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 6.h),
+        child: InkWell(
+          onTap: () => onSelect(q),
+          borderRadius: BorderRadius.circular(20.r),
+          child: Container(
+            width: showCentered ? 0.8.sw : double.infinity,
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: const Color(0xFF00B4D8).withOpacity(0.08),
+              border: Border.all(color: const Color(0xFF00B4D8).withOpacity(0.2)),
+              borderRadius: BorderRadius.circular(22.r),
             ),
-          );
-        },
-      ),
+            child: Text(
+              q,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: const Color(0xFF00B4D8),
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'SomarSans',
+              ),
+            ),
+          ),
+        ),
+      )).toList(),
+    );
+
+    if (showCentered) {
+      return Center(
+        child: content.animate().fadeIn(delay: 400.ms).scale(begin: const Offset(0.95, 0.95)),
+      );
+    }
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12.h),
+      child: content,
     );
   }
 }

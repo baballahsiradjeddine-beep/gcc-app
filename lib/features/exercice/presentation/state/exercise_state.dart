@@ -40,23 +40,27 @@ class ExerciseState extends Equatable {
   final double bestProgress;
   final AsyncValue<void> submittingStatus;
   final AsyncValue<void> reportingStatus;
-  const ExerciseState(
-      {required this.exercises,
-      required this.currentExerciceIndex,
-      required this.pageController,
-      required this.currentPage,
-      this.numberofCorrectAnswers = 0,
-      this.isShowResult = false,
-      this.isShowVideo = false,
-      this.isCorrect = false,
-      this.submissionAnswers = const [],
-      this.points = 0,
-      this.resultPoints = 0,
-      this.bestProgress = 0.0,
-      this.elapsedTime = Duration.zero,
-      this.resultStatus = ResultStatus.unset,
-      this.submittingStatus = const AsyncValue.data(null),
-      this.reportingStatus = const AsyncValue.data(null)});
+  final bool isReviewMode;
+
+  const ExerciseState({
+    required this.exercises,
+    required this.currentExerciceIndex,
+    required this.pageController,
+    required this.currentPage,
+    this.numberofCorrectAnswers = 0,
+    this.isShowResult = false,
+    this.isShowVideo = false,
+    this.isCorrect = false,
+    this.submissionAnswers = const [],
+    this.points = 0,
+    this.resultPoints = 0,
+    this.bestProgress = 0.0,
+    this.elapsedTime = Duration.zero,
+    this.resultStatus = ResultStatus.unset,
+    this.submittingStatus = const AsyncValue.data(null),
+    this.reportingStatus = const AsyncValue.data(null),
+    this.isReviewMode = false,
+  });
 
   // factory initial
   factory ExerciseState.initial() {
@@ -123,6 +127,7 @@ class ExerciseState extends Equatable {
     double? bestProgress,
     AsyncValue<void>? submittingStatus,
     AsyncValue<void>? reportingStatus,
+    bool? isReviewMode,
   }) {
     return ExerciseState(
       exercises: exercises ?? this.exercises,
@@ -142,6 +147,7 @@ class ExerciseState extends Equatable {
       bestProgress: bestProgress ?? this.bestProgress,
       submittingStatus: submittingStatus ?? this.submittingStatus,
       reportingStatus: reportingStatus ?? this.reportingStatus,
+      isReviewMode: isReviewMode ?? this.isReviewMode,
     );
   }
 
@@ -213,5 +219,6 @@ class ExerciseState extends Equatable {
         bestProgress,
         submittingStatus,
         reportingStatus,
+        isReviewMode,
       ];
 }

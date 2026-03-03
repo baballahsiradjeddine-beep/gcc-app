@@ -30,14 +30,15 @@ final chatNotifierProvider = StateNotifierProvider<ChatNotifier, ChatState>((ref
   final configs = ref.watch(configsProvider).valueOrNull;
   final welcomeMessage = configs?.titoWelcomeMessage ?? "أهلاً بك يا بطل! أنا تيتو، كيفاش نقدر نعاونك اليوم بخصوص قرايتك أو اشتراكك؟ 🐬✨";
   
-  return ChatNotifier(aiService, welcomeMessage: welcomeMessage);
+  return ChatNotifier(aiService, welcomeMessage: welcomeMessage, configs: configs);
 });
 
 class ChatNotifier extends StateNotifier<ChatState> {
   final AIService _aiService;
   final String welcomeMessage;
+  final ConfigModel? configs;
 
-  ChatNotifier(this._aiService, {required this.welcomeMessage}) : super(ChatState(messages: [
+  ChatNotifier(this._aiService, {required this.welcomeMessage, this.configs}) : super(ChatState(messages: [
     ChatMessage(
       text: welcomeMessage,
       isUser: false,
@@ -50,6 +51,28 @@ class ChatNotifier extends StateNotifier<ChatState> {
 
     final userMessage = ChatMessage(text: text, isUser: true, timestamp: DateTime.now());
     state = state.copyWith(messages: [...state.messages, userMessage], isLoading: true);
+
+    // Check for instant answers from configs
+    String? instantAnswer;
+    if (configs != null) {
+      final t = text.trim();
+      if (t == "كم سعر الاشتراك؟" || t.contains("سعر الاشتراك")) {
+        instantAnswer = configs!.titoSubscriptionPrice;
+      } else if (t == "ما هي المواد المتاحة؟" || t.contains("المواد المتاحة")) {
+        instantAnswer = configs!.titoAvailableMaterials;
+      } else if (t == "ما هو هدف التطبيق؟" || t.contains("هدف التطبيق")) {
+        instantAnswer = configs!.titoAppGoal;
+      } else if (t == "كيف أتواصل معكم؟" || t.contains("كيف أتواصل") || t.contains("مواقع التواصل")) {
+        instantAnswer = configs!.titoSocialLinks;
+      }
+    }
+
+    if (instantAnswer != null && instantAnswer.isNotEmpty) {
+      await Future.delayed(const Duration(milliseconds: 600)); // Smooth feeling
+      final assistantMessage = ChatMessage(text: instantAnswer, isUser: false, timestamp: DateTime.now());
+      state = state.copyWith(messages: [...state.messages, assistantMessage], isLoading: false);
+      return;
+    }
 
     // Prepare history for Gemini
     final history = state.messages

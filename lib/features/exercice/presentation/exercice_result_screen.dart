@@ -97,34 +97,71 @@ class ExerciceResultScreen extends HookConsumerWidget {
                 ),
               ],
             ),
-            30.verticalSpace,
-            ResultStatsWidget(
-                // value:
-                // '${bonusPoints > 0 ? "(اكمال الفصل)$bonusPoints + " : ""}${exercisesState.points}'
-                // .trim(),
-                value: getValue(),
-                title: getTitle(),
-                icon: isComplete ? SVGs.icResultCheck : SVGs.icGem),
-            15.verticalSpace,
-            Row(
-              children: [
-                Expanded(
-                    child: ResultStatsWidget(
-                        value: exercisesState.accuracy.toPercentage(),
-                        title: 'الدقة',
-                        icon: SVGs.icPrecision,
-                        startColor: const Color(0xffF87B7C),
-                        endColor: const Color(0xffF85556))),
-                8.horizontalSpace,
-                Expanded(
-                    child: ResultStatsWidget(
-                        value: exercisesState.elapsedTime.toTime,
-                        title: 'التوقيت',
-                        icon: SVGs.icTime,
-                        startColor: const Color(0xff3ADBA3),
-                        endColor: const Color(0xff00AC70))),
-              ],
-            ),
+            if (exercisesState.isReviewMode)
+               Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Container(
+                  padding: EdgeInsets.all(20.w),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF00B4D8).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20.r),
+                    border: Border.all(color: const Color(0xFF00B4D8).withOpacity(0.2)),
+                  ),
+                  child: Column(
+                    children: [
+                       Text(
+                        "ذكاء تيتو في تطور! 🧠",
+                        style: TextStyle(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.w900,
+                          color: const Color(0xFF00B4D8),
+                          fontFamily: 'SomarSans',
+                        ),
+                      ),
+                      10.verticalSpace,
+                      Text(
+                        "لقد أتممت مراجعة ذكية لـ ${exercisesState.exercises.length} سؤالاً كنت تعاني منهم سابقاً. لقد زادت نسبة إتقانك لهذه المواضيع بشكل ملحوظ!",
+                        textAlign: TextAlign.center,
+                        textDirection: TextDirection.rtl,
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          color: Colors.grey,
+                          fontFamily: 'SomarSans',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else ...[
+              ResultStatsWidget(
+                  // value:
+                  // '${bonusPoints > 0 ? "(اكمال الفصل)$bonusPoints + " : ""}${exercisesState.points}'
+                  // .trim(),
+                  value: getValue(),
+                  title: getTitle(),
+                  icon: isComplete ? SVGs.icResultCheck : SVGs.icGem),
+              15.verticalSpace,
+              Row(
+                children: [
+                  Expanded(
+                      child: ResultStatsWidget(
+                          value: exercisesState.accuracy.toPercentage(),
+                          title: 'الدقة',
+                          icon: SVGs.icPrecision,
+                          startColor: const Color(0xffF87B7C),
+                          endColor: const Color(0xffF85556))),
+                  8.horizontalSpace,
+                  Expanded(
+                      child: ResultStatsWidget(
+                          value: exercisesState.elapsedTime.toTime,
+                          title: 'التوقيت',
+                          icon: SVGs.icTime,
+                          startColor: const Color(0xff3ADBA3),
+                          endColor: const Color(0xff00AC70))),
+                ],
+              ),
+            ],
             const Spacer(),
             10.verticalSpace,
             BigButton(
@@ -141,6 +178,10 @@ class ExerciceResultScreen extends HookConsumerWidget {
                 await Future.delayed(const Duration(milliseconds: 100));
 
                 if (context.mounted) {
+                  if (exercisesState.isReviewMode) {
+                    context.goNamed(AppRoutes.home.name);
+                    return;
+                  }
                   final chapterId = exercisesState.exercises.first.chapterId;
                   
                   // Special handling for the guest tutorial tour

@@ -36,6 +36,17 @@ class RemoteCoursesDataSource {
     );
     return response;
   }
+
+  Future<Response> getTodayReview() async {
+    return await _dioClient.get(EndPoints.getTodayReview);
+  }
+
+  Future<Response> submitReview(List<Map<String, dynamic>> results) async {
+    return await _dioClient.post(
+      EndPoints.submitReview,
+      data: {'results': results},
+    );
+  }
 }
 
 class ReportExoDto {

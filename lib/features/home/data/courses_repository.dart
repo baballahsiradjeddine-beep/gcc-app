@@ -117,4 +117,27 @@ class DataRepository {
       rethrow;
     }
   }
+
+  Future<List<ExerciseModel>> getTodayReview() async {
+    try {
+      final response = await _coursesDataSource.getTodayReview();
+      final questions = response.customData['questions'] as List;
+      return questions.map((q) => ExerciseModel.fromMap(q)).toList();
+    } catch (e) {
+      AppLogger.logError('Error getting review: $e');
+      return [];
+    }
+  }
+
+  Future<void> submitReview(List<SubmissionAnswer> results) async {
+    try {
+      final payload = results.map((r) => {
+        'question_id': r.questionId,
+        'is_correct': r.isCorrect,
+      }).toList();
+      await _coursesDataSource.submitReview(payload);
+    } catch (e) {
+      AppLogger.logError('Error submitting review: $e');
+    }
+  }
 }

@@ -12,6 +12,8 @@ import 'models/exercise_model.dart';
 
 class DataState extends Equatable {
   final ContentData contentData;
+  final int pendingReviewsCount;
+
   const DataState({
     this.contentData = const ContentData(
       modules: [],
@@ -19,13 +21,16 @@ class DataState extends Equatable {
       chapters: [],
       exercises: [],
     ),
+    this.pendingReviewsCount = 0,
   });
 
   DataState copyWith({
     ContentData? contentData,
+    int? pendingReviewsCount,
   }) {
     return DataState(
       contentData: contentData ?? this.contentData,
+      pendingReviewsCount: pendingReviewsCount ?? this.pendingReviewsCount,
     );
   }
 
@@ -358,5 +363,5 @@ class DataState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [contentData];
+  List<Object?> get props => [contentData, pendingReviewsCount];
 }

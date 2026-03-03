@@ -141,6 +141,12 @@ class ExerciseNotifier extends StateNotifier<ExerciseState> {
     }
   }
 
+  Future<void> startReview() async {
+    state = state.copyWith(isReviewMode: true, exercises: []);
+    final reviews = await courseService.getReviewQuestions();
+    state = state.copyWith(exercises: reviews);
+  }
+
   Future<void> completeExercise(BuildContext context) async {
     final time = _calculateElapsedTime();
     final exercicePoints = state.currentExercise.points;
@@ -161,6 +167,16 @@ class ExerciseNotifier extends StateNotifier<ExerciseState> {
 
     // add try catch here to handle errors later on
     state = state.setSubmittingStatus(const AsyncLoading<void>());
+
+    if (state.isReviewMode) {
+      await courseService.submitReview(state.submissionAnswers);
+      state = state.setSubmittingStatus(const AsyncData<void>(null));
+      if (context.mounted) {
+        context.pushReplacementNamed(AppRoutes.results.name);
+      }
+      return;
+    }
+
     final response = await ref.read(dataProvider.notifier).submitAnswers(
           state.submissionAnswers,
           chapterId,

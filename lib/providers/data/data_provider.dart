@@ -42,6 +42,16 @@ class DataController extends StateNotifier<DataState> {
   DataController(this.dataService, this.ref) : super(const DataState()) {
     // getData();
   }
+
+  Future<void> checkPendingReviews() async {
+    try {
+      final reviews = await dataService.getReviewQuestions();
+      state = state.copyWith(pendingReviewsCount: reviews.length);
+    } catch (e) {
+      state = state.copyWith(pendingReviewsCount: 0);
+    }
+  }
+
   Future<void> getData() async {
     try {
       // For guest users, pass the onboarding division_id as query param

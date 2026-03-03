@@ -54,4 +54,6 @@ class EndPoints {
   static const pingStreak = '/v2/streaks/ping';
   static const reportExercise = '/v2/reports/question';
   static const contactUs = '/v2/reports/contact';
+  static const getTodayReview = '/v1/review/today';
+  static const submitReview = '/v1/review/submit';
 }

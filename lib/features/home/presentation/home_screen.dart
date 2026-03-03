@@ -20,6 +20,7 @@ import 'widgets/course_widget.dart';
 import 'subscribe_section.dart';
 import 'view_style.dart';
 import '../../support_chat/presentation/tito_support_fab.dart';
+import '../../exercice/presentation/widgets/review_ai_popup.dart';
 
 class HomeScreen extends HookConsumerWidget {
   const HomeScreen({super.key});
@@ -58,6 +59,24 @@ class HomeScreen extends HookConsumerWidget {
       }
       return null;
     }, [onboarding.tourStep, courses.length]);
+
+    // Check for AI Review if user is not guest
+    useEffect(() {
+      if (!isGuest) {
+        Future.microtask(() async {
+          await ref.read(dataProvider.notifier).checkPendingReviews();
+          final count = ref.read(dataProvider).pendingReviewsCount;
+          if (count > 0 && context.mounted) {
+             showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => ReviewAIPopup(count: count),
+            );
+          }
+        });
+      }
+      return null;
+    }, [isGuest]);
 
     return AppScaffold(
       paddingB: 0,
