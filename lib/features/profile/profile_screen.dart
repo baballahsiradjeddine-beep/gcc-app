@@ -211,14 +211,16 @@ class ProfileScreen extends HookConsumerWidget {
           //iser points
           if (user.subscriptions.isNotEmpty) ...[
             8.verticalSpace,
-            Container(
+            Builder(builder: (context) {
+            final bool isDark = Theme.of(context).brightness == Brightness.dark;
+            return Container(
               margin: EdgeInsets.symmetric(horizontal: 3.w),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16.r),
-                color: Colors.white,
+                color: isDark ? const Color(0xFF1E293B) : Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
+                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.08),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                     spreadRadius: 0.5,
@@ -410,7 +412,8 @@ class ProfileScreen extends HookConsumerWidget {
                   ],
                 ),
               ),
-            ),
+            );
+            }),
           ],
 
           20.verticalSpace,

@@ -35,9 +35,9 @@ class TayssirProgressWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(32.r), // Standardized border radius matched exactly to SubscribeButton
         boxShadow: [
           BoxShadow(
-            color: const Color(0xffEC4899).withOpacity(0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: const Color(0xffEC4899).withOpacity(0.15),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
         ],
       ),

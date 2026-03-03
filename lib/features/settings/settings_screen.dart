@@ -159,15 +159,15 @@ class SettingsScreen extends HookConsumerWidget {
                       ),
                       20.verticalSpace,
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _buildSocialIcon(SVGs.telegram, () => _launchUrl(AppConsts.telegramLink, context)),
-                          20.horizontalSpace,
-                          _buildSocialIcon(SVGs.instagram, () => _launchUrl(AppConsts.instagramLink, context)),
-                          20.horizontalSpace,
-                          _buildSocialIcon(SVGs.youtube, () => _launchUrl(AppConsts.youtubeLink, context)),
-                        ],
-                      ),
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildSocialIcon(SVGs.telegram, () => _launchUrl(AppConsts.telegramLink, context), isDark),
+                  20.horizontalSpace,
+                  _buildSocialIcon(SVGs.instagram, () => _launchUrl(AppConsts.instagramLink, context), isDark),
+                  20.horizontalSpace,
+                  _buildSocialIcon(SVGs.youtube, () => _launchUrl(AppConsts.youtubeLink, context), isDark),
+                ],
+              ),
                     ],
                   ),
                 ),
@@ -198,17 +198,17 @@ class SettingsScreen extends HookConsumerWidget {
     );
   }
 
-  Widget _buildSocialIcon(String svg, VoidCallback onTap) {
+  Widget _buildSocialIcon(String svg, VoidCallback onTap, bool isDark) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.all(10.r),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF334155) : Colors.white,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),

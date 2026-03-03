@@ -76,14 +76,18 @@ class CustomLessonWidget extends ConsumerWidget {
                           begin: Alignment.centerRight,
                           end: Alignment.centerLeft,
                         ),
-                  color: isLocked ? const Color(0xffE2E8F0) : null,
+                  color: isLocked 
+                      ? (Theme.of(context).brightness == Brightness.dark 
+                          ? const Color(0xFF1E293B) 
+                          : const Color(0xffF1F5F9)) 
+                      : null,
                   boxShadow: [
                     BoxShadow(
                       color: isLocked 
                           ? Colors.black.withOpacity(0.04)
-                          : const Color(0xff00B4D8).withOpacity(0.2),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
+                          : const Color(0xff00B4D8).withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
@@ -114,7 +118,11 @@ class CustomLessonWidget extends ConsumerWidget {
                             maxLines: 2,
                             overflow: TextOverflow.visible,
                             style: TextStyle(
-                              color: isLocked ? const Color(0xff64748B) : Colors.white,
+                              color: isLocked 
+                                  ? (Theme.of(context).brightness == Brightness.dark 
+                                      ? const Color(0xFF94A3B8) 
+                                      : const Color(0xff64748B))
+                                  : Colors.white,
                               fontSize: 14.sp,
                               fontWeight: FontWeight.w900,
                               fontFamily: 'SomarSans',
@@ -131,13 +139,19 @@ class CustomLessonWidget extends ConsumerWidget {
                           height: 32.h,
                           decoration: BoxDecoration(
                             color: isLocked 
-                                ? const Color(0xffCBD5E0).withOpacity(0.5)
+                                ? (Theme.of(context).brightness == Brightness.dark 
+                                    ? const Color(0xFF334155) 
+                                    : const Color(0xffCBD5E0).withOpacity(0.5))
                                 : Colors.white.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(10.r),
                           ),
                           child: Icon(
                             getLessonIcon(),
-                            color: isLocked ? const Color(0xff64748B) : Colors.white,
+                            color: isLocked 
+                                ? (Theme.of(context).brightness == Brightness.dark 
+                                    ? const Color(0xFF64748B) 
+                                    : const Color(0xff64748B))
+                                : Colors.white,
                             size: 18.sp,
                           ),
                         ),
