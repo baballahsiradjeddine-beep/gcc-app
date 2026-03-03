@@ -208,7 +208,10 @@ class DataState extends Equatable {
   }
 
   ChapterModel getChapterById(int id) {
-    return contentData.chapters.firstWhere((element) => element.id == id);
+    return contentData.chapters.firstWhere(
+      (element) => element.id == id,
+      orElse: () => ChapterModel(id: id, title: 'مراجعة ذكية', unitId: -1, progress: 0),
+    );
   }
 
   bool isCurrentCHapter(int chapterId, int unitId, bool isPro) {
@@ -351,14 +354,18 @@ class DataState extends Equatable {
   }
 
   bool isPremiumChapter(int chapterId) {
-    final chapter =
-        contentData.chapters.firstWhere((element) => element.id == chapterId);
+    final chapter = contentData.chapters.firstWhere(
+      (element) => element.id == chapterId,
+      orElse: () => const ChapterModel(id: -1, title: '', unitId: -1, progress: 0),
+    );
     return chapter.visibility == ChapterVisibility.premium;
   }
 
   ChapterVisibility getChapterVisibility(int chapterId) {
-    final chapter =
-        contentData.chapters.firstWhere((element) => element.id == chapterId);
+    final chapter = contentData.chapters.firstWhere(
+      (element) => element.id == chapterId,
+      orElse: () => const ChapterModel(id: -1, title: '', unitId: -1, progress: 0),
+    );
     return chapter.visibility;
   }
 

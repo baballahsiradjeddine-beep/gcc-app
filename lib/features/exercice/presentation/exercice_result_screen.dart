@@ -33,8 +33,10 @@ class ExerciceResultScreen extends HookConsumerWidget {
 
     final isComplete = exercisesState.bestProgress == 100;
     final user = ref.watch(userNotifierProvider).valueOrNull;
-    final visib = dataState
-        .getChapterVisibility(exercisesState.exercises.first.chapterId);
+    final firstChapterId = exercisesState.exercises.isNotEmpty 
+        ? exercisesState.exercises.first.chapterId 
+        : -1;
+    final visib = dataState.getChapterVisibility(firstChapterId);
 
     String getTitle() {
       switch (visib) {
@@ -168,7 +170,7 @@ class ExerciceResultScreen extends HookConsumerWidget {
               text: AppStrings.continueText,
               onPressed: () async {
                 final unitId = dataState
-                    .getChapterById(exercisesState.exercises.first.chapterId)
+                    .getChapterById(firstChapterId)
                     .unitId;
 
                 final streakState = ref.read(streakNotifierProvider).value;
@@ -198,7 +200,7 @@ class ExerciceResultScreen extends HookConsumerWidget {
                     await AppLogger.sendLog(
                       email: user!.email,
                       content:
-                          'Finished exercise: ${dataState.getChapterById(exercisesState.exercises.first.chapterId).title} Accuracy: ${exercisesState.accuracy.toPercentage()}',
+                          'Finished exercise: ${dataState.getChapterById(firstChapterId).title} Accuracy: ${exercisesState.accuracy.toPercentage()}',
                       type: LogType.chapters,
                     );
                   }
