@@ -17,6 +17,8 @@ import 'exercise_state.dart';
 
 final currentUnitIdProvider = StateProvider<int>((ref) => 0);
 final currentChapterIdProvider = StateProvider<int>((ref) => 0);
+final isReviewProvider = StateProvider<bool>((ref) => false);
+final isDebugReviewProvider = StateProvider<bool>((ref) => false);
 
 enum ResultStatus { unset, bad, good, average }
 
@@ -39,10 +41,25 @@ class ExerciseNotifier extends StateNotifier<ExerciseState> {
   DateTime? _startTime;
   ExerciseNotifier(this.chapterId, this.courseService, this.ref)
       : super(ExerciseState.initial()) {
-    getExercices();
-    // _startTimer();
+    _init();
     _startTime = DateTime.now();
   }
+
+  void _init() async {
+    final isReview = ref.read(isReviewProvider);
+    final isDebug = ref.read(isDebugReviewProvider);
+
+    if (isReview) {
+      if (isDebug) {
+        debugStartReview();
+      } else {
+        await startReview();
+      }
+    } else {
+      getExercices();
+    }
+  }
+
   void getExercices() async {
     final exercises = courseService.getExercises(chapterId);
     state = state.copyWith(exercises: exercises);

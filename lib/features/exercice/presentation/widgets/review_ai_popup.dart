@@ -96,9 +96,11 @@ class ReviewAIPopup extends ConsumerWidget {
                       onPressed: () {
                         Navigator.pop(context);
                         if (isDebug) {
-                          ref.read(exercicesProvider.notifier).debugStartReview();
+                          ref.read(isReviewProvider.notifier).state = true;
+                          ref.read(isDebugReviewProvider.notifier).state = true;
                         } else {
-                          ref.read(exercicesProvider.notifier).startReview();
+                          ref.read(isReviewProvider.notifier).state = true;
+                          ref.read(isDebugReviewProvider.notifier).state = false;
                         }
                         context.pushNamed(AppRoutes.exercices.name);
                       },

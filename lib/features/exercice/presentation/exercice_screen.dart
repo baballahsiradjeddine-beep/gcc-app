@@ -104,11 +104,25 @@ class ExerciceScreen extends HookConsumerWidget {
         ? null 
         : ref.watch(dataProvider).getChapterById(exercisesState.currentExercise.chapterId).unitId;
 
+    useEffect(() {
+      return () {
+        // Reset review flags when leaving
+        Future.microtask(() {
+          ref.read(isReviewProvider.notifier).state = false;
+          ref.read(isDebugReviewProvider.notifier).state = false;
+        });
+      };
+    }, []);
+
     handleLeaving() {
       BottomSheetService.showLeaveBottomSheet(context, (ctx) async {
         ctx.pop();
         await Future.delayed(const Duration(milliseconds: 100));
         if (context.mounted) {
+          // Reset review flags explicitly
+          ref.read(isReviewProvider.notifier).state = false;
+          ref.read(isDebugReviewProvider.notifier).state = false;
+          
           if (unitId != null) {
             context.pushReplacementNamed(
               AppRoutes.chapters.name,
