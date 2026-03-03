@@ -113,47 +113,86 @@ class HomeScreen extends HookConsumerWidget {
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-                child: Row(
+                child: Column(
                   children: [
-                    Container(
-                      width: 8.w,
-                      height: 24.h,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF00B4D8),
-                        borderRadius: BorderRadius.circular(4.r),
-                      ),
-                    ),
-                    12.horizontalSpace,
-                    Text(
-                      "المواد المتاحة :",
-                      style: TextStyle(
-                        fontSize: 22.sp,
-                        fontWeight: FontWeight.w900,
-                        color: isDark ? Colors.white : const Color(0xFF1E293B),
-                        fontFamily: 'SomarSans',
-                      ),
-                    ),
-                    const Spacer(),
-                    // Layout Toggle
+                    // Temporary Debug Button
                     GestureDetector(
                       onTap: () {
-                        viewStyle.value = viewStyle.value == ViewStyle.grid 
-                            ? ViewStyle.list 
-                            : ViewStyle.grid;
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) => const ReviewAIPopup(count: 5, isDebug: true),
+                        );
                       },
                       child: Container(
-                        width: 44.sp,
-                        height: 44.sp,
+                        padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 20.w),
+                        margin: EdgeInsets.only(bottom: 20.h),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-                          borderRadius: BorderRadius.circular(16.r),
+                          color: const Color(0xFF00B4D8).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(15.r),
+                          border: Border.all(color: const Color(0xFF00B4D8).withOpacity(0.3)),
                         ),
-                        child: Icon(
-                          viewStyle.value == ViewStyle.grid ? Icons.list_rounded : Icons.grid_view_rounded,
-                          color: const Color(0xFF00B4D8),
-                          size: 26.sp,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("🤖", style: TextStyle(fontSize: 20.sp)),
+                            12.horizontalSpace,
+                            Text(
+                              "تجربة نظام المراجعة الذكية (مؤقت)",
+                              style: TextStyle(
+                                color: const Color(0xFF00B4D8),
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'SomarSans',
+                              ),
+                            ),
+                          ],
                         ),
                       ),
+                    ),
+                    Row(
+                      children: [
+                        Container(
+                          width: 8.w,
+                          height: 24.h,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF00B4D8),
+                            borderRadius: BorderRadius.circular(4.r),
+                          ),
+                        ),
+                        12.horizontalSpace,
+                        Text(
+                          "المواد المتاحة :",
+                          style: TextStyle(
+                            fontSize: 22.sp,
+                            fontWeight: FontWeight.w900,
+                            color: isDark ? Colors.white : const Color(0xFF1E293B),
+                            fontFamily: 'SomarSans',
+                          ),
+                        ),
+                        const Spacer(),
+                        // Layout Toggle
+                        GestureDetector(
+                          onTap: () {
+                            viewStyle.value = viewStyle.value == ViewStyle.grid 
+                                ? ViewStyle.list 
+                                : ViewStyle.grid;
+                          },
+                          child: Container(
+                            width: 44.sp,
+                            height: 44.sp,
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(16.r),
+                            ),
+                            child: Icon(
+                              viewStyle.value == ViewStyle.grid ? Icons.list_rounded : Icons.grid_view_rounded,
+                              color: const Color(0xFF00B4D8),
+                              size: 26.sp,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

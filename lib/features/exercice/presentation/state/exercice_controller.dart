@@ -147,6 +147,42 @@ class ExerciseNotifier extends StateNotifier<ExerciseState> {
     state = state.copyWith(exercises: reviews);
   }
 
+  void debugStartReview() {
+    state = state.copyWith(
+      isReviewMode: true,
+      exercises: [
+        ExerciseModel.fromMap({
+          "id": -100,
+          "type": "multiple_choices",
+          "chapter_id": -1,
+          "points": 5,
+          "scope": "review",
+          "direction": "RTL",
+          "question": {"value": "اختبار المراجعة الذكية: هل يعمل النظام بشكل صحيح؟ (سؤال 1)", "is_latex": false},
+          "options": [
+            {"value": "نعم، يعمل بامتياز", "is_latex": false},
+            {"value": "لا، يحتاج تعديل", "is_latex": false}
+          ],
+          "correctOptions": [0],
+          "hint": [],
+          "explanation_text": {"value": "هذا سؤال تجريبي للتأكد من نظام المراجعة", "is_latex": false}
+        }),
+        ExerciseModel.fromMap({
+          "id": -101,
+          "type": "true_or_false",
+          "chapter_id": -1,
+          "points": 5,
+          "scope": "review",
+          "direction": "RTL",
+          "question": {"value": "نظام تيسير يستخدم الذكاء الاصطناعي لتحليل أخطائك", "is_latex": false},
+          "correctAnswer": true,
+          "hint": [],
+          "explanation_text": {"value": "صحيح، النظام يحلل نقاط ضعفك لتقويتها", "is_latex": false}
+        }),
+      ],
+    );
+  }
+
   Future<void> completeExercise(BuildContext context) async {
     final time = _calculateElapsedTime();
     final exercicePoints = state.currentExercise.points;

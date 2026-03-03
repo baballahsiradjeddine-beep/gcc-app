@@ -9,8 +9,9 @@ import 'package:go_router/go_router.dart';
 
 class ReviewAIPopup extends ConsumerWidget {
   final int count;
+  final bool isDebug;
 
-  const ReviewAIPopup({super.key, required this.count});
+  const ReviewAIPopup({super.key, required this.count, this.isDebug = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -88,13 +89,17 @@ class ReviewAIPopup extends ConsumerWidget {
                     ),
                   ),
                   12.horizontalSpace,
-                  Expanded(
+                    Expanded(
                     child: _Button(
                       text: "ابدأ المراجعة",
                       isPrimary: true,
                       onPressed: () {
                         Navigator.pop(context);
-                        ref.read(exercicesProvider.notifier).startReview();
+                        if (isDebug) {
+                          ref.read(exercicesProvider.notifier).debugStartReview();
+                        } else {
+                          ref.read(exercicesProvider.notifier).startReview();
+                        }
                         context.pushNamed(AppRoutes.exercices.name);
                       },
                     ),

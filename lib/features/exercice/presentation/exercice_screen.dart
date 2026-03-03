@@ -98,22 +98,27 @@ class ExerciceScreen extends HookConsumerWidget {
     );
 
     final backgroundColor = Theme.of(context).scaffoldBackgroundColor;
-    final unitId = ref
-        .watch(dataProvider)
-        .getChapterById(exercisesState.currentExercise.chapterId)
-        .unitId;
+    
+    // For review mode, we don't have a specific chapter/unit
+    final int? unitId = exercisesState.isReviewMode 
+        ? null 
+        : ref.watch(dataProvider).getChapterById(exercisesState.currentExercise.chapterId).unitId;
 
     handleLeaving() {
       BottomSheetService.showLeaveBottomSheet(context, (ctx) async {
         ctx.pop();
         await Future.delayed(const Duration(milliseconds: 100));
         if (context.mounted) {
-          context.pushReplacementNamed(
-            AppRoutes.chapters.name,
-            pathParameters: {
-              'unitId': unitId.toString(),
-            },
-          );
+          if (unitId != null) {
+            context.pushReplacementNamed(
+              AppRoutes.chapters.name,
+              pathParameters: {
+                'unitId': unitId.toString(),
+              },
+            );
+          } else {
+            context.goNamed(AppRoutes.home.name);
+          }
         }
       }, (ctx) {
         ctx.pop();

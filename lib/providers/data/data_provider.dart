@@ -52,6 +52,10 @@ class DataController extends StateNotifier<DataState> {
     }
   }
 
+  void debugTriggerReview() {
+    state = state.copyWith(pendingReviewsCount: 5);
+  }
+
   Future<void> getData() async {
     try {
       // For guest users, pass the onboarding division_id as query param
