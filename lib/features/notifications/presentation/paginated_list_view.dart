@@ -8,6 +8,7 @@ class PaginatedListView<T> extends StatelessWidget {
   final bool isFetchingMore;
   final VoidCallback onLoadMore;
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
+  final EdgeInsetsGeometry? padding;
 
   const PaginatedListView({
     super.key,
@@ -16,13 +17,14 @@ class PaginatedListView<T> extends StatelessWidget {
     required this.isFetchingMore,
     required this.onLoadMore,
     required this.itemBuilder,
+    this.padding,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       shrinkWrap: true,
-      padding: EdgeInsets.zero,
+      padding: padding ?? EdgeInsets.zero,
       itemCount: data.length + (canLoadMore ? 1 : 0),
       itemBuilder: (context, index) {
         if (index == data.length) {
