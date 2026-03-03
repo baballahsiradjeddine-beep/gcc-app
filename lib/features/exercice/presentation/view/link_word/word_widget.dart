@@ -72,9 +72,8 @@ class WordWidget extends StatelessWidget {
           boxShadow: (isSelected || isCorrect || isWrong) 
               ? [
                   BoxShadow(
-                    color: color.withOpacity(0.35),
-                    blurRadius: 15,
-                    spreadRadius: 2,
+                    color: color.withOpacity(0.15),
+                    blurRadius: 8,
                   )
                 ]
               : [

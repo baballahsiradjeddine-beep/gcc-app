@@ -162,9 +162,8 @@ class TrueFalseExerciseView extends ConsumerWidget {
             boxShadow: isSelected 
                 ? [
                     BoxShadow(
-                      color: color.withOpacity(0.35),
-                      blurRadius: 20,
-                      spreadRadius: 2,
+                      color: color.withOpacity(0.15),
+                      blurRadius: 12,
                     )
                   ]
                 : [

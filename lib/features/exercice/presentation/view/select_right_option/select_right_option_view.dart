@@ -69,8 +69,8 @@ class SelectRightOptionExerciseView extends HookConsumerWidget {
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
-                          color: AppColors.primaryColor.withOpacity(0.35),
-                          blurRadius: 20,
+                          color: AppColors.primaryColor.withOpacity(0.15),
+                          blurRadius: 12,
                           offset: const Offset(0, 4),
                         )
                       ]

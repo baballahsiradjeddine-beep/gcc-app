@@ -121,7 +121,7 @@ class MidResultScreen extends HookConsumerWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      getStatusColor().withOpacity(0.15),
+                      getStatusColor().withOpacity(0.08),
                       getStatusColor().withOpacity(0.0),
                     ],
                   ),

@@ -56,9 +56,9 @@ class AnomalyWordWidget extends ConsumerWidget {
           boxShadow: isSelected 
               ? [
                   BoxShadow(
-                    color: AppColors.primaryColor.withOpacity(0.4),
-                    blurRadius: 20,
-                    offset: const Offset(0, 4),
+                    color: AppColors.primaryColor.withOpacity(0.15),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
                   )
                 ]
               : [

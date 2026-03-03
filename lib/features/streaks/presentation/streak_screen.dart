@@ -44,7 +44,7 @@ class StreakScreen extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      const Color(0xFFF28F3B).withOpacity(0.15),
+                      const Color(0xFFF28F3B).withOpacity(0.08),
                       const Color(0xFFF28F3B).withOpacity(0.0),
                     ],
                   ),
@@ -109,9 +109,9 @@ class StreakScreen extends StatelessWidget {
                             color: const Color(0xFFF28F3B).withOpacity(0.1),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFFF28F3B).withOpacity(0.2),
-                                blurRadius: 30,
-                                spreadRadius: 5,
+                                color: const Color(0xFFF28F3B).withOpacity(0.1),
+                                blurRadius: 20,
+                                spreadRadius: 3,
                               )
                             ]
                           ),
@@ -287,8 +287,8 @@ class StreakScreen extends StatelessWidget {
             boxShadow: [
               if (isCompleted)
                 BoxShadow(
-                  color: const Color(0xFF00B4D8).withOpacity(0.3),
-                  blurRadius: 8,
+                  color: const Color(0xFF00B4D8).withOpacity(0.15),
+                  blurRadius: 6,
                   offset: const Offset(0, 2),
                 )
             ]

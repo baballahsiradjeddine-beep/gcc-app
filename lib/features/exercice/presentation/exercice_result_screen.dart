@@ -92,7 +92,7 @@ class ExerciceResultScreen extends HookConsumerWidget {
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        AppColors.primaryColor.withOpacity(0.12),
+                        AppColors.primaryColor.withOpacity(0.07),
                         AppColors.primaryColor.withOpacity(0.0),
                       ],
                     ),

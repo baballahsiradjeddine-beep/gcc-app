@@ -64,6 +64,7 @@ class _LatexContentWidgetState extends ConsumerState<LatexContentWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -85,12 +86,15 @@ class _LatexContentWidgetState extends ConsumerState<LatexContentWidget> {
             // },
             child: TeXViewDocument(
               widget.question.cleanText,
-              style: const TeXViewStyle.fromCSS(
-                'padding: 4px; color: black; direction: rtl;',
+              style: TeXViewStyle.fromCSS(
+                isDark
+                    ? 'padding: 4px; color: #CBD5E1; direction: rtl; background: transparent;'
+                    : 'padding: 4px; color: #1E293B; direction: rtl;',
               ),
             ),
-            style: const TeXViewStyle(
-              backgroundColor: Colors.white,
+            style: TeXViewStyle(
+              backgroundColor:
+                  isDark ? const Color(0xFF1E293B) : Colors.white,
             ),
           ),
         )
@@ -113,6 +117,7 @@ class PlainTextContentWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return RichText(
       textDirection:
           ref.watch(exercicesProvider).currentExercise.currentDirection,
@@ -132,7 +137,7 @@ class PlainTextContentWidget extends HookConsumerWidget {
           TextSpan(
             text: question.text.toString(),
             style: TextStyle(
-              color: Colors.black,
+              color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF1E293B),
               fontSize: 18.sp,
               fontFamily: 'SomarSans',
               fontWeight: FontWeight.normal,

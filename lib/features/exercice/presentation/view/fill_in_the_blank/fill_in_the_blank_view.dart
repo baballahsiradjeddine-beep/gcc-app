@@ -65,9 +65,9 @@ class FillInTheBlankExerciseView extends ConsumerWidget {
                         : Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1)),
                     boxShadow: isFilled ? [
                       BoxShadow(
-                        color: AppColors.primaryColor.withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
+                        color: AppColors.primaryColor.withOpacity(0.12),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
                       )
                     ] : [
                       BoxShadow(
