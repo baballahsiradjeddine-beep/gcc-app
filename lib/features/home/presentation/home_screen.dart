@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -115,7 +116,8 @@ class HomeScreen extends HookConsumerWidget {
                 padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
                 child: Column(
                   children: [
-                    // Temporary Debug Button
+                    // Debug Button — only visible in debug builds
+                    if (kDebugMode)
                     GestureDetector(
                       onTap: () {
                         showDialog(
@@ -138,7 +140,7 @@ class HomeScreen extends HookConsumerWidget {
                             Text("🤖", style: TextStyle(fontSize: 20.sp)),
                             12.horizontalSpace,
                             Text(
-                              "تجربة نظام المراجعة الذكية (مؤقت)",
+                              "تجربة نظام المراجعة الذكية (debug)",
                               style: TextStyle(
                                 color: const Color(0xFF00B4D8),
                                 fontSize: 14.sp,

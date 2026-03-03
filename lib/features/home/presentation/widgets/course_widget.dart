@@ -72,9 +72,9 @@ class CardWidget extends ConsumerWidget {
             borderRadius: BorderRadius.circular(32.r),
             boxShadow: [
               BoxShadow(
-                color: startColor.withOpacity(0.3),
-                blurRadius: 15,
-                offset: const Offset(0, 8),
+                color: startColor.withOpacity(0.15),
+                blurRadius: 10,
+                offset: const Offset(0, 5),
               ),
             ],
           ),
@@ -218,9 +218,9 @@ class CardWidget extends ConsumerWidget {
             borderRadius: BorderRadius.circular(32.r),
             boxShadow: [
               BoxShadow(
-                color: startColor.withOpacity(0.25),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
+                color: startColor.withOpacity(0.12),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
               ),
             ],
           ),

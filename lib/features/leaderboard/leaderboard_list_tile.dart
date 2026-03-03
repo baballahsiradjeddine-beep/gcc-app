@@ -71,7 +71,9 @@ class LeaderboardListTile extends ConsumerWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isMe ? const Color(0xFF00B4D8) : Colors.grey.shade200,
+                    color: isMe 
+                        ? const Color(0xFF00B4D8) 
+                        : (isDark ? const Color(0xFF334155) : Colors.grey.shade200),
                     width: 1.5.w,
                   ),
                 ),
@@ -89,12 +91,12 @@ class LeaderboardListTile extends ConsumerWidget {
                       ),
                     ),
                     placeholder: (context, url) => Shimmer.fromColors(
-                      baseColor: Colors.grey[200]!,
-                      highlightColor: Colors.grey[50]!,
+                      baseColor: isDark ? const Color(0xFF334155) : Colors.grey.shade200,
+                      highlightColor: isDark ? const Color(0xFF475569) : Colors.grey.shade50,
                       child: Container(
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white,
+                          color: isDark ? const Color(0xFF334155) : Colors.white,
                         ),
                       ),
                     ),

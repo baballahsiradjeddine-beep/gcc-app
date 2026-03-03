@@ -16,12 +16,32 @@ class HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // add :
-        Text('$title :',
-            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+        Row(
+          children: [
+            Container(
+              width: 6.w,
+              height: 22.h,
+              decoration: BoxDecoration(
+                color: const Color(0xFF00B4D8),
+                borderRadius: BorderRadius.circular(3.r),
+              ),
+            ),
+            10.horizontalSpace,
+            Text(
+              '$title :',
+              style: TextStyle(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.w900,
+                fontFamily: 'SomarSans',
+                color: isDark ? Colors.white : const Color(0xFF1E293B),
+              ),
+            ),
+          ],
+        ),
         ChangeViewWidget(viewStyle: viewStyle),
       ],
     );

@@ -218,26 +218,33 @@ class ChaptersScreen extends HookConsumerWidget {
   }
 
   Widget _buildDivider(dynamic state, int unitId, int chapterId, bool isSub) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              height: 3,
-              decoration: BoxDecoration(
-                gradient: state.isLockedChapter(unitId, chapterId, isSub)
-                    ? null
-                    : const LinearGradient(
-                        colors: [Colors.transparent, Color(0xffEC4899)],
-                      ),
-                color: state.isLockedChapter(unitId, chapterId, isSub) ? const Color(0xFFD3D3D3) : null,
-                borderRadius: BorderRadius.circular(10),
+    return Builder(
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 3,
+                  decoration: BoxDecoration(
+                    gradient: state.isLockedChapter(unitId, chapterId, isSub)
+                        ? null
+                        : const LinearGradient(
+                            colors: [Colors.transparent, Color(0xffEC4899)],
+                          ),
+                    color: state.isLockedChapter(unitId, chapterId, isSub) 
+                        ? (isDark ? const Color(0xFF334155) : const Color(0xFFD3D3D3)) 
+                        : null,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      }
     );
   }
 

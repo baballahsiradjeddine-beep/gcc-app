@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -25,46 +24,41 @@ class ChallengeDashboardScreen extends HookConsumerWidget {
     final userAsync = ref.watch(userNotifierProvider);
     final courses = ref.watch(dataProvider).contentData.modules;
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
-      child: Scaffold(
-        backgroundColor: const Color(0xFF0B1120),
-        body: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildExactHeader(context, userAsync),
-              Expanded(
-                child: ListView(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  physics: const BouncingScrollPhysics(),
-                  children: [
-                    10.verticalSpace,
-                    const SubscribeSection(),
-                    20.verticalSpace,
-                    _buildFriendsSection(context, ref),
-                    25.verticalSpace,
-                    _buildSectionTitle(),
-                    15.verticalSpace,
-                    _buildSubjectsGrid(context, ref, courses),
-                    25.verticalSpace,
-                  ],
-                ),
+    return Scaffold(
+      backgroundColor: const Color(0xFF0B1120),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildExactHeader(context, userAsync),
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                physics: const BouncingScrollPhysics(),
+                children: [
+                  10.verticalSpace,
+                  const SubscribeSection(),
+                  20.verticalSpace,
+                  _buildFriendsSection(context, ref),
+                  25.verticalSpace,
+                  _buildSectionTitle(),
+                  15.verticalSpace,
+                  _buildSubjectsGrid(context, ref, courses),
+                  25.verticalSpace,
+                ],
               ),
-            ],
-          ),
-        ).animate()
-            // fadeIn begins at 50ms → at T=350ms (overlay removal) opacity ≈ 86%
-            .fadeIn(delay: 50.ms, duration: 350.ms, curve: Curves.easeIn)
-            // scale-up starts exactly when overlay lifts → smooth emergence
-            .scale(
-              begin: const Offset(0.92, 0.92),
-              end: const Offset(1.0, 1.0),
-              delay: 350.ms,
-              duration: 600.ms,
-              curve: Curves.easeOutCubic,
             ),
-      ),
+          ],
+        ),
+      ).animate()
+          .fadeIn(delay: 50.ms, duration: 350.ms, curve: Curves.easeIn)
+          .scale(
+            begin: const Offset(0.92, 0.92),
+            end: const Offset(1.0, 1.0),
+            delay: 350.ms,
+            duration: 600.ms,
+            curve: Curves.easeOutCubic,
+          ),
     );
   }
 

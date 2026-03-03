@@ -224,9 +224,9 @@ class PomodoroScreen extends HookConsumerWidget {
                         border: state.isRunning ? Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)) : null,
                         boxShadow: state.isRunning ? [] : [
                           BoxShadow(
-                            color: const Color(0xFF00B4D8).withOpacity(0.4),
-                            blurRadius: 30,
-                            offset: const Offset(0, 10),
+                            color: const Color(0xFF00B4D8).withOpacity(0.15),
+                            blurRadius: 16,
+                            offset: const Offset(0, 6),
                           )
                         ],
                       ),
@@ -334,8 +334,8 @@ class PomodoroCirclePainter extends CustomPainter {
     
     // Glow for knob
     final glowPaint = Paint()
-      ..color = const Color(0xFF00B4D8).withOpacity(0.4)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+      ..color = const Color(0xFF00B4D8).withOpacity(0.15)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
     canvas.drawCircle(knobOffset, 11, glowPaint);
   }
 
