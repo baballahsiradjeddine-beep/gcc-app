@@ -12,6 +12,7 @@ import 'package:tayssir/router/app_router.dart';
 import '../../../../services/course_service.dart';
 import '../../../../services/actions/bottom_sheet_service.dart';
 import 'package:tayssir/features/streaks/presentation/streak_notifier.dart';
+import 'package:tayssir/providers/data/models/exercise_model.dart';
 import 'exercise_state.dart';
 
 final currentUnitIdProvider = StateProvider<int>((ref) => 0);
