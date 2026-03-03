@@ -252,13 +252,13 @@ class _QuickSuggestions extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final configs = ref.watch(configsProvider).valueOrNull;
-    final List<String> questions = (configs?.titoQaList != null && configs!.titoQaList.isNotEmpty)
-        ? configs.titoQaList
+    final List<TitoQA> questions = (configs?.titoQaList != null && configs!.titoQaList.isNotEmpty)
+        ? configs!.titoQaList
         : [
-            "كم سعر الاشتراك؟",
-            "ما هي المواد المتاحة؟",
-            "ما هو هدف التطبيق؟",
-            "كيف أتواصل معكم؟"
+            TitoQA(label: "كم سعر الاشتراك؟", value: ""),
+            TitoQA(label: "ما هي المواد المتاحة؟", value: ""),
+            TitoQA(label: "ما هو هدف التطبيق؟", value: ""),
+            TitoQA(label: "كيف أتواصل معكم؟", value: "")
           ];
     
     final content = Column(
@@ -266,7 +266,7 @@ class _QuickSuggestions extends ConsumerWidget {
       children: questions.map((q) => Padding(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 6.h),
         child: InkWell(
-          onTap: () => onSelect(q),
+          onTap: () => onSelect(q.label),
           borderRadius: BorderRadius.circular(20.r),
           child: Container(
             width: showCentered ? 0.8.sw : double.infinity,
@@ -278,7 +278,7 @@ class _QuickSuggestions extends ConsumerWidget {
               borderRadius: BorderRadius.circular(22.r),
             ),
             child: Text(
-              q,
+              q.label,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: const Color(0xFF00B4D8),

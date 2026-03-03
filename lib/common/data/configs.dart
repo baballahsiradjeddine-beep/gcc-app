@@ -20,7 +20,7 @@ class ConfigModel {
   final String titoPersona;
   final String titoWelcomeMessage;
   final String titoApiKey;
-  final List<String> titoQaList;
+  final List<TitoQA> titoQaList;
   final String titoAppGoal;
   final String titoSubscriptionPrice;
   final String titoAvailableMaterials;
@@ -67,12 +67,26 @@ class ConfigModel {
       titoPersona: map['tito_persona'] ?? '',
       titoWelcomeMessage: map['tito_welcome_message'] ?? '',
       titoApiKey: map['tito_api_key'] ?? '',
-      titoQaList: List<String>.from(map['tito_qa_list'] ?? []),
+      titoQaList: (map['tito_qa_list'] as List?)?.map((e) => TitoQA.fromMap(e)).toList() ?? [],
       titoAppGoal: map['tito_app_goal'] ?? '',
       titoSubscriptionPrice: map['tito_subscription_price'] ?? '',
       titoAvailableMaterials: map['tito_available_materials'] ?? '',
       titoSocialLinks: map['tito_social_links'] ?? '',
       titoStrictMode: map['tito_strict_mode'] ?? true,
+    );
+  }
+}
+
+class TitoQA {
+  final String label;
+  final String value;
+
+  TitoQA({required this.label, required this.value});
+
+  factory TitoQA.fromMap(Map<String, dynamic> map) {
+    return TitoQA(
+      label: map['label'] ?? '',
+      value: map['value'] ?? '',
     );
   }
 }
@@ -103,7 +117,12 @@ final configsProvider = FutureProvider<ConfigModel>((ref) async {
 مهمتك هي الإجابة على أسئلة الطلاب بذكاء وبطريقة مشجعة ومحفزة.
 ''',
       titoApiKey: '',
-      titoQaList: ["كم سعر الاشتراك؟", "ما هي المواد المتاحة؟", "ما هو هدف التطبيق؟", "كيف أتواصل معكم؟"],
+      titoQaList: [
+        TitoQA(label: "كم سعر الاشتراك؟", value: "اشتراك الفصل الواحد بـ 1000 دج، أو العام كاملاً بـ 2500 دج."),
+        TitoQA(label: "ما هي المواد المتاحة؟", value: "كل مواد البكالوريا حسب الشعبة: رياضيات، علوم، فيزياء، لغات، أدب..."),
+        TitoQA(label: "ما هو هدف التطبيق؟", value: "تطبيق تيسير يهدف لتبسيط دروس البكالوريا لجميع الشعب في الجزائر عبر فيديوهات وتمارين تفاعلية."),
+        TitoQA(label: "كيف أتواصل معكم؟", value: "فيسبوك وتيك توك تحت اسم: Tayssir Bac"),
+      ],
       titoAppGoal: 'تطبيق تيسير يهدف لتبسيط دروس البكالوريا لجميع الشعب في الجزائر عبر فيديوهات وتمارين تفاعلية.',
       titoSubscriptionPrice: 'اشتراك الفصل الواحد بـ 1000 دج، أو العام كاملاً بـ 2500 دج.',
       titoAvailableMaterials: 'كل مواد البكالوريا حسب الشعبة: رياضيات، علوم، فيزياء، لغات، أدب...',

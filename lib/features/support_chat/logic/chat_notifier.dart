@@ -56,14 +56,27 @@ class ChatNotifier extends StateNotifier<ChatState> {
     String? instantAnswer;
     if (configs != null) {
       final t = text.trim();
-      if (t == "كم سعر الاشتراك؟" || t.contains("سعر الاشتراك")) {
-        instantAnswer = configs!.titoSubscriptionPrice;
-      } else if (t == "ما هي المواد المتاحة؟" || t.contains("المواد المتاحة")) {
-        instantAnswer = configs!.titoAvailableMaterials;
-      } else if (t == "ما هو هدف التطبيق؟" || t.contains("هدف التطبيق")) {
-        instantAnswer = configs!.titoAppGoal;
-      } else if (t == "كيف أتواصل معكم؟" || t.contains("كيف أتواصل") || t.contains("مواقع التواصل")) {
-        instantAnswer = configs!.titoSocialLinks;
+      
+      // Look for a match in the custom QA list first
+      for (final qa in configs!.titoQaList) {
+        if (t == qa.label) {
+          instantAnswer = qa.value;
+          break;
+        }
+      }
+
+      // Fallback to legacy field matching if no direct label match was found 
+      // (in case they typed it manually)
+      if (instantAnswer == null || instantAnswer.isEmpty) {
+        if (t.contains("سعر الاشتراك")) {
+          instantAnswer = configs!.titoSubscriptionPrice;
+        } else if (t.contains("المواد المتاحة")) {
+          instantAnswer = configs!.titoAvailableMaterials;
+        } else if (t.contains("هدف التطبيق")) {
+          instantAnswer = configs!.titoAppGoal;
+        } else if (t.contains("كيف أتواصل") || t.contains("مواقع التواصل")) {
+          instantAnswer = configs!.titoSocialLinks;
+        }
       }
     }
 
