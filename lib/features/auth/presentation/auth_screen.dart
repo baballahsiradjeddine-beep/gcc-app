@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -98,14 +99,15 @@ class AuthScreen extends ConsumerWidget {
               ],
             ),
             
-            // 🧪 DEV ONLY: Reset onboarding (remove before production)
+            // 🧪 DEV ONLY: Reset onboarding
+            if (kDebugMode)
             GestureDetector(
               onTap: () async {
                 await ref.read(onboardingProvider.notifier).resetOnboarding();
                 if (context.mounted) context.goNamed(AppRoutes.onboarding.name);
               },
               child: Text(
-                '← تجربة شاشة الـ Onboarding',
+                '← تجربة شاشة الـ Onboarding (debug)',
                 style: TextStyle(
                   color: const Color(0xFF334155),
                   fontSize: 11.sp,

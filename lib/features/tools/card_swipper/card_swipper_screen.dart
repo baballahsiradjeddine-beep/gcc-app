@@ -67,7 +67,8 @@ class CardSwipperLoadingView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 24.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF1E293B),
+                    fontFamily: 'SomarSans',
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -78,7 +79,9 @@ class CardSwipperLoadingView extends StatelessWidget {
                     EdgeInsets.symmetric(horizontal: 20.0.w, vertical: 8.0.h),
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
+                  color: Theme.of(context).brightness == Brightness.dark 
+                      ? const Color(0xFF1E293B) 
+                      : Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(20.r),
                 ),
                 child: Row(
@@ -88,7 +91,7 @@ class CardSwipperLoadingView extends StatelessWidget {
                     SizedBox(
                       width: 18.sp,
                       height: 18.sp,
-                      child: const CircularProgressIndicator(strokeWidth: 2),
+                      child: const CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF00B4D8)),
                     ),
                     SizedBox(width: 8.w),
                     Text(
@@ -96,7 +99,10 @@ class CardSwipperLoadingView extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade600,
+                        fontFamily: 'SomarSans',
+                        color: Theme.of(context).brightness == Brightness.dark 
+                            ? const Color(0xFF94A3B8) 
+                            : Colors.grey.shade600,
                       ),
                     ),
                   ],
@@ -161,7 +167,8 @@ class CardSwipperDataView extends HookConsumerWidget {
                   style: TextStyle(
                     fontSize: 24.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    fontFamily: 'SomarSans',
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF1E293B),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -225,19 +232,21 @@ class CardSwipperDataView extends HookConsumerWidget {
                                   style: TextStyle(
                                     color: isSelected
                                         ? Colors.white
-                                        : Colors.black87,
+                                        : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : Colors.black87),
                                     fontSize: 14.sp,
                                     fontWeight: isSelected
                                         ? FontWeight.bold
                                         : FontWeight.normal,
+                                    fontFamily: 'SomarSans',
                                   ),
                                 ),
                                 selected: isSelected,
                                 showCheckmark: false,
                                 selectedColor: currentColor,
-                                backgroundColor: Colors.grey.shade100,
-                                shadowColor:
-                                    currentColor.withValues(alpha: 0.3),
+                                backgroundColor: Theme.of(context).brightness == Brightness.dark 
+                                    ? const Color(0xFF1E293B) 
+                                    : Colors.grey.shade100,
+                                shadowColor: currentColor.withValues(alpha: 0.3),
                                 elevation: isSelected ? 3 : 0,
                                 pressElevation: 5,
                                 shape: RoundedRectangleBorder(
@@ -245,7 +254,7 @@ class CardSwipperDataView extends HookConsumerWidget {
                                   side: BorderSide(
                                     color: isSelected
                                         ? Colors.transparent
-                                        : Colors.grey.shade300,
+                                        : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF334155) : Colors.grey.shade300),
                                     width: 1,
                                   ),
                                 ),
@@ -311,14 +320,15 @@ class CardSwipperDataView extends HookConsumerWidget {
                             Icon(
                               Icons.search_off_rounded,
                               size: 64.sp,
-                              color: Colors.grey.shade400,
+                              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF475569) : Colors.grey.shade400,
                             ),
                             SizedBox(height: 16.h),
                             Text(
                               'لا توجد مواضيع في هذه الفئة',
                               style: TextStyle(
                                 fontSize: 16.sp,
-                                color: Colors.grey.shade600,
+                                fontFamily: 'SomarSans',
+                                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF64748B) : Colors.grey.shade600,
                               ),
                             ),
                             8.horizontalSpace,
@@ -332,7 +342,7 @@ class CardSwipperDataView extends HookConsumerWidget {
                               icon: const Icon(Icons.refresh_rounded),
                               label: const Text('عرض كل المواضيع'),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue.shade500,
+                                backgroundColor: const Color(0xFF00B4D8),
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20.r),

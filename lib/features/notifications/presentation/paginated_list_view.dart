@@ -37,9 +37,8 @@ class PaginatedListView<T> extends StatelessWidget {
                         child: Text(
                           '.',
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Colors.transparent,
                             fontSize: 12.sp,
-                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
