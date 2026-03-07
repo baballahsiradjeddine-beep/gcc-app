@@ -25,7 +25,6 @@ dependencies:
   logger: ^2.4.0
   flutter_svg: ^2.0.10+1
   flutter_screenutil: ^5.9.3
-  freezed: ^2.5.2
   responsive_grid_list: ^1.4.0
   get_secure_storage: ^1.0.5
   device_preview: ^1.2.0
@@ -78,6 +77,8 @@ dependencies:
   flutter_animate: ^4.5.2
   animated_text_kit: ^4.3.0
   google_generative_ai: ^0.4.7
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
   # connectivity_plus: ^6.0.3
 
   
@@ -95,6 +96,9 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.2
   change_app_package_name: ^1.5.0
   rename_app: ^1.6.5
+  build_runner: ^2.5.4
+  freezed: ^3.0.0-0.0.dev
+  json_serializable: ^6.9.5
 flutter:
 
   uses-material-design: true

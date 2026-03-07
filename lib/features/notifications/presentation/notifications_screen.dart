@@ -1,3 +1,4 @@
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,6 +8,7 @@ import 'package:tayssir/features/notifications/domaine/notifiacation_model.dart'
 import 'package:tayssir/features/notifications/presentation/notification_card.dart';
 import 'package:tayssir/features/notifications/presentation/notifications_controller.dart';
 import 'package:tayssir/features/notifications/presentation/paginated_list_view.dart';
+import 'package:tayssir/resources/colors/app_colors.dart';
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
@@ -28,7 +30,7 @@ class NotificationsScreen extends ConsumerWidget {
             end: Alignment.bottomCenter,
             colors: isDark 
                 ? [const Color(0xFF0F172A), const Color(0xFF1E293B)]
-                : [Colors.white, const Color(0xFFF8FAFC)],
+                : [AppColors.surfaceWhite, AppColors.scaffoldColor],
           ),
         ),
         child: Column(
@@ -37,7 +39,7 @@ class NotificationsScreen extends ConsumerWidget {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF0F172A).withOpacity(0.8) : Colors.white.withOpacity(0.8),
+                color: isDark ? const Color(0xFF0F172A).withOpacity(0.8) : AppColors.surfaceWhite.withOpacity(0.8),
                 border: Border(
                   bottom: BorderSide(
                     color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
@@ -49,7 +51,7 @@ class NotificationsScreen extends ConsumerWidget {
                 children: [
                   IconButton(
                     icon: Icon(Icons.arrow_back_ios_new_rounded, 
-                        color: isDark ? Colors.white : const Color(0xFF1E293B), size: 20.sp),
+                        color: isDark ? Colors.white : AppColors.textBlack, size: 20.sp),
                     onPressed: () => context.pop(),
                   ),
                   const Spacer(),
@@ -58,7 +60,7 @@ class NotificationsScreen extends ConsumerWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.w900, 
                       fontSize: 20.sp,
-                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                      color: isDark ? Colors.white : AppColors.textBlack,
                       fontFamily: 'SomarSans',
                     ),
                   ),
@@ -84,7 +86,7 @@ class NotificationsScreen extends ConsumerWidget {
                           Text(
                             'لا توجد إشعارات حالياً',
                             style: TextStyle(
-                              color: isDark ? Colors.white70 : const Color(0xFF64748B),
+                              color: isDark ? Colors.white70 : AppColors.textBody,
                               fontSize: 18.sp,
                               fontWeight: FontWeight.bold,
                               fontFamily: 'SomarSans',
@@ -115,7 +117,9 @@ class NotificationsScreen extends ConsumerWidget {
                     itemBuilder: (context, item, index) {
                       return NotificationCard(
                         notification: item,
-                      );
+                      ).animate()
+                       .fadeIn(delay: (index * 100).ms, duration: 400.ms)
+                       .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic);
                     },
                   );
                 },

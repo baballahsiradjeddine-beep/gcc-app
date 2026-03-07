@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tayssir/common/core/app_assets/dynamic_app_asset.dart';
+import 'package:tayssir/resources/colors/app_colors.dart';
 import 'package:tayssir/resources/resources.dart';
 
 // ════════════════════════════════════════════════
@@ -39,7 +40,7 @@ class _ChallengeModeLandingState extends State<ChallengeModeLanding> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
       child: Scaffold(
-        backgroundColor: isDark ? const Color(0xFF0B1120) : const Color(0xFFF0F8FF),
+        backgroundColor: isDark ? AppColors.darkColor : AppColors.scaffoldColor,
         body: Stack(
           children: [
             // ── Background gradient ──
@@ -51,14 +52,14 @@ class _ChallengeModeLandingState extends State<ChallengeModeLanding> {
                     end: Alignment.bottomCenter,
                     colors: isDark
                         ? [
-                            const Color(0xFF0F172A),
-                            const Color(0xFF0B1120),
+                            AppColors.secondaryDark,
+                            AppColors.darkColor,
                             const Color(0xFF060914),
                           ]
                         : [
-                            const Color(0xFFE4F4FD),
-                            const Color(0xFFF2F9FF),
-                            const Color(0xFFE8F5FF),
+                            const Color(0xFFE0F2FE), // AppColors.primaryColorLight
+                            AppColors.surfaceWhite,
+                            const Color(0xFFF8FAFC),
                           ],
                   ),
                 ),
@@ -119,179 +120,191 @@ class _ChallengeModeLandingState extends State<ChallengeModeLanding> {
 
             // ── Main Content ──
             SafeArea(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Back Button Alignment
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: IconButton(
-                        icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF00C6E0)),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ),
-                    const Spacer(flex: 1),
-
-                    // ── HERO CHARACTER ──
-                    Container(
-                      width: 220.w,
-                      height: 220.w,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF00C6E0).withOpacity(0.22),
-                            blurRadius: 50,
-                            spreadRadius: 5,
-                          ),
-                        ],
-                      ),
-                      child: const DynamicAppAsset(
-                        assetKey: 'challenge_character',
-                        fallbackAssetPath: SVGs.titoBoarding,
-                        type: AppAssetType.svg,
-                      ),
-                    )
-                        .animate(onPlay: (c) => c.repeat(reverse: true))
-                        .moveY(
-                            begin: 0,
-                            end: -18,
-                            duration: 2800.ms,
-                            curve: Curves.easeInOut),
-
-                    SizedBox(height: 28.h),
-
-                    // ── Title ──
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          'ساحة التحديات الكبرى',
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          style: TextStyle(
-                            fontSize: 33.sp,
-                            fontWeight: FontWeight.w900,
-                            fontFamily: 'SomarSans',
-                            color: isDark ? Colors.white : const Color(0xFF0A2540),
-                            letterSpacing: -0.5,
-                            shadows: [
-                              Shadow(
-                                color: const Color(0xFF00AECC).withOpacity(0.3),
-                                offset: const Offset(0, 4),
-                                blurRadius: 10,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.3, end: 0),
-
-                    SizedBox(height: 20.h),
-
-                    // ── Chips — mono-teal palette in a soft card ──
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 10.w, vertical: 9.h),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF00C6E0).withOpacity(0.06),
-                        borderRadius: BorderRadius.circular(22),
-                        border: Border.all(
-                          color: const Color(0xFF00C6E0).withOpacity(0.18),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Back Button Alignment
+                      if (Navigator.of(context).canPop())
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: IconButton(
+                          icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white : AppColors.primaryColor),
+                          onPressed: () => Navigator.of(context).pop(),
                         ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _Chip('⚔️  نافس', const Color(0xFF0083B0)),
-                          SizedBox(width: 6.w),
-                          _Chip('🏆  تفوق', const Color(0xFF00AECC)),
-                          SizedBox(width: 6.w),
-                          _Chip('⚡  تشعّل', const Color(0xFF00C6E0)),
-                        ],
-                      ),
-                    ).animate().fadeIn(delay: 300.ms, duration: 700.ms),
-
-                    const Spacer(flex: 2),
-
-                    // ── ENTER BUTTON ──
-                    GestureDetector(
-                      onTap: _handleEnter,
-                      onTapDown: _onTapDown,
-                      onTapUp: _onTapUp,
-                      onTapCancel: _onTapCancel,
-                      child: AnimatedScale(
-                        scale: _pressing ? 0.95 : 1.0,
-                        duration: const Duration(milliseconds: 110),
-                        curve: Curves.easeOut,
-                        child: Container(
-                          width: double.infinity,
-                          height: 68.h,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF0083B0), Color(0xFF00C6E0)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
+                      
+                      SizedBox(height: 60.h),
+  
+                      // ── HERO CHARACTER ──
+                      Container(
+                        width: 200.w,
+                        height: 200.w,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF00C6E0).withOpacity(0.22),
+                              blurRadius: 50,
+                              spreadRadius: 5,
                             ),
-                            borderRadius: BorderRadius.circular(28),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF00C6E0).withOpacity(0.42),
-                                blurRadius: 22,
-                                offset: const Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              // Bottom 3-D edge
-                              Positioned(
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                child: Container(
-                                  height: 7,
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.16),
-                                    borderRadius: const BorderRadius.vertical(
-                                        bottom: Radius.circular(28)),
-                                  ),
+                          ],
+                        ),
+                        child: const DynamicAppAsset(
+                          assetKey: 'challenge_character',
+                          fallbackAssetPath: SVGs.titoBoarding,
+                          type: AppAssetType.svg,
+                        ),
+                      )
+                          .animate(onPlay: (c) => c.repeat(reverse: true))
+                          .moveY(
+                              begin: 0,
+                              end: -18,
+                              duration: 2800.ms,
+                              curve: Curves.easeInOut),
+  
+                      SizedBox(height: 28.h),
+  
+                      // ── Title ──
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            'ساحة التحديات الكبرى',
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontSize: 33.sp,
+                              fontWeight: FontWeight.w900,
+                              fontFamily: 'SomarSans',
+                              color: isDark ? Colors.white : AppColors.textBlack,
+                              letterSpacing: -0.5,
+                              shadows: [
+                                Shadow(
+                                  color: const Color(0xFF00B4D8).withOpacity(0.2),
+                                  offset: const Offset(0, 3),
+                                  blurRadius: 8,
                                 ),
+                              ],
+                            ),
+                          ),
+                        ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.3, end: 0),
+  
+                      SizedBox(height: 20.h),
+  
+                      // ── Chips — mono-teal palette in a soft card ──
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 10.w, vertical: 9.h),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF00C6E0).withOpacity(0.06),
+                          borderRadius: BorderRadius.circular(22),
+                          border: Border.all(
+                            color: const Color(0xFF00C6E0).withOpacity(0.18),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _Chip('⚔️  نافس', AppColors.secondaryColor),
+                            SizedBox(width: 6.w),
+                            _Chip('🏆  تفوق', AppColors.primaryColor),
+                            SizedBox(width: 6.w),
+                            _Chip('⚡  تشعّل', const Color(0xFF00D4F0)),
+                          ],
+                        ),
+                      ).animate().fadeIn(delay: 300.ms, duration: 700.ms),
+  
+                      SizedBox(height: 100.h),
+  
+                      // ── ENTER BUTTON ──
+                      GestureDetector(
+                        onTap: _handleEnter,
+                        onTapDown: _onTapDown,
+                        onTapUp: _onTapUp,
+                        onTapCancel: _onTapCancel,
+                        child: AnimatedScale(
+                          scale: _pressing ? 0.98 : 1.0,
+                          duration: const Duration(milliseconds: 110),
+                          curve: Curves.easeOut,
+                          child: Container(
+                            width: double.infinity,
+                            height: 62.h,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF00B4D8), Color(0xFF0077B6)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.rocket_launch_rounded,
-                                          color: Colors.white, size: 26)
-                                      .animate(
-                                          onPlay: (c) => c.repeat(reverse: true))
-                                      .moveY(begin: 0, end: -4, duration: 800.ms),
-                                  SizedBox(width: 12.w),
-                                  Text(
-                                    'ادخل الساحة!',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 21.sp,
-                                      fontWeight: FontWeight.w900,
-                                      fontFamily: 'SomarSans',
-                                      letterSpacing: 0.5,
+                              borderRadius: BorderRadius.circular(22.r),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.15),
+                                width: 1.5,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF00B4D8).withOpacity(0.25),
+                                  blurRadius: 15,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ],
+                            ),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                // Shine Effect Overlay
+                                Positioned.fill(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(22.r),
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          Colors.white.withOpacity(0.12),
+                                          Colors.white.withOpacity(0.0),
+                                          Colors.white.withOpacity(0.0),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ],
-                              ),
-                            ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.rocket_launch_rounded,
+                                            color: Colors.white, size: 24)
+                                        .animate(
+                                            onPlay: (c) => c.repeat(reverse: true))
+                                        .moveY(begin: 0, end: -3, duration: 1200.ms),
+                                    SizedBox(width: 12.w),
+                                    Text(
+                                      'ادخل الساحة!',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 19.sp,
+                                        fontWeight: FontWeight.w900,
+                                        fontFamily: 'SomarSans',
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    )
-                      .animate(delay: 800.ms)
-                      .fadeIn(duration: 500.ms)
-                      .slideY(begin: 0.3, end: 0),
-
-                    // Add enough space for the bottom navigation bar
-                    SizedBox(height: 120.h),
-                  ],
+                      )
+                        .animate(delay: 800.ms)
+                        .fadeIn(duration: 500.ms)
+                        .slideY(begin: 0.3, end: 0),
+  
+                      // Add enough space for the bottom navigation bar
+                      SizedBox(height: 120.h),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -313,21 +326,24 @@ class _Chip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final displayColor = isDark ? color.withOpacity(0.8) : color;
+    final displayColor = isDark ? color.withOpacity(0.9) : color;
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: displayColor.withOpacity(isDark ? 0.2 : 0.11),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: displayColor.withOpacity(0.35), width: 1.5),
+        color: displayColor.withOpacity(isDark ? 0.15 : 0.08),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: displayColor.withOpacity(isDark ? 0.3 : 0.2),
+          width: 1.2,
+        ),
       ),
       child: Text(
         label,
         style: TextStyle(
           color: isDark ? Colors.white : color,
-          fontSize: 13.sp,
-          fontWeight: FontWeight.w800,
+          fontSize: 12.5.sp,
+          fontWeight: FontWeight.w900,
           fontFamily: 'SomarSans',
         ),
       ),

@@ -101,7 +101,7 @@ class PomodoroScreen extends HookConsumerWidget {
                       triangleSide: TriangleSide.bottom,
                     ),
                   ),
-                ).animate().fadeIn(delay: 100.ms).scale(curve: Curves.easeOutBack),
+                ).animate().fadeIn(delay: 200.ms).scale(curve: Curves.easeOutBack, duration: 600.ms),
                 
                 40.verticalSpace,
                 
@@ -142,9 +142,10 @@ class PomodoroScreen extends HookConsumerWidget {
                                   )
                                 ],
                               ),
-                            ).animate(onPlay: (c) => c.repeat(reverse: true))
-                             .moveY(begin: -8, end: 8, duration: 4.seconds, curve: Curves.easeInOut)
-                             .rotate(begin: -0.04, end: 0.04, duration: 4.seconds, curve: Curves.easeInOut),
+                             ).animate(onPlay: (c) => c.repeat(reverse: true))
+                              .moveY(begin: -8, end: 8, duration: 4.seconds, curve: Curves.easeInOut)
+                              .rotate(begin: -0.04, end: 0.04, duration: 4.seconds, curve: Curves.easeInOut)
+                              .shimmer(delay: 2.seconds, duration: 2.seconds, color: state.status == PomodoroStatus.running ? const Color(0xFF00B4D8).withOpacity(0.3) : Colors.transparent),
                             
                             // Alarm Emoji
                             Positioned(
@@ -195,7 +196,7 @@ class PomodoroScreen extends HookConsumerWidget {
                       shadows: [Shadow(color: const Color(0xFF00B4D8).withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4))]
                     ),
                   ),
-                ).animate().fadeIn(delay: 500.ms).scale(),
+                ).animate().fadeIn(delay: 600.ms).scale(begin: const Offset(0.8, 0.8), duration: 600.ms, curve: Curves.elasticOut),
                 
                 32.verticalSpace,
                 

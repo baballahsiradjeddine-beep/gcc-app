@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:tayssir/common/data/configs.dart';
+import 'package:tayssir/resources/colors/app_colors.dart';
 import '../logic/chat_notifier.dart';
 
 class ChatBottomSheet extends HookConsumerWidget {
@@ -29,12 +30,14 @@ class ChatBottomSheet extends HookConsumerWidget {
       return null;
     }, [chatState.messages.length]);
 
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Container(
       height: 0.85.sh,
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
+        color: isDark ? const Color(0xFF0F172A) : AppColors.surfaceWhite,
         borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: isDark ? Colors.white.withOpacity(0.05) : AppColors.borderColor.withOpacity(0.5)),
       ),
       child: Column(
         children: [
@@ -79,16 +82,17 @@ class ChatBottomSheet extends HookConsumerWidget {
 class _ChatHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.05))),
+        border: Border(bottom: BorderSide(color: isDark ? Colors.white.withOpacity(0.05) : AppColors.borderColor)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
-            icon: const Icon(Icons.close, color: Colors.white24),
+            icon: Icon(Icons.close, color: isDark ? Colors.white24 : AppColors.textBody.withOpacity(0.4)),
             onPressed: () => Navigator.pop(context),
           ),
           Row(
@@ -96,7 +100,7 @@ class _ChatHeader extends StatelessWidget {
               Text(
                 'تيتو الذكي 🐬',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : AppColors.textBlack,
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w900,
                   fontFamily: 'SomarSans',
@@ -128,6 +132,7 @@ class _MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUser = message.isUser;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Align(
       alignment: isUser ? Alignment.centerLeft : Alignment.centerRight,
       child: Container(
@@ -135,7 +140,9 @@ class _MessageBubble extends StatelessWidget {
         constraints: BoxConstraints(maxWidth: 0.75.sw),
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         decoration: BoxDecoration(
-          color: isUser ? const Color(0xFF1E293B) : const Color(0xFF00B4D8).withOpacity(0.1),
+          color: isUser 
+              ? (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)) 
+              : AppColors.primaryColor.withOpacity(0.1),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20.r),
             topRight: Radius.circular(20.r),
@@ -143,14 +150,18 @@ class _MessageBubble extends StatelessWidget {
             bottomRight: isUser ? Radius.circular(20.r) : Radius.zero,
           ),
           border: Border.all(
-            color: isUser ? Colors.white.withOpacity(0.05) : const Color(0xFF00B4D8).withOpacity(0.2),
+            color: isUser 
+                ? (isDark ? Colors.white.withOpacity(0.05) : AppColors.borderColor) 
+                : AppColors.primaryColor.withOpacity(0.2),
           ),
         ),
         child: Text(
           message.text,
           textDirection: TextDirection.rtl,
           style: TextStyle(
-            color: Colors.white,
+            color: isUser 
+                ? (isDark ? Colors.white : AppColors.textBlack) 
+                : (isDark ? Colors.white : AppColors.secondaryColor),
             fontSize: 14.sp,
             fontFamily: 'SomarSans',
             height: 1.4,
@@ -194,6 +205,7 @@ class _ChatInput extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Row(
@@ -227,11 +239,11 @@ class _ChatInput extends ConsumerWidget {
                   controller.clear();
                 }
               },
-              style: const TextStyle(color: Colors.white, fontFamily: 'SomarSans'),
+              style: TextStyle(color: isDark ? Colors.white : AppColors.textBlack, fontFamily: 'SomarSans'),
               decoration: InputDecoration(
                 hintText: 'اسأل تيتو أي شيء...',
-                hintStyle: TextStyle(color: Colors.white24, fontSize: 14.sp, fontFamily: 'SomarSans'),
-                fillColor: const Color(0xFF1E293B),
+                hintStyle: TextStyle(color: isDark ? Colors.white24 : AppColors.textBody.withOpacity(0.3), fontSize: 14.sp, fontFamily: 'SomarSans'),
+                fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
                 filled: true,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(25.r), borderSide: BorderSide.none),
                 contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),

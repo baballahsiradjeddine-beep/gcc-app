@@ -14,6 +14,9 @@ import '../../../../services/actions/bottom_sheet_service.dart';
 import 'package:tayssir/features/streaks/presentation/streak_notifier.dart';
 import 'package:tayssir/providers/data/models/exercise_model.dart';
 import 'exercise_state.dart';
+import '../../../ai_planner/state/ai_planner_notifier.dart';
+import 'package:tayssir/services/sounds/sound_manager.dart';
+import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
 
 final currentUnitIdProvider = StateProvider<int>((ref) => 0);
 final currentChapterIdProvider = StateProvider<int>((ref) => 0);
@@ -105,6 +108,7 @@ class ExerciseNotifier extends StateNotifier<ExerciseState> {
 
   void hideVideo() {
     state = state.hideVideo();
+    _markAITaskDone('study');
   }
 
   void hideResults() {
@@ -140,6 +144,12 @@ class ExerciseNotifier extends StateNotifier<ExerciseState> {
     if (state.currentExerciceIndex < state.exercises.length - 1) {
       final exercicePoints = state.currentExercise.points;
       final isCorrect = state.isCorrect;
+      
+      final isSoundOn = ref.read(isSoundEnabledProvider);
+      if (isCorrect && isSoundOn) {
+        SoundService.playPoints();
+      }
+      
       state = state.copyWith(
         points: state.points + (isCorrect ? exercicePoints : 0),
         numberofCorrectAnswers: state.isCorrect
@@ -206,6 +216,11 @@ class ExerciseNotifier extends StateNotifier<ExerciseState> {
     final exercicePoints = state.currentExercise.points;
     final isCorrect = state.isCorrect;
     final wonPoints = isCorrect ? exercicePoints : 0;
+    
+    final isSoundOn = ref.read(isSoundEnabledProvider);
+    if (isCorrect && isSoundOn) {
+       SoundService.playPoints();
+    }
     state = state.addSubmissionAnswer(SubmissionAnswer(
         questionId: state.currentExercise.id, isCorrect: isCorrect));
     state = state.copyWith(
@@ -250,8 +265,22 @@ class ExerciseNotifier extends StateNotifier<ExerciseState> {
     ref.read(streakNotifierProvider.notifier).pingStreak();
 
     state = state.setSubmittingStatus(const AsyncData<void>(null));
+    _markAITaskDone('exercise');
     if (context.mounted) {
       context.pushReplacementNamed(AppRoutes.results.name);
+    }
+  }
+
+  void _markAITaskDone(String type) {
+    try {
+      final dataState = ref.read(dataProvider);
+      final chapter = dataState.contentData.chapters.firstWhere((c) => c.id == chapterId);
+      final unit = dataState.contentData.units.firstWhere((u) => u.id == chapter.unitId);
+      final materialId = unit.materialId.toString();
+      
+      ref.read(aiPlannerProvider.notifier).markSubjectTaskDone(materialId, type);
+    } catch (e) {
+      AppLogger.logError('Failed to mark AI task as done: $e');
     }
   }
 
@@ -280,6 +309,16 @@ class ExerciseNotifier extends StateNotifier<ExerciseState> {
 
     // final isCorrect = currentExercise.checkAnswer(answer);
     state = state.copyWith(isShowResult: true, isCorrect: isCorrect);
+    
+    final isSoundOn = ref.read(isSoundEnabledProvider);
+    if (isSoundOn) {
+      if (state.isCorrect) {
+        SoundService.playSuccess();
+      } else {
+        SoundService.playError();
+      }
+    }
+
     if (state.isCorrect) {
       BottomSheetService.showSuccessBottomSheet(context, state.isCorrect, () {
         nextExerise(context);

@@ -7,6 +7,9 @@ import 'package:tayssir/features/onboarding/widgets/onboarding_button.dart';
 import 'package:tayssir/features/onboarding/widgets/tito_speaker.dart';
 import 'package:tayssir/providers/divisions/division_model.dart';
 import 'package:tayssir/providers/divisions/divisions.dart';
+import 'package:tayssir/services/sounds/sound_manager.dart';
+import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
+import 'package:flutter/services.dart';
 
 class StepDivisionPage extends ConsumerStatefulWidget {
   final VoidCallback onNext;
@@ -21,6 +24,11 @@ class _StepDivisionPageState extends ConsumerState<StepDivisionPage> {
 
   Future<void> _handleNext() async {
     if (_selected == null) return;
+    final isSoundOn = ref.read(isSoundEnabledProvider);
+    if (isSoundOn) {
+      SoundService.play('assets/sounds/success_short.mp3');
+      HapticFeedback.mediumImpact();
+    }
     await ref
         .read(onboardingProvider.notifier)
         .setDivision(_selected!.id, _selected!.name);
@@ -58,7 +66,14 @@ class _StepDivisionPageState extends ConsumerState<StepDivisionPage> {
                       division: div,
                       isSelected: isSelected,
                       index: i,
-                      onTap: () => setState(() => _selected = div),
+                      onTap: () {
+                        final isSoundOn = ref.read(isSoundEnabledProvider);
+                        if (isSoundOn) {
+                          SoundService.play('assets/sounds/ui_click_premium.mp3');
+                          HapticFeedback.lightImpact();
+                        }
+                        setState(() => _selected = div);
+                      },
                     );
                   },
                 ),

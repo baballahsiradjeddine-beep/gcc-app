@@ -141,9 +141,7 @@ class FilterSection<T> extends ConsumerWidget {
                                       sigmaX: 1.5, sigmaY: 1.5),
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      color: AppColors.borderColor.withValues(
-                                        alpha: 0.3,
-                                      ),
+                                      color: AppColors.borderColor.withOpacity(0.3),
                                       borderRadius: BorderRadius.circular(20.r),
                                     ),
                                     child: Center(

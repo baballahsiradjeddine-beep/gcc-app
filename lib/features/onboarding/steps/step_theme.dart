@@ -6,6 +6,9 @@ import 'package:tayssir/features/onboarding/onboarding_notifier.dart';
 import 'package:tayssir/features/onboarding/widgets/onboarding_button.dart';
 import 'package:tayssir/features/onboarding/widgets/tito_speaker.dart';
 import 'package:tayssir/providers/settings/settings_provider.dart';
+import 'package:tayssir/services/sounds/sound_manager.dart';
+import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
+import 'package:flutter/services.dart';
 
 class StepThemePage extends ConsumerStatefulWidget {
   final VoidCallback onNext;
@@ -21,6 +24,12 @@ class _StepThemePageState extends ConsumerState<StepThemePage> {
   Future<void> _handleNext() async {
     if (_isDarkSelected == null) return;
     
+    final isSoundOn = ref.read(isSoundEnabledProvider);
+    if (isSoundOn) {
+      SoundService.play('assets/sounds/success_short.mp3');
+      HapticFeedback.mediumImpact();
+    }
+
     // Set the theme in settings
     final currentIsDark = ref.read(settingsNotifierProvider).isDarkMode;
     if (currentIsDark != _isDarkSelected) {
@@ -55,7 +64,14 @@ class _StepThemePageState extends ConsumerState<StepThemePage> {
                   child: _ThemeCard(
                     isDark: true,
                     isSelected: _isDarkSelected == true,
-                    onTap: () => setState(() => _isDarkSelected = true),
+                    onTap: () {
+                      final isSoundOn = ref.read(isSoundEnabledProvider);
+                      if (isSoundOn) {
+                        SoundService.play('assets/sounds/ui_click_premium.mp3');
+                        HapticFeedback.lightImpact();
+                      }
+                      setState(() => _isDarkSelected = true);
+                    },
                   ),
                 ),
                 20.horizontalSpace,
@@ -63,7 +79,14 @@ class _StepThemePageState extends ConsumerState<StepThemePage> {
                   child: _ThemeCard(
                     isDark: false,
                     isSelected: _isDarkSelected == false,
-                    onTap: () => setState(() => _isDarkSelected = false),
+                    onTap: () {
+                      final isSoundOn = ref.read(isSoundEnabledProvider);
+                      if (isSoundOn) {
+                        SoundService.play('assets/sounds/ui_click_premium.mp3');
+                        HapticFeedback.lightImpact();
+                      }
+                      setState(() => _isDarkSelected = false);
+                    },
                   ),
                 ),
               ],

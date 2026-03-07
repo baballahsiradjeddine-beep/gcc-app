@@ -1,13 +1,16 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tayssir/features/exercice/presentation/state/exercice_controller.dart';
+import 'package:tayssir/services/sounds/sound_manager.dart';
+import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
 import 'package:tayssir/router/app_router.dart';
 import 'package:go_router/go_router.dart';
 
-class ReviewAIPopup extends ConsumerWidget {
+class ReviewAIPopup extends HookConsumerWidget {
   final int count;
   final bool isDebug;
 
@@ -15,6 +18,14 @@ class ReviewAIPopup extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isSoundOn = ref.watch(isSoundEnabledProvider);
+
+    useEffect(() {
+      if (isSoundOn) {
+        SoundService.play('assets/sounds/ai_magic.mp3');
+      }
+      return null;
+    }, []);
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
       child: Center(
@@ -85,7 +96,10 @@ class ReviewAIPopup extends ConsumerWidget {
                     child: _Button(
                       text: "ليس الآن",
                       isPrimary: false,
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () {
+                        if (isSoundOn) SoundService.play('assets/sounds/ui_click_premium.mp3');
+                        Navigator.pop(context);
+                      },
                     ),
                   ),
                   12.horizontalSpace,
@@ -94,6 +108,7 @@ class ReviewAIPopup extends ConsumerWidget {
                       text: "ابدأ المراجعة",
                       isPrimary: true,
                       onPressed: () {
+                        if (isSoundOn) SoundService.play('assets/sounds/ui_click_premium.mp3');
                         Navigator.pop(context);
                         if (isDebug) {
                           ref.read(isReviewProvider.notifier).state = true;

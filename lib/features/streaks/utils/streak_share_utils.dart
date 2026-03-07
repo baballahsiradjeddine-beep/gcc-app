@@ -98,7 +98,7 @@ class StreakShareUtils {
                           padding: const EdgeInsets.symmetric(
                               vertical: 20, horizontal: 15), // Shrunk height
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
+                            color: Colors.white.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(color: Colors.white, width: 1.5),
                           ),
@@ -137,7 +137,7 @@ class StreakShareUtils {
                                     width: 120, // Shorter line
                                     decoration: BoxDecoration(
                                       color:
-                                          Colors.white.withValues(alpha: 0.6),
+                                          Colors.white.withOpacity(0.6),
                                       borderRadius: BorderRadius.circular(1),
                                     ),
                                   ),

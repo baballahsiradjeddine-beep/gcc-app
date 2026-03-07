@@ -246,7 +246,7 @@ class CardSwipperDataView extends HookConsumerWidget {
                                 backgroundColor: Theme.of(context).brightness == Brightness.dark 
                                     ? const Color(0xFF1E293B) 
                                     : Colors.grey.shade100,
-                                shadowColor: currentColor.withValues(alpha: 0.3),
+                                shadowColor: currentColor.withOpacity(0.3),
                                 elevation: isSelected ? 3 : 0,
                                 pressElevation: 5,
                                 shape: RoundedRectangleBorder(
@@ -285,7 +285,7 @@ class CardSwipperDataView extends HookConsumerWidget {
                     EdgeInsets.symmetric(horizontal: 20.0.w, vertical: 8.0.h),
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                 decoration: BoxDecoration(
-                  color: currentColor.withValues(alpha: 0.1),
+                  color: currentColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20.r),
                 ),
                 child: Row(

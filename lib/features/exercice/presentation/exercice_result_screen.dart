@@ -1,3 +1,4 @@
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -20,6 +21,9 @@ import '../../../router/app_router.dart';
 import 'package:tayssir/features/streaks/presentation/streak_notifier.dart';
 import 'package:tayssir/common/core/app_assets/dynamic_app_asset.dart';
 import 'package:tayssir/features/onboarding/onboarding_notifier.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:tayssir/services/sounds/sound_manager.dart';
+import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
 import 'widgets/results/result_stats_widget.dart';
 
 class ExerciceResultScreen extends HookConsumerWidget {
@@ -31,6 +35,14 @@ class ExerciceResultScreen extends HookConsumerWidget {
     final exercisesState = ref.watch(exercicesProvider);
     final dataState = ref.watch(dataProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isSoundOn = ref.watch(isSoundEnabledProvider);
+
+    useEffect(() {
+      if (isSoundOn) {
+        SoundService.playLevelComplete();
+      }
+      return null;
+    }, []);
 
     final isComplete = exercisesState.bestProgress == 100;
     final user = ref.watch(userNotifierProvider).valueOrNull;
@@ -121,14 +133,14 @@ class ExerciceResultScreen extends HookConsumerWidget {
                             )
                           ],
                         ),
-                      ),
+                      ).animate().fadeIn().slideY(begin: -0.2, end: 0, curve: Curves.bounceOut, duration: 800.ms),
                       const Spacer(flex: 1),
                       DynamicAppAsset(
                         assetKey: exercisesState.accuracy.resultAssetKey(),
                         fallbackAssetPath: exercisesState.accuracy.resultIcon(),
                         type: AppAssetType.svg,
                         height: context.isSmallDevice ? 200.h : 270.h,
-                      ),
+                      ).animate().scale(begin: const Offset(0.5, 0.5), end: const Offset(1, 1), curve: Curves.elasticOut, duration: 1.2.seconds),
                       const Spacer(flex: 1),
                       if (exercisesState.isReviewMode)
                         Container(
@@ -170,29 +182,34 @@ class ExerciceResultScreen extends HookConsumerWidget {
                         )
                       else ...[
                         ResultStatsWidget(
-                            value: getValue(),
-                            title: getTitle(),
-                            icon:
-                                isComplete ? SVGs.icResultCheck : SVGs.icGem),
+                          value: getValue(),
+                          title: getTitle(),
+                          icon: isComplete ? SVGs.icResultCheck : SVGs.icGem,
+                        ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1, end: 0),
+                        
                         16.verticalSpace,
+                        
                         Row(
                           children: [
                             Expanded(
-                                child: ResultStatsWidget(
-                                    value:
-                                        exercisesState.accuracy.toPercentage(),
-                                    title: 'الدقة',
-                                    icon: SVGs.icPrecision,
-                                    startColor: const Color(0xffF87B7C),
-                                    endColor: const Color(0xffF85556))),
+                              child: ResultStatsWidget(
+                                value: exercisesState.accuracy.toPercentage(),
+                                title: 'الدقة',
+                                icon: SVGs.icPrecision,
+                                startColor: const Color(0xffF87B7C),
+                                endColor: const Color(0xffF85556),
+                              ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.1, end: 0),
+                            ),
                             12.horizontalSpace,
                             Expanded(
-                                child: ResultStatsWidget(
-                                    value: exercisesState.elapsedTime.toTime,
-                                    title: 'التوقيت',
-                                    icon: SVGs.icTime,
-                                    startColor: const Color(0xff3ADBA3),
-                                    endColor: const Color(0xff00AC70))),
+                              child: ResultStatsWidget(
+                                value: exercisesState.elapsedTime.toTime,
+                                title: 'التوقيت',
+                                icon: SVGs.icTime,
+                                startColor: const Color(0xff3ADBA3),
+                                endColor: const Color(0xff00AC70),
+                              ).animate().fadeIn(delay: 800.ms).slideY(begin: 0.1, end: 0),
+                            ),
                           ],
                         ),
                       ],

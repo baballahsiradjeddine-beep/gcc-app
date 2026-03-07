@@ -11,6 +11,7 @@ import 'package:tayssir/providers/google/google_sign_in.dart';
 import 'package:tayssir/providers/token/token_controller.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';
 import 'package:tayssir/services/actions/snack_bar_service.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../debug/app_logger.dart';
 import '../features/onboarding/onboarding_notifier.dart';
@@ -20,6 +21,8 @@ import '../providers/settings/settings_provider.dart';
 import '../services/geo/geo_service.dart';
 import '../utils/enums/auth_state.dart';
 import 'package:tayssir/providers/app_assets/app_assets_provider.dart';
+import 'package:tayssir/providers/data/data_provider.dart';
+import 'package:tayssir/features/home/presentation/subscribe_section.dart';
 
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -323,11 +326,19 @@ final initialLoadProvider = FutureProvider<bool>((ref) async {
       await ref.watch(sharedPreferencesProvider.future);
       await ref.read(settingsNotifierProvider.notifier).getSettings();
       await ref.watch(configsProvider.future);
-      // await ref.watch(cardDataProvider.future); // required auth
+      
+      // Fetch materials/subjects early so they are ready for the Home Screen
+      await ref.read(dataProvider.notifier).getData();
+      
+      // Fetch banners early (only if authenticated)
       if (authState == AuthStatus.authenticated) {
-        // await ref.watch(subscriptionOptionsProvider.future);
-        // await ref.watch(cardDataProvider.future);
+        await ref.watch(bannerItemsProvider.future);
       }
+      
+      // --- NEW: Deterministic Asset Precaching before Splash finishes ---
+      // This ensures that when the user hits the Home page, the images are already in CACHE.
+      await _precacheEverything(ref);
+      
     } else {
       AppLogger.logInfo('No internet connection, loading in offline mode');
     }
@@ -339,3 +350,81 @@ final initialLoadProvider = FutureProvider<bool>((ref) async {
     return false;
   }
 });
+
+/// Resolves and caches all critical UI images early to prevent 'flicker' or 'pop-in'.
+Future<void> _precacheEverything(Ref ref) async {
+  try {
+    final assetsMap = ref.read(appAssetsProvider).valueOrNull ?? {};
+    final materials = ref.read(dataProvider).contentData.modules;
+    final user = ref.read(userNotifierProvider).valueOrNull;
+
+    final List<Future> precacheTasks = [];
+
+    // 1. Dynamic App Assets (Heros, Arenas, etc)
+    for (final asset in assetsMap.values) {
+      if (asset.url.isNotEmpty && !asset.url.toLowerCase().contains('.svg')) {
+        final fullUrl = '${asset.url}?${asset.version}';
+        precacheTasks.add(_precacheImageProvider(CachedNetworkImageProvider(fullUrl)));
+      }
+    }
+
+    // 2. Material/Subject Images
+    for (final m in materials) {
+      final imageUrls = [m.imageList, m.imageGrid];
+      for (final rawUrl in imageUrls) {
+        if (rawUrl.isNotEmpty) {
+          final fullUrl = rawUrl.startsWith('http') 
+              ? rawUrl 
+              : 'https://gcc.tayssir-bac.com/storage/${rawUrl.replaceAll(RegExp(r'^/'), '')}';
+          precacheTasks.add(_precacheImageProvider(CachedNetworkImageProvider(fullUrl)));
+        }
+      }
+    }
+
+    // 3. User Identity (Avatar and Badge)
+    if (user != null) {
+      if (user.completeProfilePic.isNotEmpty) {
+        precacheTasks.add(_precacheImageProvider(CachedNetworkImageProvider(user.completeProfilePic)));
+      }
+      final badgeIcon = user.badge?.completeIconUrl;
+      if (badgeIcon != null && badgeIcon.isNotEmpty) {
+        precacheTasks.add(_precacheImageProvider(CachedNetworkImageProvider(badgeIcon)));
+      }
+    }
+
+    // 4. Banners
+    final banners = ref.read(bannerItemsProvider).valueOrNull ?? [];
+    for (final b in banners) {
+      if (b.image != null && b.image!.isNotEmpty) {
+        precacheTasks.add(_precacheImageProvider(CachedNetworkImageProvider(b.image!)));
+      }
+    }
+
+    // Wait for all downloads to finish (or timeout after 5s to not block splash forever)
+    if (precacheTasks.isNotEmpty) {
+      AppLogger.logInfo('Precaching ${precacheTasks.length} assets before dashboard entry...');
+      await Future.wait(precacheTasks).timeout(const Duration(seconds: 8), onTimeout: () => []);
+    }
+  } catch (e) {
+    AppLogger.logError('Warning: Prefetching assets failed: $e');
+  }
+}
+
+/// Helper to precache images without a BuildContext
+Future<void> _precacheImageProvider(ImageProvider provider) {
+  final completer = Completer<void>();
+  final stream = provider.resolve(ImageConfiguration.empty);
+  late ImageStreamListener listener;
+  listener = ImageStreamListener(
+    (ImageInfo info, bool syncCall) {
+      if (!completer.isCompleted) completer.complete();
+      stream.removeListener(listener);
+    },
+    onError: (dynamic exception, StackTrace? stackTrace) {
+      if (!completer.isCompleted) completer.complete();
+      stream.removeListener(listener);
+    },
+  );
+  stream.addListener(listener);
+  return completer.future;
+}

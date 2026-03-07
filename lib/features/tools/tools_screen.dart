@@ -9,6 +9,7 @@ import 'package:tayssir/features/home/presentation/view_style.dart';
 
 import 'package:tayssir/features/tools/common/models/tool_model.dart';
 import 'package:tayssir/features/tools/common/state/tools_provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';
 
 import '../../../common/core/app_scaffold.dart';
@@ -27,7 +28,7 @@ class ToolsScreen extends HookConsumerWidget {
     final viewStyle = useState<ViewStyle>(ViewStyle.list);
     final tools = ref.watch(toolsProvider);
     return AppScaffold(
-      topSafeArea: true,
+      topSafeArea: false,
       extendBody: true,
       bodyBackgroundColor: Colors.transparent,
       paddingX: 0,
@@ -36,14 +37,14 @@ class ToolsScreen extends HookConsumerWidget {
         onRefresh: () async => ref.invalidate(toolsProvider),
         color: const Color(0xFF00B4D8),
         child: CustomScrollView(
-          physics: const ClampingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           slivers: [
             // App Bar
             SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-                child: const CustomAppBar(),
-              ),
+                padding: EdgeInsets.only(left: 20.w, right: 20.w, top: 8.h, bottom: 16.h),
+                child: const CustomAppBar(reverse: true),
+              ).animate().fadeIn().slideY(begin: -0.1, end: 0),
             ),
 
             // Hero Banner Section
@@ -86,7 +87,7 @@ class ToolsScreen extends HookConsumerWidget {
                             endColor: tools[index].endColor,
                             isLocked: tools[index].isLocked,
                             isStartBottomColor: tools[index].isStartBottomColor,
-                          ),
+                          ).animate().fadeIn(delay: (index * 100).ms).slideX(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
                         ),
                         childCount: tools.length,
                       ),

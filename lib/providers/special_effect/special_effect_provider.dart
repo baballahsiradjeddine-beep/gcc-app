@@ -22,9 +22,8 @@ class SpecialEffectService {
     bool shouldVibrate = true,
   }) async {
     if (isSoundEnabled) {
-      SoundService.playSound();
+      SoundService.play('assets/sounds/ms_click.mp3');
       return;
     }
-    return;
   }
 }

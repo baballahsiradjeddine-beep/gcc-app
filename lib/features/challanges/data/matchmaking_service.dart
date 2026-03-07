@@ -293,8 +293,17 @@ class MatchmakingService {
 
     final questionsList = (questionsData['questions'] as List?) ?? [];
 
-    final botNames = ['Tito Bot 🐧', 'Ahmed 🤓', 'Sara 📚', 'Amine ⭐'];
+    final botNames = [
+      'أحمد 🤓', 'سارة 📚', 'أمينة ⭐', 'ياسين 🚀', 'مريم ✨', 'عمر ⚔️', 
+      'ليلى 🎨', 'حمزة 🦁', 'نور 🌙', 'إياد 🧠', 'ريان 🛡️', 'جنى 🌸'
+    ];
+    final botSeeds = ['Felix', 'Aneka', 'Caleb', 'Mimi', 'Jasper', 'Sasha', 'Bear', 'Coco'];
     final botName = botNames[Random().nextInt(botNames.length)];
+    final botSeed = botSeeds[Random().nextInt(botSeeds.length)] + Random().nextInt(100).toString();
+    
+    final currentUser = _ref.read(userNotifierProvider).value;
+    final userBadgeIcon = currentUser?.badge?.completeIconUrl;
+    final userBadgeColor = currentUser?.badge?.color;
 
     await matchRef.set({
       'status': 'starting',
@@ -306,16 +315,18 @@ class MatchmakingService {
           'uid': myUid,
           'name': myName ?? 'Guest',
           'avatar': myAvatar ?? '',
-          'badgeIconUrl': _ref.read(userNotifierProvider).value?.badge?.completeIconUrl,
-          'badgeColor': _ref.read(userNotifierProvider).value?.badge?.color,
+          'badgeIconUrl': userBadgeIcon,
+          'badgeColor': userBadgeColor,
           'score': 0,
           'status': 'ready',
           'emoji': '',
         },
-        'bot_123': {
+        'bot_${Random().nextInt(9999)}': {
           'uid': 'bot_123',
           'name': botName,
-          'avatar': '',
+          'avatar': 'https://api.dicebear.com/7.x/avataaars/svg?seed=$botSeed',
+          'badgeIconUrl': userBadgeIcon,
+          'badgeColor': userBadgeColor,
           'score': 0,
           'status': 'ready',
           'emoji': '',

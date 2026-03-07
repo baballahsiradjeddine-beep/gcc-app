@@ -21,10 +21,12 @@ class ActionButtonSheet extends StatelessWidget {
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.all(20),
-          decoration: const BoxDecoration(
-            color: Colors.white,
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark 
+                ? const Color(0xFF1E293B) 
+                : AppColors.surfaceWhite.withOpacity(0.95),
             // radius top
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(30.r)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -54,10 +56,11 @@ class ActionButtonSheet extends StatelessWidget {
               Text(
                 message,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: AppColors.darkColor,
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : AppColors.textBlack,
                   fontWeight: FontWeight.normal,
+                  fontFamily: 'SomarSans',
                 ),
               ),
               10.verticalSpace,

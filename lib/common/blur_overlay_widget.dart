@@ -46,7 +46,7 @@ class BlurOverlayWidget extends StatelessWidget {
               filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
               child: Container(
                 // margin: const EdgeInsets.all(0),
-                color: Colors.black.withValues(alpha: 0.5),
+                color: Colors.black.withOpacity(0.5),
                 child: Center(
                   child: Padding(
                     padding: padding ?? EdgeInsets.all(20.r),

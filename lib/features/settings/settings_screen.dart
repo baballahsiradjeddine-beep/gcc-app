@@ -1,3 +1,4 @@
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -15,6 +16,7 @@ import 'package:tayssir/services/actions/snack_bar_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../constants/strings.dart';
+import 'package:tayssir/resources/colors/app_colors.dart';
 import '../../resources/resources.dart';
 
 class SettingsScreen extends HookConsumerWidget {
@@ -77,57 +79,57 @@ class SettingsScreen extends HookConsumerWidget {
                   style: TextStyle(
                     fontSize: 22.sp,
                     fontWeight: FontWeight.w900,
-                    color: isDark ? Colors.white : const Color(0xFF1E293B),
+                    color: isDark ? Colors.white : AppColors.textBlack,
                     fontFamily: 'SomarSans',
                   ),
                 ),
                 15.verticalSpace,
 
                 // Account Section
-                _buildSectionHeader(isDark, 'الحساب'),
+                _buildSectionHeader(isDark, 'الحساب').animate().fadeIn(delay: 100.ms).slideX(begin: 0.1, end: 0),
                 SettingsItem(
                   title: AppStrings.personalInformations,
                   pathName: AppRoutes.profile.name,
                   icon: SVGs.icPerson,
-                ),
+                ).animate().fadeIn(delay: 200.ms).slideX(begin: 0.05, end: 0),
                 SettingsItem(
                   title: AppStrings.security,
                   pathName: AppRoutes.security.name,
                   icon: SVGs.icSecurity,
-                ),
+                ).animate().fadeIn(delay: 300.ms).slideX(begin: 0.05, end: 0),
                 15.verticalSpace,
 
                 // Preferences Section
-                _buildSectionHeader(isDark, 'التفضيلات'),
+                _buildSectionHeader(isDark, 'التفضيلات').animate().fadeIn(delay: 400.ms).slideX(begin: 0.1, end: 0),
                 const SettingsItem(
                   title: AppStrings.audioEffects,
                   actionWidget: AudioSoundSwitchButton(),
                   icon: SVGs.icSound,
-                ),
+                ).animate().fadeIn(delay: 500.ms).slideX(begin: 0.05, end: 0),
                 15.verticalSpace,
 
                 // Support Section
-                _buildSectionHeader(isDark, 'الدعم والتواصل'),
+                _buildSectionHeader(isDark, 'الدعم والتواصل').animate().fadeIn(delay: 600.ms).slideX(begin: 0.1, end: 0),
                 SettingsItem(
                   title: 'قيم التطبيق',
                   onTap: () => requestReview(),
                   iconData: Icons.star_rounded,
-                ),
+                ).animate().fadeIn(delay: 700.ms).slideX(begin: 0.05, end: 0),
                 SettingsItem(
                   title: AppStrings.contactUs,
                   pathName: AppRoutes.contactUs.name,
                   icon: SVGs.icPhone,
-                ),
+                ).animate().fadeIn(delay: 800.ms).slideX(begin: 0.05, end: 0),
                 15.verticalSpace,
 
                 // About Us Card
                 Container(
                   padding: EdgeInsets.all(20.w),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9), // Slate-100 instead of blue.shade50
+                    color: isDark ? const Color(0xFF1E293B) : AppColors.scaffoldColor, // Slate-100
                     borderRadius: BorderRadius.circular(24.r),
                     border: Border.all(
-                      color: isDark ? Colors.white10 : const Color(0xFFE2E8F0), // Slate-200
+                      color: isDark ? Colors.white10 : const Color(0xFFE2E8F0), 
                     ),
                   ),
                   child: Column(
@@ -143,7 +145,7 @@ class SettingsScreen extends HookConsumerWidget {
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : const Color(0xFF1E293B),
+                          color: isDark ? Colors.white : AppColors.textBlack,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -170,7 +172,7 @@ class SettingsScreen extends HookConsumerWidget {
               ),
                     ],
                   ),
-                ),
+                ).animate().fadeIn(delay: 900.ms).scale(begin: const Offset(0.95, 0.95)),
 
                 12.verticalSpace,
                 const LogoutButton(),
@@ -191,7 +193,7 @@ class SettingsScreen extends HookConsumerWidget {
         style: TextStyle(
           fontSize: 14.sp,
           fontWeight: FontWeight.bold,
-          color: isDark ? Colors.white38 : const Color(0xFF64748B), // Slate-500
+          color: isDark ? Colors.white38 : AppColors.textBody.withOpacity(0.6), 
           letterSpacing: 0.5,
         ),
       ),

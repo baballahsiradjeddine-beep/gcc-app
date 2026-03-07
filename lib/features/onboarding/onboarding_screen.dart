@@ -89,13 +89,13 @@ class _BackgroundDecor extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: RadialGradient(colors: [
-                const Color(0xFF00B4D8).withValues(alpha: 0.18),
+                const Color(0xFF00B4D8).withOpacity(0.18),
                 Colors.transparent,
               ]),
             ),
-          ),
-        ).animate(onPlay: (c) => c.repeat(reverse: true))
-          .scale(begin: const Offset(1, 1), end: const Offset(1.15, 1.15), duration: 4.seconds),
+          ).animate(onPlay: (c) => c.repeat(reverse: true))
+            .scale(begin: const Offset(1, 1), end: const Offset(1.15, 1.15), duration: 4.seconds),
+        ),
         Positioned(
           bottom: -60.h,
           left: -60.w,
@@ -105,13 +105,13 @@ class _BackgroundDecor extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: RadialGradient(colors: [
-                const Color(0xFFEC4899).withValues(alpha: 0.14),
+                const Color(0xFFEC4899).withOpacity(0.14),
                 Colors.transparent,
               ]),
             ),
-          ),
-        ).animate(onPlay: (c) => c.repeat(reverse: true))
-          .scale(begin: const Offset(1, 1), end: const Offset(1.1, 1.1), duration: 3.5.seconds),
+          ).animate(onPlay: (c) => c.repeat(reverse: true))
+            .scale(begin: const Offset(1, 1), end: const Offset(1.1, 1.1), duration: 3.5.seconds),
+        ),
       ],
     );
   }
@@ -139,7 +139,7 @@ class _ProgressDots extends StatelessWidget {
           decoration: BoxDecoration(
             color: isActive
                 ? const Color(0xFF00B4D8)
-                : const Color(0xFF00B4D8).withValues(alpha: 0.25),
+                : const Color(0xFF00B4D8).withOpacity(0.25),
             borderRadius: BorderRadius.circular(4.r),
           ),
         );

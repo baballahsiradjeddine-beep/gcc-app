@@ -1,3 +1,4 @@
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -9,19 +10,32 @@ import 'package:tayssir/router/app_router.dart';
 import 'package:tayssir/resources/resources.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tayssir/common/core/app_assets/dynamic_app_asset.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:tayssir/resources/colors/app_colors.dart';
+import 'package:tayssir/services/sounds/sound_manager.dart';
+import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
 
-class StreakScreen extends StatelessWidget {
+class StreakScreen extends HookConsumerWidget {
   final StreakModel streak;
   final int unitId;
 
   const StreakScreen({super.key, required this.streak, required this.unitId});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final int currentStreak = streak.currentStreak;
     final int weekNumber = (currentStreak > 0) ? (currentStreak - 1) ~/ 7 : 0;
     final int weekStartDay = (weekNumber * 7) + 1;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isSoundOn = ref.watch(isSoundEnabledProvider);
+
+    useEffect(() {
+      if (isSoundOn) {
+        SoundService.playStreak();
+      }
+      return null;
+    }, []);
 
     return AppScaffold(
       onPopScope: () {},
@@ -29,7 +43,7 @@ class StreakScreen extends StatelessWidget {
       paddingY: 0,
       body: Container(
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+          color: isDark ? const Color(0xFF0F172A) : AppColors.scaffoldColor,
         ),
         child: Stack(
           children: [
@@ -68,7 +82,7 @@ class StreakScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         fontFamily: 'SomarSans',
                       ),
-                    ),
+                    ).animate().fadeIn().slideY(begin: -0.2, end: 0),
                     Text(
                       "$currentStreak أيام متواصلة",
                       textAlign: TextAlign.center,
@@ -79,7 +93,7 @@ class StreakScreen extends StatelessWidget {
                         fontFamily: 'SomarSans',
                         height: 1.2,
                       ),
-                    ),
+                    ).animate().fadeIn(delay: 200.ms).slideY(begin: -0.1, end: 0),
 
                     const Spacer(flex: 1),
 
@@ -119,11 +133,13 @@ class StreakScreen extends StatelessWidget {
                             child: Text(
                               "🔥",
                               style: TextStyle(fontSize: 70.sp),
-                            ),
+                            ).animate(onPlay: (c) => c.repeat(reverse: true))
+                             .scale(begin: const Offset(1, 1), end: const Offset(1.1, 1.1), duration: 1.seconds)
+                             .shimmer(delay: 2.seconds, duration: 1.5.seconds),
                           ),
                         ),
                       ],
-                    ),
+                    ).animate().fadeIn(delay: 400.ms).scale(begin: const Offset(0.8, 0.8)),
 
                     const Spacer(flex: 1),
 
@@ -132,10 +148,10 @@ class StreakScreen extends StatelessWidget {
                       width: double.infinity,
                       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                        color: isDark ? const Color(0xFF1E293B) : AppColors.surfaceWhite,
                         borderRadius: BorderRadius.circular(30.r),
                         border: Border.all(
-                          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0), 
+                          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9), 
                           width: 1.5
                         ),
                         boxShadow: [
@@ -156,7 +172,10 @@ class StreakScreen extends StatelessWidget {
                               children: List.generate(7, (index) {
                                 final dayNumber = weekStartDay + index;
                                 final bool isCompleted = dayNumber <= currentStreak;
-                                return _buildNumericDayItem(dayNumber, isCompleted, isDark);
+                                return _buildNumericDayItem(dayNumber, isCompleted, isDark)
+                                    .animate()
+                                    .fadeIn(delay: (600 + index * 100).ms)
+                                    .scale(begin: const Offset(0.8, 0.8));
                               }),
                             ),
                           ),
@@ -180,7 +199,7 @@ class StreakScreen extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 15.sp,
-                              color: isDark ? Colors.white70 : const Color(0xFF1E293B),
+                              color: isDark ? Colors.white70 : AppColors.textBlack,
                               fontWeight: FontWeight.w700,
                               fontFamily: 'SomarSans',
                               height: 1.4,
@@ -266,7 +285,7 @@ class StreakScreen extends StatelessWidget {
           "$dayNumber",
           style: TextStyle(
             fontSize: 13.sp,
-            color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
+            color: isDark ? Colors.white38 : AppColors.textBody.withOpacity(0.6),
             fontWeight: FontWeight.bold,
             fontFamily: 'SomarSans',
           ),
@@ -276,12 +295,12 @@ class StreakScreen extends StatelessWidget {
           width: 36.w,
           height: 36.w,
           decoration: BoxDecoration(
-            color: isCompleted ? const Color(0xFF00B4D8) : (isDark ? const Color(0xFF0F172A) : Colors.white),
+            color: isCompleted ? const Color(0xFF00B4D8) : (isDark ? const Color(0xFF0F172A) : AppColors.surfaceWhite),
             borderRadius: BorderRadius.circular(12.r),
             border: Border.all(
               color: isCompleted 
                   ? const Color(0xFF00B4D8) 
-                  : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                  : (isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9)),
               width: 1.5,
             ),
             boxShadow: [

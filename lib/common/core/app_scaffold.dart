@@ -101,7 +101,7 @@ class AppScaffold extends StatelessWidget {
       child: Directionality(
         textDirection: TextDirection.rtl,
         child: Scaffold(
-            backgroundColor: bodyBackgroundColor ?? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0B1120) : const Color(0xFFF8FAFC)),
+            backgroundColor: bodyBackgroundColor ?? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0B1120) : Color(0xFFF1F5F9)),
             extendBody: extendBody,
             resizeToAvoidBottomInset: resizeToAvoidBottomInset,
             body: PopScope(

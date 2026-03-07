@@ -9,6 +9,9 @@ import 'package:toastification/toastification.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tayssir/router/app_router.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:tayssir/services/sounds/sound_manager.dart';
 import '../firebase_options.dart';
 
 // Top-level function handles background messages
@@ -45,10 +48,27 @@ class FCMService {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
     // Foreground Listener
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       AppLogger.logInfo(
           "Message received in foreground: ${message.notification?.title}");
       if (message.notification != null) {
+        
+        // Play notification sound if enabled
+        try {
+          final prefs = await SharedPreferences.getInstance();
+          final settingsJson = prefs.getString('settings');
+          bool isSoundEnabled = true; // Default
+          if (settingsJson != null) {
+            final settingsMap = jsonDecode(settingsJson);
+            isSoundEnabled = settingsMap['isSoundEnabled'] ?? true;
+          }
+          if (isSoundEnabled) {
+            SoundService.playNotification();
+          }
+        } catch (e) {
+          AppLogger.logError('Error checking sound settings for notification: $e');
+        }
+
         final isChallenge = message.data['type'] == 'challenge_invite';
         String? imageUrl = message.notification?.android?.imageUrl ??
             message.notification?.apple?.imageUrl ??

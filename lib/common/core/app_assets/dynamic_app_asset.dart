@@ -42,7 +42,6 @@ class DynamicAppAsset extends HookConsumerWidget {
         if (serverAsset != null && serverAsset.url.isNotEmpty) {
           final imageUrl = '${serverAsset.url}?${serverAsset.version}';
           final isSvg = imageUrl.toLowerCase().contains('.svg');
-          print('>>> DynamicAppAsset [$assetKey]: Rendering $imageUrl (isSvg: $isSvg)');
           
           if (isSvg) {
             return SvgPicture.network(

@@ -259,7 +259,7 @@ class _LevelNumber extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final shadowColor =
-        Color.alphaBlend(Colors.black.withValues(alpha: 0.25), themeColor);
+        Color.alphaBlend(Colors.black.withOpacity(0.25), themeColor);
     final textStyle = GoogleFonts.balooDa2(
       fontSize: 32.sp,
       fontWeight: FontWeight.w900,
@@ -335,7 +335,7 @@ class _AchievementCard extends StatelessWidget {
         border: Border.all(color: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFEEEEEE)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: Colors.black.withOpacity(0.02),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),

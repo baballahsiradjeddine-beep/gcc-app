@@ -7,6 +7,9 @@ import 'package:go_router/go_router.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:tayssir/features/onboarding/onboarding_notifier.dart';
 import 'package:tayssir/router/app_router.dart';
+import 'package:tayssir/services/sounds/sound_manager.dart';
+import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
+import 'package:flutter/services.dart';
 
 // ── Global showcase keys for each nav tab ──
 final GlobalKey tourKeyHome = GlobalKey();
@@ -112,6 +115,10 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
     final current = ref.read(onboardingProvider).tourStep;
     if (current < 0 || current >= _tourOrder.length) return;
 
+    final isSoundOn = ref.read(isSoundEnabledProvider);
+    if (isSoundOn) SoundService.playClickPremium();
+    HapticFeedback.lightImpact();
+
     // 1. Navigate to the tapped tab right away
     final navIndex = _tourOrder[current].navIndex;
     widget.navigationShell.goBranch(
@@ -203,18 +210,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
           extendBody: true,
           body: Stack(
             children: [
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 400),
-                switchInCurve: Curves.easeIn,
-                switchOutCurve: Curves.easeOut,
-                transitionBuilder: (Widget child, Animation<double> animation) {
-                  return FadeTransition(opacity: animation, child: child);
-                },
-                child: KeyedSubtree(
-                  key: ValueKey<int>(widget.navigationShell.currentIndex),
-                  child: widget.navigationShell,
-                ),
-              ),
+              widget.navigationShell,
               if (isTourActive && tourStep < _tourOrder.length)
                 _TitoBubbleOverlay(
                   step: currentStepDef,
@@ -314,7 +310,15 @@ class _TourAwareNavBar extends ConsumerWidget {
     final isSelected = currentIndex == index;
     final isTargetted = isTourActive && index == currentTourNavIndex;
     final isBlocked = isTourActive && index != currentTourNavIndex;
-    final VoidCallback? tapCallback = isBlocked ? null : () => onTap(index);
+    final isSoundOn = ref.watch(isSoundEnabledProvider);
+    
+    final VoidCallback? tapCallback = isBlocked ? null : () {
+      if (isSoundOn && !isSelected) {
+        SoundService.playClickPremium();
+        HapticFeedback.lightImpact();
+      }
+      onTap(index);
+    };
 
     // For selected item: build the floating container using layout padding 
     // instead of Transform.translate so Showcase calculates the exact bounds.
@@ -333,7 +337,7 @@ class _TourAwareNavBar extends ConsumerWidget {
             borderRadius: BorderRadius.circular(24.r),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF00B4D8).withValues(alpha: 0.4),
+                color: const Color(0xFF00B4D8).withOpacity(0.4),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -448,7 +452,7 @@ class _NavItemWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(24.r),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF00B4D8).withValues(alpha: 0.4),
+                  color: const Color(0xFF00B4D8).withOpacity(0.4),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -516,12 +520,12 @@ class _TitoBubbleOverlay extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         decoration: BoxDecoration(
-          color: const Color(0xFF1E293B).withValues(alpha: 0.95), // Slightly lighter, more premium navy
+          color: const Color(0xFF1E293B).withOpacity(0.95), // Slightly lighter, more premium navy
           borderRadius: BorderRadius.circular(20.r),
-          border: Border.all(color: const Color(0xFF00B4D8).withValues(alpha: 0.6), width: 1.5),
+          border: Border.all(color: const Color(0xFF00B4D8).withOpacity(0.6), width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF00B4D8).withValues(alpha: 0.1),
+              color: const Color(0xFF00B4D8).withOpacity(0.1),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -571,8 +575,8 @@ class _NavBackground extends StatelessWidget {
           width: double.infinity,
           decoration: BoxDecoration(
             color: isDark
-                ? const Color(0xFF0F172A).withValues(alpha: 0.85)
-                : Colors.white.withValues(alpha: 0.85),
+                ? const Color(0xFF0F172A).withOpacity(0.85)
+                : Colors.white.withOpacity(0.85),
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(32.r),
               topRight: Radius.circular(32.r),
@@ -580,8 +584,8 @@ class _NavBackground extends StatelessWidget {
             border: Border(
               top: BorderSide(
                 color: isDark
-                    ? Colors.white.withValues(alpha: 0.1)
-                    : Colors.black.withValues(alpha: 0.05),
+                    ? Colors.white.withOpacity(0.1)
+                    : Colors.black.withOpacity(0.05),
                 width: 1,
               ),
             ),
@@ -615,10 +619,10 @@ class _RegisterNowSheet extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF0F172A),
         borderRadius: BorderRadius.circular(32.r),
-        border: Border.all(color: const Color(0xFF00B4D8).withValues(alpha: 0.3)),
+        border: Border.all(color: const Color(0xFF00B4D8).withOpacity(0.3)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF00B4D8).withValues(alpha: 0.15),
+            color: const Color(0xFF00B4D8).withOpacity(0.15),
             blurRadius: 40,
             offset: const Offset(0, -10),
           ),
@@ -689,7 +693,7 @@ class _RegisterNowSheet extends StatelessWidget {
                 borderRadius: BorderRadius.circular(18.r),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF00B4D8).withValues(alpha: 0.35),
+                    color: const Color(0xFF00B4D8).withOpacity(0.35),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   )

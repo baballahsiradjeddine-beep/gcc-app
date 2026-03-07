@@ -22,6 +22,7 @@ import 'subscribe_section.dart';
 import 'view_style.dart';
 import '../../support_chat/presentation/tito_support_fab.dart';
 import '../../exercice/presentation/widgets/review_ai_popup.dart';
+import 'package:tayssir/resources/colors/app_colors.dart'; // Force re-import
 
 class HomeScreen extends HookConsumerWidget {
   const HomeScreen({super.key});
@@ -158,7 +159,7 @@ class HomeScreen extends HookConsumerWidget {
                           width: 8.w,
                           height: 24.h,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF00B4D8),
+                            color: AppColors.primaryColor,
                             borderRadius: BorderRadius.circular(4.r),
                           ),
                         ),
@@ -168,7 +169,7 @@ class HomeScreen extends HookConsumerWidget {
                           style: TextStyle(
                             fontSize: 22.sp,
                             fontWeight: FontWeight.w900,
-                            color: isDark ? Colors.white : const Color(0xFF1E293B),
+                            color: isDark ? Colors.white : AppColors.textBlack,
                             fontFamily: 'SomarSans',
                           ),
                         ),
@@ -184,12 +185,12 @@ class HomeScreen extends HookConsumerWidget {
                             width: 44.sp,
                             height: 44.sp,
                             decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                              color: isDark ? AppColors.darkBlue : AppColors.surfaceWhite,
                               borderRadius: BorderRadius.circular(16.r),
                             ),
                             child: Icon(
                               viewStyle.value == ViewStyle.grid ? Icons.list_rounded : Icons.grid_view_rounded,
-                              color: const Color(0xFF00B4D8),
+                              color: AppColors.primaryColor,
                               size: 26.sp,
                             ),
                           ),
@@ -207,7 +208,7 @@ class HomeScreen extends HookConsumerWidget {
                 child: Center(
                   child: Padding(
                     padding: EdgeInsets.all(40.0),
-                    child: CircularProgressIndicator(color: Color(0xFF00B4D8)),
+                    child: CircularProgressIndicator(color: AppColors.primaryColor),
                   ),
                 ),
               )
@@ -218,7 +219,7 @@ class HomeScreen extends HookConsumerWidget {
                     padding: EdgeInsets.all(40.0),
                     child: Text(
                       'جاري جلب مواد شعبتك... 🐬',
-                      style: TextStyle(fontFamily: 'SomarSans', color: Color(0xFF94A3B8)),
+                      style: TextStyle(fontFamily: 'SomarSans', color: AppColors.disabledTextColor),
                     ),
                   ),
                 ),

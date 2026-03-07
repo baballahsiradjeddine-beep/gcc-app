@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
+  // Brand Design Tokens
   AppColors._();
 
   // Core Brand Colors
@@ -9,7 +10,8 @@ class AppColors {
   static const Color secondaryColor = Color(0xFF0077B6);
   
   // Background / Surface Colors
-  static const Color scaffoldColor = Color(0xFFF8FAFC); // brand.surface
+  static const Color scaffoldColor = Color(0xFFF1F5F9); // Slate-100 for better depth
+  static const Color surfaceWhite = Color(0xFFFFFFFF);
   static const Color darkColor = Color(0xFF0B1120);     // brand.darkSurface
   static const Color secondaryDark = Color(0xFF0F172A); // dark.bg
 
@@ -24,14 +26,17 @@ class AppColors {
   static const Color redColor = Color(0xFFF43F5E);   // From arena_screen failure
 
   // Legacy / Basic
-  static const Color textBlack = Color(0xFF1E293B); // Slate-800
+  static const Color textBlack = Color(0xFF0F172A); // Slate-900 for maximum contrast
+  static const Color textBody = Color(0xFF334155);  // Slate-700 for better readability
   static const Color textWhite = Color(0xFFF8FAFC);
-  static const Color greyColor = Color(0xFF94A3B8); // Slate-400
+  static const Color greyColor = Color(0xFF64748B); // Slate-500
   static const Color borderColor = Color(0xFFE2E8F0); // Slate-200
-  static const Color disabledColor = Color(0xFFCBD5E1);
-  static const Color disabledTextColor = Color(0xFF94A3B8);
-  static const Color darkBlue = Color(0xFF1E293B);
-  static const Color videoControls = Color(0xAA000000);
+  static const Color shadowColor = Color(0x1A0F172A); // Subtle Slate shadow for light mode
+
+  // Specific UI Elements (Legacy/Compatibility)
+  static const Color disabledTextColor = Color(0xFF94A3B8); // Slate-400
+  static const Color videoControls = Color(0xB30F172A);    // 70% opacity dark
+  static const Color darkBlue = Color(0xFF1E293B);          // Brand dark
 
   // Gradients
   static const LinearGradient primaryGradient = LinearGradient(

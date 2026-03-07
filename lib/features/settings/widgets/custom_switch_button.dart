@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tayssir/providers/settings/settings_provider.dart';
 import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
 import 'package:tayssir/resources/colors/app_colors.dart';
+import 'package:tayssir/services/sounds/sound_manager.dart';
+import 'package:flutter/services.dart';
 
 class CustomSwitchButton extends ConsumerWidget {
   const CustomSwitchButton({
@@ -45,6 +47,11 @@ class AudioSoundSwitchButton extends ConsumerWidget {
       child: CustomSwitchButton(
         value: ref.watch(isSoundEnabledProvider),
         onChanged: (value) {
+          final isSoundOn = ref.read(isSoundEnabledProvider);
+          if (isSoundOn) {
+            SoundService.play('assets/sounds/ui_click_premium.mp3');
+            HapticFeedback.lightImpact();
+          }
           ref.read(settingsNotifierProvider.notifier).toggleSound();
         },
       ),

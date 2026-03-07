@@ -7,6 +7,7 @@ import 'package:tayssir/features/units/widgets/animated_circular_progress_widget
 import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';
 import 'package:tayssir/services/actions/dialog_service.dart';
+import 'package:tayssir/resources/colors/app_colors.dart';
 
 class CustomLessonWidget extends ConsumerWidget {
   const CustomLessonWidget({
@@ -52,7 +53,7 @@ class CustomLessonWidget extends ConsumerWidget {
             // 1. Progress Avatar (RIGHT side in RTL)
             AnimatedCircularProgressWidget(
               percentage: progress,
-              color: const Color(0xffEC4899),
+              color: AppColors.pinkColor,
               imageUrl: imageUrl,
               size: 80,
               borderWidth: 5.0,
@@ -72,20 +73,20 @@ class CustomLessonWidget extends ConsumerWidget {
                   gradient: isLocked
                       ? null
                       : const LinearGradient(
-                          colors: [Color(0xff00B4D8), Color(0xff0077B6)],
+                          colors: [AppColors.primaryColor, AppColors.secondaryColor],
                           begin: Alignment.centerRight,
                           end: Alignment.centerLeft,
                         ),
                   color: isLocked 
                       ? (Theme.of(context).brightness == Brightness.dark 
-                          ? const Color(0xFF1E293B) 
-                          : const Color(0xffF1F5F9)) 
+                          ? AppColors.darkBlue 
+                          : AppColors.surfaceWhite) 
                       : null,
                   boxShadow: [
                     BoxShadow(
                       color: isLocked 
                           ? Colors.black.withOpacity(0.04)
-                          : const Color(0xff00B4D8).withOpacity(0.1),
+                          : AppColors.primaryColor.withOpacity(0.1),
                       blurRadius: 8,
                       offset: const Offset(0, 3),
                     ),
@@ -120,8 +121,8 @@ class CustomLessonWidget extends ConsumerWidget {
                             style: TextStyle(
                               color: isLocked 
                                   ? (Theme.of(context).brightness == Brightness.dark 
-                                      ? const Color(0xFF94A3B8) 
-                                      : const Color(0xff64748B))
+                                      ? AppColors.disabledTextColor 
+                                      : AppColors.greyColor)
                                   : Colors.white,
                               fontSize: 14.sp,
                               fontWeight: FontWeight.w900,
@@ -140,8 +141,8 @@ class CustomLessonWidget extends ConsumerWidget {
                           decoration: BoxDecoration(
                             color: isLocked 
                                 ? (Theme.of(context).brightness == Brightness.dark 
-                                    ? const Color(0xFF334155) 
-                                    : const Color(0xffCBD5E0).withOpacity(0.5))
+                                    ? AppColors.textBody 
+                                    : AppColors.borderColor.withOpacity(0.5))
                                 : Colors.white.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(10.r),
                           ),
@@ -149,8 +150,8 @@ class CustomLessonWidget extends ConsumerWidget {
                             getLessonIcon(),
                             color: isLocked 
                                 ? (Theme.of(context).brightness == Brightness.dark 
-                                    ? const Color(0xFF64748B) 
-                                    : const Color(0xff64748B))
+                                    ? AppColors.greyColor 
+                                    : AppColors.greyColor)
                                 : Colors.white,
                             size: 18.sp,
                           ),

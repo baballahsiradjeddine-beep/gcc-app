@@ -90,7 +90,7 @@ class BlurOverlay extends StatelessWidget {
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Apply the blur effect
       child: Container(
-        color: Colors.black.withValues(alpha: 0.2), // Add a dim background
+        color: Colors.black.withOpacity(0.2), // Add a dim background
         child: child, // Display the actual bottom sheet content
       ),
     );

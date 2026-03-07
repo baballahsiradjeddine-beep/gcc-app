@@ -12,11 +12,17 @@ class CustomAppBar extends ConsumerWidget {
   final bool showActions;
   final bool showLogo;
   final bool reverse;
+  final bool showNotifications;
+  final bool showThemeToggle;
+  final bool forceDarkMode;
   const CustomAppBar({
     super.key,
     this.showActions = true,
     this.showLogo = true,
     this.reverse = false,
+    this.showNotifications = true,
+    this.showThemeToggle = true,
+    this.forceDarkMode = false,
   });
 
   @override
@@ -33,48 +39,54 @@ class CustomAppBar extends ConsumerWidget {
       ? Row(
           children: reverse 
             ? [
-                // Theme Toggle Button
-                GestureDetector(
-                  onTap: () => ref.read(settingsNotifierProvider.notifier).toggleDarkMode(),
-                  child: _buildActionIcon(
-                    context, 
-                    settings.isDarkMode ? Icons.wb_sunny_rounded : Icons.nightlight_round, 
-                    isDark,
-                    color: settings.isDarkMode ? Colors.yellow : null,
-                  ),
-                ),
-                12.horizontalSpace,
-                // Notification Button
-                GestureDetector(
-                  onTap: () => context.pushNamed(AppRoutes.notifcations.name),
-                  child: _buildActionIcon(context, Icons.notifications_none_rounded, isDark),
-                ),
-                if (!isGuest) ...[
-                  12.horizontalSpace,
+                if (!isGuest && (showNotifications || showThemeToggle)) ...[
                   const ProfileButton(),
+                  12.horizontalSpace,
                 ],
+                if (!isGuest && (!showNotifications && !showThemeToggle))
+                  const ProfileButton(),
+                // Notification Button
+                if (showNotifications)
+                  GestureDetector(
+                    onTap: () => context.pushNamed(AppRoutes.notifcations.name),
+                    child: _buildActionIcon(context, Icons.notifications_none_rounded, isDark || forceDarkMode),
+                  ),
+                if (showNotifications && showThemeToggle) 12.horizontalSpace,
+                // Theme Toggle Button
+                if (showThemeToggle)
+                  GestureDetector(
+                    onTap: () => ref.read(settingsNotifierProvider.notifier).toggleDarkMode(),
+                    child: _buildActionIcon(
+                      context, 
+                      settings.isDarkMode ? Icons.wb_sunny_rounded : Icons.nightlight_round, 
+                      isDark || forceDarkMode,
+                      color: settings.isDarkMode ? Colors.yellow : (forceDarkMode ? Colors.white : null),
+                    ),
+                  ),
               ]
             : [
                  if (!isGuest) ...[
                   const ProfileButton(),
-                  12.horizontalSpace,
+                  if (showNotifications || showThemeToggle) 12.horizontalSpace,
                 ],
                 // Notification Button
-                GestureDetector(
-                  onTap: () => context.pushNamed(AppRoutes.notifcations.name),
-                  child: _buildActionIcon(context, Icons.notifications_none_rounded, isDark),
-                ),
-                12.horizontalSpace,
-                // Theme Toggle Button
-                GestureDetector(
-                  onTap: () => ref.read(settingsNotifierProvider.notifier).toggleDarkMode(),
-                  child: _buildActionIcon(
-                    context, 
-                    settings.isDarkMode ? Icons.wb_sunny_rounded : Icons.nightlight_round, 
-                    isDark,
-                    color: settings.isDarkMode ? Colors.yellow : null,
+                if (showNotifications)
+                  GestureDetector(
+                    onTap: () => context.pushNamed(AppRoutes.notifcations.name),
+                    child: _buildActionIcon(context, Icons.notifications_none_rounded, isDark || forceDarkMode),
                   ),
-                ),
+                if (showNotifications && showThemeToggle) 12.horizontalSpace,
+                // Theme Toggle Button
+                if (showThemeToggle)
+                  GestureDetector(
+                    onTap: () => ref.read(settingsNotifierProvider.notifier).toggleDarkMode(),
+                    child: _buildActionIcon(
+                      context, 
+                      settings.isDarkMode ? Icons.wb_sunny_rounded : Icons.nightlight_round, 
+                      isDark || forceDarkMode,
+                      color: settings.isDarkMode ? Colors.yellow : (forceDarkMode ? Colors.white : null),
+                    ),
+                  ),
               ],
         )
       : const SizedBox.shrink();

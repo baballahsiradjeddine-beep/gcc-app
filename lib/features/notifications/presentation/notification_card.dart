@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tayssir/features/notifications/domaine/notifiacation_model.dart';
 import 'package:tayssir/features/notifications/presentation/notifications_controller.dart';
+import 'package:tayssir/resources/colors/app_colors.dart';
 
 class NotificationCard extends ConsumerWidget {
   final NotificationModel notification;
@@ -37,8 +38,8 @@ class NotificationCard extends ConsumerWidget {
       margin: EdgeInsets.symmetric(horizontal: 0.w, vertical: 8.h),
       decoration: BoxDecoration(
         color: notification.isRead 
-            ? (isDark ? const Color(0xFF1E293B).withOpacity(0.5) : const Color(0xFFF8FAFC))
-            : (isDark ? const Color(0xFF1E293B) : Colors.white),
+            ? (isDark ? const Color(0xFF1E293B).withOpacity(0.5) : AppColors.scaffoldColor)
+            : (isDark ? const Color(0xFF1E293B) : AppColors.surfaceWhite),
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
           color: notification.isRead 
@@ -100,8 +101,8 @@ class NotificationCard extends ConsumerWidget {
                               fontSize: 16.sp,
                               fontWeight: FontWeight.w900,
                               color: notification.isRead
-                                  ? (isDark ? Colors.white60 : const Color(0xFF64748B))
-                                  : (isDark ? Colors.white : const Color(0xFF1E293B)),
+                                  ? (isDark ? Colors.white60 : AppColors.textBody.withOpacity(0.6))
+                                  : (isDark ? Colors.white : AppColors.textBlack),
                               fontFamily: 'SomarSans',
                             ),
                           ),
@@ -140,8 +141,8 @@ class NotificationCard extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: notification.isRead
-                        ? (isDark ? Colors.white38 : const Color(0xFF64748B))
-                        : (isDark ? Colors.white70 : const Color(0xFF334155)),
+                        ? (isDark ? Colors.white38 : AppColors.textBody.withOpacity(0.4))
+                        : (isDark ? Colors.white70 : AppColors.textBody),
                     height: 1.5,
                     fontFamily: 'SomarSans',
                     fontWeight: notification.isRead ? FontWeight.normal : FontWeight.w500,

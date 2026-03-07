@@ -14,11 +14,15 @@ import 'package:tayssir/features/units/empty_content_widget.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';
 import 'package:tayssir/router/app_router.dart';
 import 'package:tayssir/services/actions/dialog_service.dart';
+import 'package:tayssir/services/sounds/sound_manager.dart';
+import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
+import 'package:flutter/services.dart';
 
 import '../../providers/data/data_provider.dart';
 import '../../providers/data/models/chapter_model.dart';
 import '../exercice/presentation/state/exercice_controller.dart';
 import '../units/widgets/unit_progress_widget.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class ChaptersScreen extends HookConsumerWidget {
   const ChaptersScreen({super.key, required this.unitId});
@@ -29,6 +33,7 @@ class ChaptersScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userNotifierProvider).valueOrNull;
     final isSub = user?.isSub ?? false;
+    final isSoundOn = ref.watch(isSoundEnabledProvider);
     final state = ref.watch(dataProvider);
     final chapters = state.getChaptersByUnitId(unitId);
     final unit = state.getUnitById(unitId);
@@ -102,7 +107,7 @@ class ChaptersScreen extends HookConsumerWidget {
                 color: Theme.of(context).scaffoldBackgroundColor,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: scrollOffset.value > 10 ? 0.08 : 0),
+                    color: Colors.black.withOpacity(scrollOffset.value > 10 ? 0.08 : 0),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -121,6 +126,7 @@ class ChaptersScreen extends HookConsumerWidget {
                       return true;
                     },
                     child: CustomScrollView(
+                      physics: const BouncingScrollPhysics(),
                       slivers: [
                         SliverToBoxAdapter(
                           child: Padding(
@@ -133,7 +139,7 @@ class ChaptersScreen extends HookConsumerWidget {
                               startColor: _hexToColor(material.gradiantColorStart),
                               endColor: _hexToColor(material.gradiantColorEnd),
                               imageUrl: material.imageList,
-                            ),
+                            ).animate().fadeIn().slideY(begin: -0.1, end: 0),
                           ),
                         ),
                         SliverPadding(
@@ -161,6 +167,10 @@ class ChaptersScreen extends HookConsumerWidget {
                                             : state.isLockedChapter(unitId, chapter.id, isSub)
                                                 ? null
                                                 : () {
+                                                    if (isSoundOn) {
+                                                      SoundService.play('assets/sounds/ui_click_premium.mp3');
+                                                      HapticFeedback.lightImpact();
+                                                    }
                                                     if (user?.email != null) {
                                                       AppLogger.sendLog(
                                                         email: user!.email,
@@ -176,8 +186,8 @@ class ChaptersScreen extends HookConsumerWidget {
                                         title: chapter.title,
                                         isCurrent: state.isCurrentCHapter(chapter.id, unitId, isSub),
                                         isPremium: isPro,
-                                      );
-                                    }),
+                                      ).animate().fadeIn(delay: (index * 80).ms).scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1), curve: Curves.easeOutCubic, duration: 400.ms).slideY(begin: 0.1, end: 0);
+                                    }).toList(),
                                   ],
                                 );
                               },
@@ -203,7 +213,7 @@ class ChaptersScreen extends HookConsumerWidget {
                             end: Alignment.bottomCenter,
                             colors: [
                               Theme.of(context).scaffoldBackgroundColor,
-                              Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0),
+                              Theme.of(context).scaffoldBackgroundColor.withOpacity(0),
                             ],
                           ),
                         ),

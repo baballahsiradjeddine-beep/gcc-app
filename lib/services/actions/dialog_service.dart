@@ -1,3 +1,4 @@
+import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import 'package:tayssir/router/app_router.dart';
 import 'package:tayssir/services/actions/dialog_content.dart';
 import 'package:tayssir/services/actions/pomodoro_dialog_content.dart';
 import 'package:tayssir/services/actions/sub_done_dialog_content.dart';
+import 'package:tayssir/services/actions/badge_celebration_dialog.dart';
 
 enum SubscrptionStatus { pending, success, failure }
 
@@ -93,7 +95,7 @@ class DialogService {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return const DialogContent(
+        return DialogContent(
           title: 'الدرس مقفل',
           subTitle:
               'يجب أن تحصل على الأقل 50% في التمرين الأخير لفتح هذا الدرس',
@@ -120,6 +122,21 @@ class DialogService {
       },
     );
   }
+
+  static void showBadgeCelebrationDialog(
+      BuildContext context, String badgeName, String badgeIconUrl, Color badgeColor) {
+    showDialog(
+      context: context,
+      barrierDismissible: true, // Let them dismiss easily
+      builder: (context) {
+        return BadgeCelebrationDialog(
+          badgeName: badgeName,
+          badgeIconUrl: badgeIconUrl,
+          badgeColor: badgeColor,
+        );
+      },
+    );
+  }
 }
 
 class DialogContent extends HookWidget {
@@ -142,57 +159,65 @@ class DialogContent extends HookWidget {
   @override
   Widget build(BuildContext context) {
     return BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 0.8.sw,
-              padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(20)),
-              ),
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Center(
+          child: Container(
+            width: 0.85.sw,
+            padding: EdgeInsets.all(28.w),
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark 
+                  ? const Color(0xFF1E293B).withOpacity(0.95) 
+                  : AppColors.surfaceWhite.withOpacity(0.95),
+              borderRadius: BorderRadius.circular(32.r),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 30,
+                  offset: const Offset(0, 15),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                   Text(
                     title,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      color: AppColors.darkColor,
-                      fontWeight: FontWeight.bold,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 22.sp,
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.textBlack,
+                      fontWeight: FontWeight.w900,
+                      fontFamily: 'SomarSans',
                     ),
-                  ),
-
-                  const Divider(
-                    color: AppColors.greyColor,
-                  ),
-                  // add subtitle here and make it good and beutiful
-                  if (subTitle != null)
+                  ).animate().fadeIn().slideY(begin: -0.2, end: 0),
+                  
+                  if (subTitle != null) ...[
+                    16.verticalSpace,
                     Text(
                       subTitle!,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: AppColors.darkColor,
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : AppColors.textBody,
+                        fontFamily: 'SomarSans',
+                        height: 1.5,
                       ),
-                    ),
-                  10.verticalSpace,
-                  const Divider(
-                    color: AppColors.greyColor,
-                  ),
-                  10.verticalSpace,
+                    ).animate().fadeIn(delay: 200.ms),
+                  ],
+                  
+                  28.verticalSpace,
+                  
                   if (onPressed != null) ...[
                     BigButton(
                         text: buttonText!,
                         buttonType: ButtonType.primary,
                         onPressed: () {
                           context.pop();
-                          if (onPressed != null) {
-                            onPressed!();
-                          }
+                          onPressed!();
                         }),
-                    10.verticalSpace,
+                    12.verticalSpace,
                   ],
                   BigButton(
                       text: 'رجوع',
@@ -208,7 +233,8 @@ class DialogContent extends HookWidget {
                 ],
               ),
             ),
-          ],
-        ));
+          ),
+        ).animate().scale(begin: const Offset(0.8, 0.8), curve: Curves.easeOutBack, duration: 500.ms).fadeIn(),
+    );
   }
 }

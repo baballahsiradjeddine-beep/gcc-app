@@ -11,6 +11,9 @@ import '../../../common/tito_advice_widget.dart';
 import '../../../constants/strings.dart';
 import 'state/grade_controller.dart';
 import 'widgets/speciality_drop_down.dart';
+import 'package:tayssir/services/sounds/sound_manager.dart';
+import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'subject_widget.dart';
 
 class GradeCalculatorScreen extends HookConsumerWidget {
@@ -21,6 +24,16 @@ class GradeCalculatorScreen extends HookConsumerWidget {
     final specialities = ref.watch(specialityProvider);
     final currentSpeciality = useState<SpecialityModel>(specialities.first);
     final state = ref.watch(gradeControllerProvider(currentSpeciality.value));
+    final isSoundOn = ref.watch(isSoundEnabledProvider);
+    final wasPassing = useRef<bool>(state.isPassing);
+
+    useEffect(() {
+      if (isSoundOn && state.isPassing && !wasPassing.value) {
+        SoundService.playPoints();
+      }
+      wasPassing.value = state.isPassing;
+      return null;
+    }, [state.isPassing]);
     return AppScaffold(
         paddingB: 0,
         body: SliverScrollingWidget(
@@ -36,6 +49,7 @@ class GradeCalculatorScreen extends HookConsumerWidget {
                     // icon: IconData(cu),
 
                     onChanged: (speciality) {
+                      if (isSoundOn) SoundService.playClickPremium();
                       currentSpeciality.value = speciality!;
                     },
                     selectedItem: currentSpeciality.value,
@@ -50,6 +64,7 @@ class GradeCalculatorScreen extends HookConsumerWidget {
                   subjectGrade: subject.grade,
                   subjectCoef: state.getCofficientOfSubject(subject.subjectId),
                   onGradeChange: (grade) {
+                    if (isSoundOn) SoundService.playClickPremium();
                     ref
                         .read(gradeControllerProvider(currentSpeciality.value)
                             .notifier)

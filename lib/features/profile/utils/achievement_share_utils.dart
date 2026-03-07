@@ -202,7 +202,7 @@ class _AchievementShareDesign extends StatelessWidget {
             bottom: 18,
             child: Builder(builder: (context) {
               final shadowColor = Color.alphaBlend(
-                  Colors.black.withValues(alpha: 0.25), themeColor);
+                  Colors.black.withOpacity(0.25), themeColor);
               final textStyle = GoogleFonts.balooDa2(
                 fontSize: 28,
                 fontWeight: FontWeight.w900,
@@ -269,10 +269,10 @@ class _AchievementShareDesign extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
+        color: Colors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),
         border:
-            Border.all(color: themeColor.withValues(alpha: 0.5), width: 1.0),
+            Border.all(color: themeColor.withOpacity(0.5), width: 1.0),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

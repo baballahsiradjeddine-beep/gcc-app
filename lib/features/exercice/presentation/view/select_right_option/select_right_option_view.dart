@@ -53,12 +53,12 @@ class SelectRightOptionExerciseView extends HookConsumerWidget {
                     ? LinearGradient(
                         colors: isDark 
                           ? [const Color(0xFF0C4A6E).withOpacity(0.4), const Color(0xFF1E293B)] 
-                          : [const Color(0xFFF0F9FF), Colors.white],
+                          : [const Color(0xFFF0F9FF), AppColors.surfaceWhite],
                         begin: Alignment.centerRight,
                         end: Alignment.centerLeft,
                       )
                     : null,
-                color: isSelected ? null : (isDark ? const Color(0xFF1E293B) : Colors.white),
+                color: isSelected ? null : (isDark ? const Color(0xFF1E293B) : AppColors.surfaceWhite),
                 borderRadius: BorderRadius.circular(20.r),
                 border: Border.all(
                   color: isSelected
@@ -122,7 +122,7 @@ class SelectRightOptionExerciseView extends HookConsumerWidget {
                                 color: Colors.white,
                                 shape: BoxShape.circle,
                               ),
-                            ),
+                            ).animate().scale(duration: 200.ms),
                           )
                         : null,
                   ),

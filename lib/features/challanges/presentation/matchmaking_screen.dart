@@ -11,6 +11,8 @@ import 'package:tayssir/features/challanges/data/matchmaking_service.dart';
 import 'package:tayssir/router/app_router.dart';
 import 'package:tayssir/resources/resources.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:tayssir/services/sounds/sound_manager.dart';
+import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
 
 class MatchmakingScreen extends HookConsumerWidget {
   final int unitId;
@@ -30,6 +32,7 @@ class MatchmakingScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final statusText = useState<String>('');
     final error = useState<String?>(null);
+    final isSoundOn = ref.watch(isSoundEnabledProvider);
     final searchMode = useState<String>(initialSearchMode ?? 'initial'); 
     final privateCode = useState<String?>(invitationCode);
     final codeController = useTextEditingController();
@@ -54,6 +57,7 @@ class MatchmakingScreen extends HookConsumerWidget {
             final mid = snap.value as String;
             final sub = db.child('challenges/matches/$mid/status').onValue.listen((event) {
               if (event.snapshot.value == 'starting') {
+                if (isSoundOn) SoundService.playMatchFound();
                 goToArena(mid);
               }
             });
@@ -71,6 +75,7 @@ class MatchmakingScreen extends HookConsumerWidget {
         final service = ref.read(matchmakingServiceProvider);
         final id = await service.findMatchOrJoinQueue(unitId, courseTitle);
         if (id != null) {
+          if (isSoundOn) SoundService.playMatchFound();
           statusText.value = 'تم العثور على خصم! ⚔️';
           await Future.delayed(const Duration(seconds: 1));
           goToArena(id);
@@ -97,7 +102,10 @@ class MatchmakingScreen extends HookConsumerWidget {
         statusText.value = 'جاري الانضمام للغرفة...';
         final service = ref.read(matchmakingServiceProvider);
         final id = await service.joinPrivateMatch(codeController.text);
-        if (id != null) goToArena(id);
+        if (id != null) {
+           if (isSoundOn) SoundService.playMatchFound();
+           goToArena(id);
+        }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
       }
@@ -118,15 +126,10 @@ class MatchmakingScreen extends HookConsumerWidget {
           body: Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xFF0B1120), Color(0xFF111827)],
-              ),
-            ),
+            color: const Color(0xFF0B1120),
             child: SafeArea(
               child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
                 padding: EdgeInsets.symmetric(horizontal: 25.w),
                 child: Column(
                   children: [
@@ -232,32 +235,58 @@ class MatchmakingScreen extends HookConsumerWidget {
         width: double.infinity,
         height: 62.h,
         decoration: BoxDecoration(
-          gradient: LinearGradient(colors: gradient),
-          borderRadius: BorderRadius.circular(20),
-          border: const Border(
-            bottom: BorderSide(color: Colors.black26, width: 4),
+          gradient: LinearGradient(
+            colors: gradient,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(22.r),
+          border: Border.all(
+            color: Colors.white.withOpacity(0.15),
+            width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: gradient.first.withOpacity(0.3),
+              color: gradient.first.withOpacity(0.25),
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),
           ],
         ),
-        alignment: Alignment.center,
-        child: Text(
-          label,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16.sp,
-            fontWeight: FontWeight.w900,
-            fontFamily: 'SomarSans',
-            shadows: const [Shadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 4)],
-          ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Shine effect
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(22.r),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white.withOpacity(0.12),
+                      Colors.white.withOpacity(0.0),
+                      Colors.white.withOpacity(0.0),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Text(
+              label,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 17.sp,
+                fontWeight: FontWeight.w900,
+                fontFamily: 'SomarSans',
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
         ),
       ),
-    ).animate().scale(begin: const Offset(1, 1), end: const Offset(1.02, 1.02), duration: 200.ms);
+    ).animate().scale(begin: const Offset(1, 1), end: const Offset(0.98, 0.98), duration: 200.ms, curve: Curves.easeOut);
   }
 
   Widget _buildLoadingState(String text) {

@@ -73,6 +73,7 @@ class SubscriptionOptionWidget extends StatelessWidget {
                         colors: gradientColors,
                       )
                     : null,
+                color: isSelected ? null : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E293B) : AppColors.surfaceWhite),
                 borderRadius: const BorderRadius.all(
                   Radius.circular(16),
                 ),

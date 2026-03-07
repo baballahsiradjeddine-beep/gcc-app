@@ -40,9 +40,8 @@ class PodiumUserWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isMe = user.id == ref.watch(userNotifierProvider).valueOrNull?.id;
-    return Expanded(
-      child: Padding(
-        padding: EdgeInsets.only(top: offsetY),
+    return Padding(
+      padding: EdgeInsets.only(top: offsetY),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -58,8 +57,8 @@ class PodiumUserWidget extends ConsumerWidget {
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: isMe 
-                          ? const Color(0xFF00B4D8).withOpacity(0.5) 
-                          : (isDark ? const Color(0xFF334155) : Colors.grey.shade200),
+                          ? AppColors.primaryColor.withOpacity(0.5) 
+                          : (isDark ? AppColors.greyColor.withOpacity(0.3) : Colors.grey.shade200),
                       width: 2.w,
                     ),
                   ),
@@ -77,8 +76,8 @@ class PodiumUserWidget extends ConsumerWidget {
                         ),
                       ),
                       placeholder: (context, url) => Shimmer.fromColors(
-                        baseColor: isDark ? const Color(0xFF334155) : Colors.grey.shade200,
-                        highlightColor: isDark ? const Color(0xFF475569) : Colors.grey.shade50,
+                        baseColor: isDark ? AppColors.greyColor.withOpacity(0.2) : Colors.grey.shade200,
+                        highlightColor: isDark ? AppColors.greyColor.withOpacity(0.3) : Colors.grey.shade50,
                         child: Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
@@ -138,7 +137,7 @@ class PodiumUserWidget extends ConsumerWidget {
                       width: 24.sp,
                       height: 24.sp,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF00B4D8),
+                        color: AppColors.primaryColor,
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 2.w),
                         boxShadow: [
@@ -164,8 +163,8 @@ class PodiumUserWidget extends ConsumerWidget {
                 fontWeight: FontWeight.w900,
                 fontSize: size > 100 ? 16.sp : 14.sp,
                 color: isMe 
-                    ? const Color(0xFF00B4D8) 
-                    : (isDark ? Colors.white : const Color(0xFF1E293B)),
+                    ? AppColors.primaryColor 
+                    : (isDark ? Colors.white : AppColors.secondaryDark),
                 fontFamily: 'SomarSans',
               ),
             ),
@@ -190,7 +189,6 @@ class PodiumUserWidget extends ConsumerWidget {
               ),
             ),
           ],
-        ),
       ),
     );
   }

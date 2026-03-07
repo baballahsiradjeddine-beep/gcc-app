@@ -32,17 +32,21 @@ class ExerciceDialogContent extends HookWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              decoration: BoxDecoration(
+                color: Theme.of(context).brightness == Brightness.dark 
+                    ? const Color(0xFF1E293B) 
+                    : AppColors.surfaceWhite,
+                borderRadius: BorderRadius.circular(24.r),
               ),
               child: Column(
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      color: AppColors.darkColor,
+                    style: TextStyle(
+                      fontSize: 20.sp,
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.textBlack,
                       fontWeight: FontWeight.bold,
+                      fontFamily: 'SomarSans',
                     ),
                   ),
                   10.verticalSpace,
@@ -75,7 +79,7 @@ class ExerciceDialogContent extends HookWidget {
                                       textAlign: TextAlign.center,
                                       textStyle: TextStyle(
                                         fontSize: 18.sp,
-                                        color: AppColors.textBlack,
+                                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.textBlack,
                                       )),
                                 ))
                             .toList(),

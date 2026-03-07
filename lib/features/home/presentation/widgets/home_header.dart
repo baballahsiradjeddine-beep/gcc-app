@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tayssir/features/home/presentation/view_style.dart';
+import 'package:tayssir/resources/colors/app_colors.dart';
 
 import 'change_view_widget.dart';
 
@@ -26,7 +27,7 @@ class HomeHeader extends StatelessWidget {
               width: 6.w,
               height: 22.h,
               decoration: BoxDecoration(
-                color: const Color(0xFF00B4D8),
+                color: AppColors.primaryColor,
                 borderRadius: BorderRadius.circular(3.r),
               ),
             ),
@@ -37,7 +38,7 @@ class HomeHeader extends StatelessWidget {
                 fontSize: 20.sp,
                 fontWeight: FontWeight.w900,
                 fontFamily: 'SomarSans',
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
+                color: isDark ? Colors.white : AppColors.textBlack,
               ),
             ),
           ],

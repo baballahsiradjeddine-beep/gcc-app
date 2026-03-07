@@ -73,7 +73,7 @@ class ResultBottomSheet extends ConsumerWidget {
                       width: 50.sp,
                       height: 50.sp,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isDark ? const Color(0xFF334155) : AppColors.surfaceWhite,
                         borderRadius: BorderRadius.circular(16.r),
                         boxShadow: [
                           BoxShadow(
@@ -135,9 +135,9 @@ class ResultBottomSheet extends ConsumerWidget {
                     width: double.infinity,
                     padding: EdgeInsets.all(16.r),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(20.r),
-                      border: Border.all(color: Colors.white.withOpacity(0.2)),
+                      border: Border.all(color: Colors.white.withOpacity(0.3)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -256,6 +256,7 @@ class ReportExoDialog extends HookConsumerWidget {
                   fontSize: 20.sp,
                   fontWeight: FontWeight.w900,
                   fontFamily: 'SomarSans',
+                  color: isDark ? Colors.white : AppColors.textBlack,
                 ),
               ),
             ),

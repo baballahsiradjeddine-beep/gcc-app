@@ -73,7 +73,7 @@ class TourSpotlightCard extends StatelessWidget {
                 end: const Offset(1, 1),
                 duration: 600.ms,
                 curve: Curves.elasticOut,
-              ),
+              ).shimmer(delay: 1.5.seconds, duration: 1.5.seconds),
 
           28.verticalSpace,
 

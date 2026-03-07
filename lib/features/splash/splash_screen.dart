@@ -12,6 +12,8 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:tayssir/providers/app_assets/app_assets_provider.dart';
+import 'package:tayssir/providers/data/data_provider.dart';
+import 'package:tayssir/providers/user/user_notifier.dart';
 
 class SplashScreen extends HookConsumerWidget {
   const SplashScreen({super.key});
@@ -20,18 +22,62 @@ class SplashScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final size = context.isSmallDevice ? 220.h : 250.h;
     final assetsState = ref.watch(appAssetsProvider);
+    final dataState = ref.watch(dataProvider);
+    final materials = dataState.contentData.modules;
+    final user = ref.watch(userNotifierProvider).valueOrNull;
 
-    // Pre-cache assets when they arrive to stop the flicker
+    // 1. Pre-cache dynamic App Assets (Heros, Characters, Arena)
     useEffect(() {
       assetsState.whenData((assetsMap) {
-        for (var asset in assetsMap.values) {
-          if (asset.url.isNotEmpty && !asset.url.toLowerCase().contains('.svg')) {
-            precacheImage(CachedNetworkImageProvider(asset.url), context);
+        for (final asset in assetsMap.values) {
+          if (asset.url.isNotEmpty) {
+            // CRITICAL: We MUST match the URL format in DynamicAppAsset (url?version)
+            // If the version is missing, DynamicAppAsset uses an empty string query or similar.
+            final fullUrl = '${asset.url}?${asset.version}';
+            
+            if (!fullUrl.toLowerCase().contains('.svg')) {
+              // Pre-cache regular images (PNG, JPG)
+              precacheImage(CachedNetworkImageProvider(fullUrl), context);
+            }
+            // Note: SVG precaching is complex in the background without the exact loader class,
+            // but the PNG case with ?version is the most common cause of flickers.
           }
         }
       });
       return null;
     }, [assetsState.valueOrNull]);
+
+    // 2. Pre-cache subject/material images early!
+    useEffect(() {
+      if (materials.isNotEmpty) {
+        for (final m in materials) {
+          final imageUrls = [m.imageList, m.imageGrid];
+          for (final rawUrl in imageUrls) {
+            if (rawUrl.isNotEmpty) {
+               final fullUrl = rawUrl.startsWith('http') 
+                  ? rawUrl 
+                  : 'https://gcc.tayssir-bac.com/storage/${rawUrl.replaceAll(RegExp(r'^/'), '')}';
+               precacheImage(CachedNetworkImageProvider(fullUrl), context);
+            }
+          }
+        }
+      }
+      return null;
+    }, [materials.length]);
+
+    // 3. Pre-cache user profile assets to avoid flickering in the Header
+    useEffect(() {
+      if (user != null) {
+        if (user.completeProfilePic.isNotEmpty) {
+          precacheImage(CachedNetworkImageProvider(user.completeProfilePic), context);
+        }
+        final badgeUrl = user.badge?.completeIconUrl;
+        if (badgeUrl != null && badgeUrl.isNotEmpty) {
+          precacheImage(CachedNetworkImageProvider(badgeUrl), context);
+        }
+      }
+      return null;
+    }, [user?.id]);
 
     return SafeArea(
       top: false,
@@ -41,29 +87,41 @@ class SplashScreen extends HookConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Image.asset(
-            //   Images.tito,
-            // ),
             SizedBox(
               height: 1.h,
             ),
             Column(
               children: [
-                DynamicAppAsset(
-                  assetKey: 'home_hero',
-                  fallbackAssetPath: SVGs.titoLogin,
-                  type: AppAssetType.svg,
-                  height: size,
+                // Display the logo or a hero image in the middle of splash
+                // NEW: Only reveal the hero once we have the metadata to avoid the 'flicker'
+                // between the fallback dolphin and the server's hero.
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 600),
+                  child: assetsState.maybeWhen(
+                    data: (_) => DynamicAppAsset(
+                      key: const ValueKey('splash_hero_ready'),
+                      assetKey: 'home_hero',
+                      fallbackAssetPath: SVGs.titoLogin,
+                      type: AppAssetType.svg,
+                      height: size,
+                    ),
+                    orElse: () => SizedBox(
+                      key: const ValueKey('splash_hero_loading'),
+                      height: size,
+                      // We can put a subtle shimmer or just leave it empty 
+                      // to make the appearance of the hero feel like a 'reveal'
+                    ),
+                  ),
                 ),
                 20.verticalSpace,
                 const AppLogo(),
               ],
             ),
-            // const Spacer(),
             Column(
               children: [
+                // The loader text and indicator
                 const TayssirDataLoader(),
-                20.verticalSpace,
+                30.verticalSpace,
               ],
             ),
           ],

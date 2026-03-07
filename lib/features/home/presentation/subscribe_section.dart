@@ -43,7 +43,8 @@ final bannerItemsProvider = FutureProvider<List<BannerModel>>((ref) async {
 // });
 
 class SubscribeSection extends HookConsumerWidget {
-  const SubscribeSection({super.key});
+  final bool showProgress;
+  const SubscribeSection({super.key, this.showProgress = true});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -65,7 +66,7 @@ class SubscribeSection extends HookConsumerWidget {
             image: banner.image,
           );
         }) ?? [],
-      const UserProgressWidget(),
+      if (showProgress) const UserProgressWidget(),
     ];
 
     return items.isNotEmpty

@@ -289,7 +289,7 @@ class ResumesDataView extends HookWidget {
                   padding:
                       EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
                   decoration: BoxDecoration(
-                    color: currentColor.withValues(alpha: 0.1),
+                    color: currentColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20.r),
                   ),
                   child: Row(

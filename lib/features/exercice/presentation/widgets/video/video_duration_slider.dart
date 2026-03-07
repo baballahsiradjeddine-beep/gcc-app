@@ -25,7 +25,7 @@ class VideoDurationSlider extends ConsumerWidget {
                   allowScrubbing: true,
                   colors: VideoProgressColors(
                     playedColor: Colors.blue,
-                    bufferedColor: Colors.grey.withValues(alpha: .5),
+                    bufferedColor: Colors.grey.withOpacity(.5),
                     backgroundColor: Colors.white,
                   ),
                 );

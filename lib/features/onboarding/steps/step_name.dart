@@ -7,6 +7,9 @@ import 'package:tayssir/features/onboarding/widgets/onboarding_button.dart';
 import 'package:tayssir/features/onboarding/widgets/tito_speaker.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tayssir/router/app_router.dart';
+import 'package:tayssir/services/sounds/sound_manager.dart';
+import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
+import 'package:flutter/services.dart';
 
 class StepNamePage extends ConsumerStatefulWidget {
   final VoidCallback onNext;
@@ -36,6 +39,11 @@ class _StepNamePageState extends ConsumerState<StepNamePage> {
 
   Future<void> _handleNext() async {
     if (!_hasText) return;
+    final isSoundOn = ref.read(isSoundEnabledProvider);
+    if (isSoundOn) {
+      SoundService.play('assets/sounds/success_short.mp3');
+      HapticFeedback.mediumImpact();
+    }
     await ref.read(onboardingProvider.notifier).setName(_controller.text.trim());
     widget.onNext();
   }

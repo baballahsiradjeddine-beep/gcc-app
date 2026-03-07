@@ -72,7 +72,7 @@ class BigButton extends HookConsumerWidget {
           ],
         );
         textStyle = TextStyle(
-          color: isDark ? AppColors.primaryColor : const Color(0xFF0077B6),
+          color: isDark ? AppColors.primaryColor : AppColors.primaryColor,
           fontSize: 18.sp,
           fontWeight: FontWeight.bold,
           fontFamily: 'SomarSans',
@@ -80,7 +80,7 @@ class BigButton extends HookConsumerWidget {
         break;
       case ButtonType.outline:
         decoration = BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          color: isDark ? const Color(0xFF1E293B) : AppColors.surfaceWhite,
           borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
             color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
@@ -88,7 +88,7 @@ class BigButton extends HookConsumerWidget {
           ),
         );
         textStyle = TextStyle(
-          color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
+          color: isDark ? const Color(0xFFCBD5E1) : AppColors.textBlack,
           fontSize: 16.sp,
           fontWeight: FontWeight.bold,
           fontFamily: 'SomarSans',

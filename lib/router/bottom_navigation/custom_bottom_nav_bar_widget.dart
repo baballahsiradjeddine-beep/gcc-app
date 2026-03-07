@@ -125,8 +125,8 @@ class CustomBottomNavBarWidget extends ConsumerWidget {
                         ),
                       ),
                     ),
-                  ),
-                ).animate(onPlay: (c) => c.repeat(period: 3.seconds)).move(begin: const Offset(-50, -50), end: const Offset(120, 120)),
+                  ).animate(onPlay: (c) => c.repeat(period: 3.seconds)).move(begin: const Offset(-50, -50), end: const Offset(120, 120)),
+                ),
                 
                 Icon(
                   filledIcon,

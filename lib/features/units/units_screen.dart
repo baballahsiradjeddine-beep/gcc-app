@@ -11,6 +11,7 @@ import 'package:tayssir/features/units/empty_content_widget.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';
 import 'package:tayssir/router/app_router.dart';
 import 'package:tayssir/services/actions/dialog_service.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../providers/data/data_provider.dart';
 import '../exercice/presentation/state/exercice_controller.dart';
@@ -57,7 +58,7 @@ class UnitsScreen extends HookConsumerWidget {
                 color: Theme.of(context).scaffoldBackgroundColor,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: scrollOffset.value > 10 ? 0.08 : 0),
+                    color: Colors.black.withOpacity(scrollOffset.value > 10 ? 0.08 : 0),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -76,6 +77,7 @@ class UnitsScreen extends HookConsumerWidget {
                       return true;
                     },
                     child: CustomScrollView(
+                      physics: const BouncingScrollPhysics(),
                       slivers: [
                         SliverToBoxAdapter(
                           child: Padding(
@@ -88,39 +90,39 @@ class UnitsScreen extends HookConsumerWidget {
                               startColor: _hexToColor(material.gradiantColorStart),
                               endColor: _hexToColor(material.gradiantColorEnd),
                               imageUrl: material.imageList,
-                            ),
+                            ).animate().fadeIn().slideY(begin: -0.1, end: 0),
                           ),
                         ),
-                        SliverPadding(
-                          padding: EdgeInsets.symmetric(horizontal: 20.w),
-                          sliver: Directionality(
-                            textDirection: material.direction,
-                            child: SliverList(
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) {
-                                  final isCurrent = state.isCurrentUnit(units[index].id, courseId);
-                                  final isPremiumUnit = state.isPremiumUnit(units[index].id);
-                                  
-                                  return Padding(
-                                    padding: EdgeInsets.symmetric(vertical: 4.h),
-                                    child: CustomLessonWidget(
-                                      onPressed: isPremiumUnit && !isSub
-                                          ? () => DialogService.showNeedSubscriptionDialog(context)
-                                          : () {
-                                              ref.read(currentUnitIdProvider.notifier).state = units[index].id;
-                                              context.pushNamed(
-                                                AppRoutes.chapters.name,
-                                                pathParameters: {'unitId': units[index].id.toString()},
-                                              );
-                                            },
-                                      imageUrl: units[index].image,
-                                      progress: units[index].progress,
-                                      title: units[index].title,
-                                      isPremium: isPremiumUnit,
-                                      isCurrent: isCurrent,
-                                    ),
-                                  );
-                                },
+                            SliverPadding(
+                              padding: EdgeInsets.symmetric(horizontal: 20.w),
+                              sliver: Directionality(
+                                textDirection: material.direction,
+                                child: SliverList(
+                                  delegate: SliverChildBuilderDelegate(
+                                    (context, index) {
+                                      final isCurrent = state.isCurrentUnit(units[index].id, courseId);
+                                      final isPremiumUnit = state.isPremiumUnit(units[index].id);
+                                      
+                                      return Padding(
+                                        padding: EdgeInsets.symmetric(vertical: 4.h),
+                                        child: CustomLessonWidget(
+                                          onPressed: isPremiumUnit && !isSub
+                                              ? () => DialogService.showNeedSubscriptionDialog(context)
+                                              : () {
+                                                  ref.read(currentUnitIdProvider.notifier).state = units[index].id;
+                                                  context.pushNamed(
+                                                    AppRoutes.chapters.name,
+                                                    pathParameters: {'unitId': units[index].id.toString()},
+                                                  );
+                                                },
+                                          imageUrl: units[index].image,
+                                          progress: units[index].progress,
+                                          title: units[index].title,
+                                          isPremium: isPremiumUnit,
+                                          isCurrent: isCurrent,
+                                        ).animate().fadeIn(delay: (index * 80).ms).scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1), curve: Curves.easeOutCubic, duration: 400.ms).slideY(begin: 0.1, end: 0),
+                                      );
+                                    },
                                 childCount: units.length,
                               ),
                             ),
@@ -144,7 +146,7 @@ class UnitsScreen extends HookConsumerWidget {
                             end: Alignment.bottomCenter,
                             colors: [
                               Theme.of(context).scaffoldBackgroundColor,
-                              Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0),
+                              Theme.of(context).scaffoldBackgroundColor.withOpacity(0),
                             ],
                           ),
                         ),

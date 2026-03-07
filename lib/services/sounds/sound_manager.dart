@@ -1,33 +1,45 @@
 import 'package:just_audio/just_audio.dart';
 import 'package:tayssir/debug/app_logger.dart';
 
-// maybe concvert to a provider
 class SoundService {
-  // singletoon
   static final SoundService _instance = SoundService._internal();
+  final AudioPlayer _player = AudioPlayer();
 
   factory SoundService() => _instance;
 
-  SoundService._internal() {
-    // player.setAsset('assets/sounds/ms_click.mp3');
-    // player.setLoopMode(LoopMode.one);
+  SoundService._internal();
+
+  static void play(String assetPath) async {
+    try {
+      final player = AudioPlayer();
+      await player.setAsset(assetPath);
+      await player.setVolume(0.6);
+      await player.play();
+      // Dispose player after it finishes playing to free resources
+      player.processingStateStream.listen((state) {
+        if (state == ProcessingState.completed) {
+          player.dispose();
+        }
+      });
+    } catch (e) {
+      AppLogger.logError('Error playing sound $assetPath: $e');
+    }
   }
 
-  static void playSound() async {
-    try {
-      // if (_instance.player.playing) {
-      //   await _instance.player.stop();
-      //   return;
-      // }
-      // // player.
-      // await _instance.player.play();
+  static void playSuccess() => play('assets/sounds/success_short.mp3');
+  static void playError() => play('assets/sounds/error_soft.mp3');
+  static void playLevelComplete() => play('assets/sounds/level_complete.mp3');
+  static void playStreak() => play('assets/sounds/streak_fire.mp3');
+  static void playMatchFound() => play('assets/sounds/match_found.mp3');
+  static void playChatPop() => play('assets/sounds/chat_pop.mp3');
+  static void playPoints() => play('assets/sounds/points_collect.mp3');
+  static void playAiMagic() => play('assets/sounds/ai_magic.mp3');
+  static void playTaskDone() => play('assets/sounds/task_done.mp3');
+  static void playClickPremium() => play('assets/sounds/ui_click_premium.mp3');
+  static void playNotification() => play('assets/sounds/notification_ping.mp3');
+  static void playAction() => play('assets/sounds/action.mp3');
 
-      final player = AudioPlayer();
-      player.setAsset('assets/sounds/ms_click.mp3');
-      await player.setVolume(0.5);
-      await player.play();
-    } catch (e) {
-      AppLogger.logError('Error playing sound$e');
-    }
+  static void playDefaultClick() {
+    play('assets/sounds/ms_click.mp3');
   }
 }

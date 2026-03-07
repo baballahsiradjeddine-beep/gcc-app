@@ -75,13 +75,7 @@ class SocialScreen extends HookConsumerWidget {
           ),
         ),
         body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFF0B1120), Color(0xFF0F172A)],
-            ),
-          ),
+          color: const Color(0xFF0B1120),
           child: TabBarView(
             controller: tabController,
             children: const [
@@ -118,25 +112,28 @@ class SearchUsersTab extends HookConsumerWidget {
     }
 
     return Padding(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(20.w),
       child: Column(
         children: [
           TextField(
             controller: searchController,
             onChanged: (val) => handleSearch(val),
-            style: const TextStyle(color: Colors.white, fontFamily: 'SomarSans'),
+            style: const TextStyle(color: Colors.white, fontFamily: 'SomarSans', fontWeight: FontWeight.bold),
             decoration: InputDecoration(
               hintText: 'ابحث عن اسم زميلك...',
               hintStyle: const TextStyle(color: Colors.white24, fontFamily: 'SomarSans'),
-              prefixIcon: const Icon(Icons.search, color: Color(0xFFEC4899)),
+              prefixIcon: const Icon(Icons.search, color: Color(0xFF00C6E0)),
               fillColor: const Color(0xFF1E293B),
               filled: true,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+              contentPadding: EdgeInsets.symmetric(vertical: 16.h),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(22.r), borderSide: BorderSide.none),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(22.r), borderSide: BorderSide.none),
+              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(22.r), borderSide: const BorderSide(color: Color(0xFF00C6E0), width: 1.5)),
             ),
           ),
-          20.verticalSpace,
+          25.verticalSpace,
           if (isLoading.value)
-            const Center(child: CircularProgressIndicator())
+            const Center(child: CircularProgressIndicator(color: Color(0xFF00C6E0)))
           else
             Expanded(
               child: searchResults.value.isEmpty
@@ -144,13 +141,14 @@ class SearchUsersTab extends HookConsumerWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.search, size: 80.sp, color: Colors.white10),
-                          10.verticalSpace,
+                          Icon(Icons.search_rounded, size: 70.sp, color: Colors.white.withOpacity(0.05)),
+                          15.verticalSpace,
                           Text("ابحث عن مستخدمين لتحديهم!", style: TextStyle(color: Colors.white24, fontSize: 14.sp, fontFamily: 'SomarSans')),
                         ],
                       ),
                     )
                   : ListView.builder(
+                      physics: const BouncingScrollPhysics(),
                       itemCount: searchResults.value.length,
                       itemBuilder: (context, index) {
                         final u = searchResults.value[index];
@@ -165,12 +163,12 @@ class SearchUsersTab extends HookConsumerWidget {
 
   Widget _buildUserListItem(dynamic u, WidgetRef ref, BuildContext context, {bool isSearch = false, bool isPending = false, bool isFriend = false}) {
     return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.all(12.w),
+      margin: EdgeInsets.only(bottom: 16.h),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.03),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        borderRadius: BorderRadius.circular(22.r),
+        border: Border.all(color: Colors.white.withOpacity(0.06), width: 1.5),
       ),
       child: Row(
         children: [
@@ -254,15 +252,20 @@ class SearchUsersTab extends HookConsumerWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.5)),
+          color: color.withOpacity(0.12),
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(color: color.withOpacity(0.3), width: 1.5),
         ),
         child: Text(
           label,
-          style: TextStyle(color: color, fontSize: 12.sp, fontWeight: FontWeight.bold, fontFamily: 'SomarSans'),
+          style: TextStyle(
+            color: color, 
+            fontSize: 13.sp, 
+            fontWeight: FontWeight.w900, 
+            fontFamily: 'SomarSans',
+          ),
         ),
       ),
     );

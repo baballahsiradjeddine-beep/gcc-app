@@ -170,7 +170,7 @@ class AnimatedCircularProgressWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color:
-                        Colors.black.withValues(alpha: 0.3), // Fixed withValues
+                        Colors.black.withOpacity(0.3), // Fixed withValues
                   ),
                   child: Icon(
                     Icons.lock,
@@ -187,7 +187,7 @@ class AnimatedCircularProgressWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color:
-                        Colors.black.withValues(alpha: 0.3), // Fixed withValues
+                        Colors.black.withOpacity(0.3), // Fixed withValues
                   ),
                   child: Center(
                     child: Text(

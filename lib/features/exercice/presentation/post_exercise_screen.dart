@@ -9,6 +9,10 @@ import 'package:tayssir/common/sliver_scrolling_widget.dart';
 import 'package:tayssir/constants/strings.dart';
 import 'package:tayssir/features/exercice/presentation/state/exercice_controller.dart';
 import 'package:tayssir/utils/extensions/context.dart';
+import 'package:tayssir/services/sounds/sound_manager.dart';
+import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../../resources/resources.dart';
 import 'package:tayssir/common/core/app_assets/dynamic_app_asset.dart';
@@ -23,6 +27,20 @@ class MidResultScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final exercisesState = ref.watch(exercicesProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isSoundOn = ref.watch(isSoundEnabledProvider);
+
+    useEffect(() {
+      if (isSoundOn) {
+        if (exercisesState.resultStatus == ResultStatus.good) {
+          SoundService.playPoints();
+        } else if (exercisesState.resultStatus == ResultStatus.bad) {
+          SoundService.playError();
+        } else {
+          SoundService.playClickPremium();
+        }
+      }
+      return null;
+    }, []);
 
     Color getStatusColor() {
       switch (exercisesState.resultStatus) {

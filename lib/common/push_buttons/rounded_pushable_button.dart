@@ -56,7 +56,7 @@ class _PushableImageButtonState
   Widget build(BuildContext context) {
     final totalSize = widget.size + widget.elevation;
     final bottomColor =
-        widget.bottomColor ?? widget.topColor.withValues(alpha: 0.7);
+        widget.bottomColor ?? widget.topColor.withOpacity(0.7);
 
     return SizedBox(
       width: totalSize,

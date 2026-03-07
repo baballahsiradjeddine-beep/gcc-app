@@ -28,12 +28,12 @@ class LeaderboardListTile extends ConsumerWidget {
       child: Container(
         decoration: BoxDecoration(
           color: isMe 
-              ? const Color(0xFF00B4D8).withOpacity(0.08) 
-              : (isDark ? const Color(0xFF1E293B) : Colors.white),
+              ? AppColors.primaryColor.withOpacity(0.08) 
+              : (isDark ? AppColors.darkBlue : Colors.white),
           borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
             color: isMe 
-                ? const Color(0xFF00B4D8).withOpacity(0.3) 
+                ? AppColors.primaryColor.withOpacity(0.3) 
                 : (isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.02)),
             width: 1.w,
           ),
@@ -138,7 +138,7 @@ class LeaderboardListTile extends ConsumerWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.white10 : const Color(0xFFF1F5F9),
+                  color: isDark ? Colors.white10 : AppColors.scaffoldColor,
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Text(

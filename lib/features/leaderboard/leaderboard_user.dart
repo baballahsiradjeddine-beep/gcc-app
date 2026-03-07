@@ -16,12 +16,12 @@ class LeaderboardUser {
   factory LeaderboardUser.fromMap(Map<String, dynamic> json) {
     return LeaderboardUser(
         id: json['id'] as int? ?? 0,
-        name: json['name'] as String,
-        points: json['points'] as int,
+        name: (json['name'] ?? json['username'] ?? 'مستخدم') as String,
+        points: (json['points'] ?? 0) as int,
         image: json['image'] == null
             ? json['avatar_url'] as String?
             : json['image'] as String?,
-        wilaya: json['wilaya'] as String);
+        wilaya: (json['wilaya'] ?? 'الجزائر') as String);
   }
 
   // get image if https://tayssir-bac.com/storage/ then return null
