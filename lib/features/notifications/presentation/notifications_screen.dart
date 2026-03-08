@@ -19,123 +19,134 @@ class NotificationsScreen extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AppScaffold(
-      paddingB: 0,
+      includeBackButton: true,
       topSafeArea: true,
-      paddingY: 0,
-      paddingX: 0,
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: isDark 
-                ? [const Color(0xFF0F172A), const Color(0xFF1E293B)]
-                : [AppColors.surfaceWhite, AppColors.scaffoldColor],
-          ),
+      paddingB: 0,
+      paddingY: 10.h,
+      bodyBackgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+      appBar: Text(
+        'مركز الإشعارات 🔔',
+        style: TextStyle(
+          fontSize: 22.sp,
+          fontWeight: FontWeight.w900,
+          color: isDark ? Colors.white : const Color(0xFF1E293B),
+          fontFamily: 'SomarSans',
         ),
-        child: Column(
-          children: [
-            // Custom Premium AppBar
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF0F172A).withOpacity(0.8) : AppColors.surfaceWhite.withOpacity(0.8),
-                border: Border(
-                  bottom: BorderSide(
-                    color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-                    width: 1,
-                  ),
-                ),
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.arrow_back_ios_new_rounded, 
-                        color: isDark ? Colors.white : AppColors.textBlack, size: 20.sp),
-                    onPressed: () => context.pop(),
-                  ),
-                  const Spacer(),
-                  Text(
-                    'مركز الإشعارات',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900, 
-                      fontSize: 20.sp,
-                      color: isDark ? Colors.white : AppColors.textBlack,
-                      fontFamily: 'SomarSans',
-                    ),
-                  ),
-                  const Spacer(),
-                  SizedBox(width: 40.w), // Balance for back button
-                ],
-              ),
-            ),
-
-            Expanded(
-              child: controller.notifications.when(
-                data: (data) {
-                  if (data.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "📭",
-                            style: TextStyle(fontSize: 60.sp),
+      ),
+      body: Column(
+        children: [
+          10.verticalSpace,
+          Expanded(
+            child: controller.notifications.when(
+              data: (data) {
+                if (data.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(30.w),
+                          decoration: BoxDecoration(
+                            color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.withOpacity(0.05),
+                            shape: BoxShape.circle,
                           ),
-                          20.verticalSpace,
-                          Text(
-                            'لا توجد إشعارات حالياً',
-                            style: TextStyle(
-                              color: isDark ? Colors.white70 : AppColors.textBody,
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'SomarSans',
-                            ),
+                          child: Icon(
+                            Icons.notifications_off_outlined,
+                            size: 80.sp,
+                            color: isDark ? Colors.white24 : Colors.grey.shade300,
                           ),
-                          8.verticalSpace,
-                          Text(
-                            'سنخبرك عندما يكون هناك شيء جديد!',
+                        ),
+                        24.verticalSpace,
+                        Text(
+                          'لا توجد إشعارات حالياً',
+                          style: TextStyle(
+                            color: isDark ? Colors.white : const Color(0xFF1E293B),
+                            fontSize: 20.sp,
+                            fontWeight: FontWeight.w900,
+                            fontFamily: 'SomarSans',
+                          ),
+                        ),
+                        8.verticalSpace,
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 40.w),
+                          child: Text(
+                            'سنقوم بإعلامك فور وصول أي تحديثات أو تنبيهات هامة لك!',
+                            textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
+                              color: isDark ? Colors.white38 : const Color(0xFF64748B),
                               fontSize: 14.sp,
+                              height: 1.5,
                               fontFamily: 'SomarSans',
                             ),
                           ),
-                        ],
-                      ),
-                    );
-                  }
+                        ),
+                      ],
+                    ),
+                  ).animate().fadeIn(duration: 600.ms).scale(begin: const Offset(0.9, 0.9));
+                }
 
-                  return PaginatedListView<NotificationModel>(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                    data: data,
-                    canLoadMore: controller.canLoadMore,
-                    isFetchingMore: controller.isFetchingMore,
-                    onLoadMore: () => ref
-                        .read(notificationsControllerProvider.notifier)
-                        .fetchMoreNotifications(),
-                    itemBuilder: (context, item, index) {
-                      return NotificationCard(
-                        notification: item,
-                      ).animate()
-                       .fadeIn(delay: (index * 100).ms, duration: 400.ms)
-                       .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic);
-                    },
-                  );
-                },
-                loading: () => const Center(
-                  child: CircularProgressIndicator(color: Color(0xFF00B4D8)),
+                return PaginatedListView<NotificationModel>(
+                  padding: EdgeInsets.only(top: 10.h, bottom: 40.h),
+                  data: data,
+                  canLoadMore: controller.canLoadMore,
+                  isFetchingMore: controller.isFetchingMore,
+                  onLoadMore: () => ref
+                      .read(notificationsControllerProvider.notifier)
+                      .fetchMoreNotifications(),
+                  itemBuilder: (context, item, index) {
+                    return NotificationCard(
+                      notification: item,
+                    ).animate()
+                     .fadeIn(delay: (index * 50).ms, duration: 400.ms)
+                     .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
+                  },
+                );
+              },
+              loading: () => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 40.w,
+                      height: 40.w,
+                      child: const CircularProgressIndicator(
+                        color: Color(0xFF00B4D8),
+                        strokeWidth: 3,
+                      ),
+                    ),
+                    20.verticalSpace,
+                    Text(
+                      'جاري تحميل الإشعارات...',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: isDark ? Colors.white38 : Colors.black38,
+                        fontFamily: 'SomarSans',
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
-                error: (error, stack) => Center(
-                  child: Text(
-                    'خطأ: $error',
-                    style: TextStyle(color: Colors.red, fontSize: 14.sp),
-                  ),
+              ),
+              error: (error, stack) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, color: Colors.red, size: 40),
+                    12.verticalSpace,
+                    Text(
+                      'حدث خطأ في جلب البيانات',
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
+                        fontFamily: 'SomarSans',
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

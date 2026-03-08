@@ -11,11 +11,12 @@ import 'package:tayssir/features/subscriptions/presentation/paper/custom_back_bu
 import 'package:tayssir/features/subscriptions/presentation/widgets/subscription_option.dart';
 import 'package:tayssir/providers/user/subscription_model.dart';
 import 'package:tayssir/router/app_router.dart';
+import 'package:tayssir/resources/colors/app_colors.dart';
+import 'package:tayssir/common/core/app_scaffold.dart';
 
-import '../../../common/app_buttons/big_button.dart';
-import '../../../common/core/app_scaffold.dart';
-import '../../../common/tito_advice_widget.dart';
-import '../../../constants/strings.dart';
+import 'package:tayssir/common/app_buttons/big_button.dart';
+import 'package:tayssir/common/tito_advice_widget.dart';
+import 'package:tayssir/constants/strings.dart';
 
 final subscriptionOptionsProvider =
     FutureProvider<List<SubscriptionModel>>((ref) async {
@@ -31,61 +32,67 @@ class SubscriptionOptionsScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final subscriptionOptionsAsync = ref.watch(subscriptionOptionsProvider);
     final selectedSubOption = useState<SubscriptionModel?>(null);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AppScaffold(
-      paddingY: 0,
-      topSafeArea: false,
+      includeBackButton: true,
+      topSafeArea: true,
+      paddingX: 20.w,
+      appBar: Text(
+        'اختر اشتراكك 💎',
+        style: TextStyle(
+          fontSize: 22.sp,
+          fontWeight: FontWeight.w900,
+          color: isDark ? Colors.white : AppColors.textBlack,
+          fontFamily: 'SomarSans',
+        ),
+      ),
       body: subscriptionOptionsAsync.when(
         data: (subscriptionOptions) {
-          // Set initial selection if not set
-          if (selectedSubOption.value == null &&
-              subscriptionOptions.isNotEmpty) {
+          if (selectedSubOption.value == null && subscriptionOptions.isNotEmpty) {
             selectedSubOption.value = subscriptionOptions.first;
           }
 
-          return SliverScrollingWidget(
+          return Column(
             children: [
-              50.verticalSpace,
-              const CustomBackButton(),
-              const TitoAdviceWidget(
-                  text: AppStrings.dearStudentChooseSubscription),
-              10.verticalSpace,
-              ...List.generate(
-                subscriptionOptions.length,
-                (index) => SubscriptionOptionWidget(
-                  totalPrice: subscriptionOptions[index].price,
-                  discountedPrice:
-                      subscriptionOptions[index].discounts.isNotEmpty
-                          ? subscriptionOptions[index].realPrice
-                          : null,
-                  percentageDiscount:
-                      subscriptionOptions[index].discounts.isNotEmpty
-                          ? subscriptionOptions[index].percentage
-                          : null,
-                  descriptionText: subscriptionOptions[index].description,
-                  gradientColors: subscriptionOptions[index].gradientColors,
-                  innerColor: subscriptionOptions[index].innterColor,
-                  onPressed: () {
-                    if (selectedSubOption.value != subscriptionOptions[index]) {
-                      selectedSubOption.value = subscriptionOptions[index];
-                    }
-                  },
-                  disabledColor: const Color(0xffEEEEEE),
-                  isSelected:
-                      (selectedSubOption.value == subscriptionOptions[index]),
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    children: [
+                      const TitoAdviceWidget(
+                        text: AppStrings.dearStudentChooseSubscription,
+                      ),
+                      20.verticalSpace,
+                      ...subscriptionOptions.map((sub) => SubscriptionOptionWidget(
+                        totalPrice: sub.price,
+                        discountedPrice: sub.discounts.isNotEmpty ? sub.realPrice : null,
+                        percentageDiscount: sub.discounts.isNotEmpty ? sub.percentage : null,
+                        descriptionText: sub.description,
+                        gradientColors: sub.gradientColors.isEmpty 
+                          ? [const Color(0XFF175DC7), const Color(0XFF00C4F6)] 
+                          : sub.gradientColors,
+                        innerColor: sub.innterColor ?? const Color(0XFF175DC7),
+                        onPressed: () => selectedSubOption.value = sub,
+                        isSelected: selectedSubOption.value == sub,
+                      )),
+                      40.verticalSpace,
+                    ],
+                  ),
                 ),
               ),
-              const Spacer(),
-              BigButton(
-                text: AppStrings.continueText,
-                onPressed: selectedSubOption.value != null
-                    ? () {
-                        context.pushNamed(AppRoutes.subscriptions.name,
-                            extra: {'subscription': selectedSubOption.value});
-                      }
-                    : null,
+              Padding(
+                padding: EdgeInsets.only(bottom: 20.h, top: 10.h),
+                child: BigButton(
+                  text: AppStrings.continueText,
+                  onPressed: selectedSubOption.value != null
+                      ? () {
+                          context.pushNamed(AppRoutes.subscriptions.name,
+                              extra: {'subscription': selectedSubOption.value});
+                        }
+                      : null,
+                ),
               ),
-              20.verticalSpace,
             ],
           );
         },

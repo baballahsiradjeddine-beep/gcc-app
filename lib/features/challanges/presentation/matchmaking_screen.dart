@@ -6,9 +6,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:tayssir/common/core/app_scaffold.dart';
 import 'package:tayssir/common/app_buttons/app_button.dart';
 import 'package:tayssir/features/challanges/data/matchmaking_service.dart';
 import 'package:tayssir/router/app_router.dart';
+import 'package:tayssir/resources/colors/app_colors.dart';
 import 'package:tayssir/resources/resources.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:tayssir/services/sounds/sound_manager.dart';
@@ -111,62 +113,49 @@ class MatchmakingScreen extends HookConsumerWidget {
       }
     }
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
-      child: PopScope(
-        onPopInvoked: (didPop) {
-          if (didPop) ref.read(matchmakingServiceProvider).cancelSearch();
+      value: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+      child: AppScaffold(
+        bodyBackgroundColor: isDark ? const Color(0xFF0B1120) : Colors.white,
+        includeBackButton: true,
+        paddingX: 25.w,
+        topSafeArea: true,
+        onPopScope: () {
+          if (searchMode.value == 'initial') {
+            context.pop();
+          } else {
+            ref.read(matchmakingServiceProvider).cancelSearch();
+            searchMode.value = 'initial';
+          }
         },
-        child: Scaffold(
-          backgroundColor: const Color(0xFF0B1120),
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-          ),
-          body: Container(
-            width: double.infinity,
-            height: double.infinity,
-            color: const Color(0xFF0B1120),
-            child: SafeArea(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: EdgeInsets.symmetric(horizontal: 25.w),
-                child: Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: IconButton(
-                        icon: const CircleAvatar(
-                            backgroundColor: Colors.white10,
-                            child: Icon(Icons.arrow_back, color: Colors.white)),
-                        onPressed: () => context.pop(),
-                      ),
-                    ),
-                    _buildVisualHeader(),
-                    40.verticalSpace,
-                    if (error.value != null)
-                      _buildErrorState(context, error.value!)
-                    else if (searchMode.value == 'initial')
-                      _buildInitialState(startRandomSearch, handleCreatePrivate,
-                          () => searchMode.value = 'join_private')
-                    else if (searchMode.value == 'random')
-                      _buildLoadingState(statusText.value)
-                    else if (searchMode.value == 'create_private')
-                      _buildPrivateCreatedState(privateCode.value)
-                    else if (searchMode.value == 'join_private')
-                      _buildJoinPrivateState(codeController, handleJoinPrivate,
-                          () => searchMode.value = 'initial'),
-                  ],
-                ),
-              ),
-            ),
+        body: SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          child: Column(
+            children: [
+              _buildVisualHeader(isDark),
+              40.verticalSpace,
+              if (error.value != null)
+                _buildErrorState(context, error.value!, isDark)
+              else if (searchMode.value == 'initial')
+                _buildInitialState(startRandomSearch, handleCreatePrivate,
+                    () => searchMode.value = 'join_private', isDark)
+              else if (searchMode.value == 'random')
+                _buildLoadingState(statusText.value, isDark)
+              else if (searchMode.value == 'create_private')
+                _buildPrivateCreatedState(privateCode.value, isDark)
+              else if (searchMode.value == 'join_private')
+                _buildJoinPrivateState(codeController, handleJoinPrivate,
+                    () => searchMode.value = 'initial', isDark),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildVisualHeader() {
+  Widget _buildVisualHeader(bool isDark) {
     return Column(
       children: [
         SvgPicture.asset(SVGs.titoBoarding, height: 180.h)
@@ -176,7 +165,7 @@ class MatchmakingScreen extends HookConsumerWidget {
         Text(
           "الاستعداد للمعركة ⚔️",
           style: TextStyle(
-            color: Colors.white,
+            color: isDark ? Colors.white : AppColors.textBlack,
             fontSize: 26.sp,
             fontWeight: FontWeight.w900,
             fontFamily: 'SomarSans',
@@ -186,13 +175,13 @@ class MatchmakingScreen extends HookConsumerWidget {
     );
   }
 
-  Widget _buildInitialState(VoidCallback onRandom, VoidCallback onCreate, VoidCallback onJoin) {
+  Widget _buildInitialState(VoidCallback onRandom, VoidCallback onCreate, VoidCallback onJoin, bool isDark) {
     return Column(
       children: [
         Text(
           "اختر كيف تريد مواجهة منافسك اليوم",
           style: TextStyle(
-            color: Colors.white60,
+            color: isDark ? Colors.white60 : Colors.black45,
             fontSize: 15.sp,
             fontFamily: 'SomarSans',
             fontWeight: FontWeight.bold,
@@ -217,7 +206,7 @@ class MatchmakingScreen extends HookConsumerWidget {
           child: Text(
             "لديك كود تحدي؟ انضم هنا 🔑",
             style: TextStyle(
-              color: const Color(0xFF00C6E0),
+              color: isDark ? const Color(0xFF00C6E0) : const Color(0xFF00B4D8),
               fontWeight: FontWeight.w900,
               fontFamily: 'SomarSans',
               fontSize: 14.sp,
@@ -289,23 +278,23 @@ class MatchmakingScreen extends HookConsumerWidget {
     ).animate().scale(begin: const Offset(1, 1), end: const Offset(0.98, 0.98), duration: 200.ms, curve: Curves.easeOut);
   }
 
-  Widget _buildLoadingState(String text) {
+  Widget _buildLoadingState(String text, bool isDark) {
     return Column(
       children: [
         const CircularProgressIndicator(color: Color(0xFF00C6E0)),
         25.verticalSpace,
-        Text(text, style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold)),
+        Text(text, style: TextStyle(color: isDark ? Colors.white : AppColors.textBlack, fontSize: 18.sp, fontWeight: FontWeight.bold)),
       ],
     );
   }
 
-  Widget _buildPrivateCreatedState(String? code) {
+  Widget _buildPrivateCreatedState(String? code, bool isDark) {
     return Column(
       children: [
         Text(
           "كود الغرفة الخاص بك 🗝️",
           style: TextStyle(
-            color: Colors.white60,
+            color: isDark ? Colors.white60 : Colors.black45,
             fontSize: 16.sp,
             fontFamily: 'SomarSans',
             fontWeight: FontWeight.bold,
@@ -315,7 +304,7 @@ class MatchmakingScreen extends HookConsumerWidget {
         Container(
           padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 25.h),
           decoration: BoxDecoration(
-            color: const Color(0xFF1E293B),
+            color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
             borderRadius: BorderRadius.circular(30),
             border: Border.all(color: const Color(0xFF00C6E0).withOpacity(0.5), width: 2),
             boxShadow: [
@@ -340,7 +329,7 @@ class MatchmakingScreen extends HookConsumerWidget {
         Text(
           "أرسل هذا الكود لمنافسك وانتظره هنا...",
           style: TextStyle(
-            color: Colors.white38,
+            color: isDark ? Colors.white38 : Colors.black26,
             fontStyle: FontStyle.italic,
             fontFamily: 'SomarSans',
             fontSize: 13.sp,
@@ -355,13 +344,13 @@ class MatchmakingScreen extends HookConsumerWidget {
     );
   }
 
-  Widget _buildJoinPrivateState(TextEditingController controller, VoidCallback onJoin, VoidCallback onBack) {
+  Widget _buildJoinPrivateState(TextEditingController controller, VoidCallback onJoin, VoidCallback onBack, bool isDark) {
     return Column(
       children: [
         Text(
           "أدخل كود التحدي",
           style: TextStyle(
-            color: Colors.white,
+            color: isDark ? Colors.white : AppColors.textBlack,
             fontSize: 20.sp,
             fontWeight: FontWeight.w900,
             fontFamily: 'SomarSans',
@@ -370,7 +359,7 @@ class MatchmakingScreen extends HookConsumerWidget {
         10.verticalSpace,
         Text(
           "المكون من 4 أرقام",
-          style: TextStyle(color: Colors.white38, fontSize: 14.sp, fontFamily: 'Cairo'),
+          style: TextStyle(color: isDark ? Colors.white38 : Colors.black26, fontSize: 14.sp, fontFamily: 'Cairo'),
         ),
         30.verticalSpace,
         TextField(
@@ -387,18 +376,18 @@ class MatchmakingScreen extends HookConsumerWidget {
           maxLength: 4,
           decoration: InputDecoration(
             hintText: "0000",
-            hintStyle: TextStyle(color: Colors.white.withOpacity(0.05)),
+            hintStyle: TextStyle(color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05)),
             filled: true,
-            fillColor: const Color(0xFF1E293B),
+            fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
             counterText: "",
             contentPadding: EdgeInsets.symmetric(vertical: 20.h),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(25),
-              borderSide: const BorderSide(color: Colors.white10),
+              borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(25),
-              borderSide: const BorderSide(color: Colors.white10),
+              borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(25),
@@ -418,7 +407,7 @@ class MatchmakingScreen extends HookConsumerWidget {
           child: Text(
             "تراجع",
             style: TextStyle(
-              color: Colors.white38,
+              color: isDark ? Colors.white38 : Colors.black26,
               fontSize: 14.sp,
               fontFamily: 'SomarSans',
               fontWeight: FontWeight.bold,
@@ -429,12 +418,12 @@ class MatchmakingScreen extends HookConsumerWidget {
     );
   }
 
-  Widget _buildErrorState(BuildContext context, String msg) {
+  Widget _buildErrorState(BuildContext context, String msg, bool isDark) {
     return Column(
       children: [
         const Icon(Icons.error_outline, color: Colors.red, size: 50),
         15.verticalSpace,
-        Text(msg, style: const TextStyle(color: Colors.white70, fontFamily: 'SomarSans'), textAlign: TextAlign.center),
+        Text(msg, style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontFamily: 'SomarSans'), textAlign: TextAlign.center),
         20.verticalSpace,
         SmallButton(text: "العودة", onPressed: () => context.pop()),
       ],

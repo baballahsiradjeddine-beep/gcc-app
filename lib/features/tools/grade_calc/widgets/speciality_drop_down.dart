@@ -4,14 +4,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tayssir/features/tools/grade_calc/speciality_model.dart';
 import 'package:tayssir/resources/colors/app_colors.dart';
-
 import 'custom_drop_down_item_widget.dart';
 
 class SpecialityDropDown extends StatelessWidget {
   final List<SpecialityModel> items;
   final void Function(SpecialityModel?) onChanged;
   final SpecialityModel? selectedItem;
-  // final Widget icon;
   const SpecialityDropDown({
     super.key,
     required this.items,
@@ -19,7 +17,6 @@ class SpecialityDropDown extends StatelessWidget {
     this.selectedItem,
     required this.hintText,
     this.validator,
-    // required this.icon ,
   });
 
   final String hintText;
@@ -27,23 +24,26 @@ class SpecialityDropDown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget buildButtonContent(
-      String text,
-    ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    Widget buildButtonContent(String text, String? iconPath) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Icon(icon, color: AppColors.primaryColor),
-          SvgPicture.asset(
-            selectedItem!.iconPath,
-            width: 20.w,
+          if (iconPath != null)
+            SvgPicture.asset(
+              iconPath,
+              width: 24.w,
+            ),
+          Text(
+            text,
+            style: TextStyle(
+              color: isDark ? Colors.white : AppColors.textBlack,
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w900,
+              fontFamily: 'SomarSans',
+            ),
           ),
-          Text(text,
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 16.sp,
-                fontWeight: FontWeight.bold,
-              )),
         ],
       );
     }
@@ -52,8 +52,8 @@ class SpecialityDropDown extends StatelessWidget {
       textDirection: TextDirection.ltr,
       child: DropdownButtonFormField2<SpecialityModel>(
         isExpanded: true,
-        dropdownStyleData: buildMenuStyle(),
-        hint: buildButtonContent(hintText),
+        dropdownStyleData: buildMenuStyle(isDark),
+        hint: buildButtonContent(hintText, null),
         items: items.map((SpecialityModel speciality) {
           return DropdownMenuItem<SpecialityModel>(
             value: speciality,
@@ -66,18 +66,24 @@ class SpecialityDropDown extends StatelessWidget {
         }).toList(),
         selectedItemBuilder: (BuildContext context) {
           return items.map((SpecialityModel speciality) {
-            return buildButtonContent(speciality.name);
+            return buildButtonContent(speciality.name, speciality.iconPath);
           }).toList();
         },
-        validator: (value) {
+        validator: validator ?? (value) {
           if (value == null) {
             return 'الرجاء اختيار التخصص';
           }
           return null;
         },
-        decoration: buildInputDecoration(),
+        decoration: buildInputDecoration(isDark),
         buttonStyleData: const ButtonStyleData(
-          elevation: 5,
+          elevation: 0,
+        ),
+        iconStyleData: IconStyleData(
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: isDark ? Colors.white38 : AppColors.greyColor,
+          ),
         ),
         alignment: Alignment.centerRight,
         value: selectedItem,
@@ -86,46 +92,45 @@ class SpecialityDropDown extends StatelessWidget {
     );
   }
 
-  InputBorder buildBorder({
-    color = AppColors.borderColor,
-  }) {
+  InputBorder buildBorder(bool isDark, {Color? color}) {
     return OutlineInputBorder(
       borderSide: BorderSide(
-        color: color,
+        color: color ?? (isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFE2E8F0)),
         width: 1.5,
       ),
-      borderRadius: const BorderRadius.all(Radius.circular(16)),
+      borderRadius: BorderRadius.circular(20.r),
     );
   }
 
-  InputDecoration buildInputDecoration() {
+  InputDecoration buildInputDecoration(bool isDark) {
     return InputDecoration(
-      contentPadding: const EdgeInsets.only(
-        left: 0,
-        right: 10,
-      ),
-      border: buildBorder(),
-      enabledBorder: buildBorder(),
-      focusedBorder: buildBorder(),
-      errorBorder: buildBorder(
-        color: Colors.red,
-      ),
-      focusedErrorBorder: buildBorder(),
+      contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+      filled: true,
+      fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+      border: buildBorder(isDark),
+      enabledBorder: buildBorder(isDark),
+      focusedBorder: buildBorder(isDark, color: AppColors.primaryColor),
+      errorBorder: buildBorder(isDark, color: Colors.red),
+      focusedErrorBorder: buildBorder(isDark),
     );
   }
 
-  DropdownStyleData buildMenuStyle() {
+  DropdownStyleData buildMenuStyle(bool isDark) {
     return DropdownStyleData(
       isOverButton: false,
-      maxHeight: 120.h,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(10)),
+      maxHeight: 250.h,
+      width: 320.w,
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(
+          color: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFE2E8F0),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey,
-            blurRadius: 5,
-            offset: Offset(0, 2),
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),

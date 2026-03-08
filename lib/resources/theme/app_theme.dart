@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tayssir/resources/colors/app_colors.dart';
 
@@ -31,6 +32,11 @@ class AppTheme {
           elevation: 0,
           centerTitle: true,
           iconTheme: IconThemeData(color: AppColors.textBlack),
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.dark, // Android
+            statusBarBrightness: Brightness.light, // iOS
+          ),
         ),
         textTheme: _textTheme(Brightness.light),
       );
@@ -58,6 +64,11 @@ class AppTheme {
           elevation: 0,
           centerTitle: true,
           iconTheme: IconThemeData(color: Colors.white),
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.light, // Android
+            statusBarBrightness: Brightness.dark, // iOS
+          ),
         ),
         textTheme: _textTheme(Brightness.dark),
       );

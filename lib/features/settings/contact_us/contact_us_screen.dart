@@ -60,15 +60,22 @@ class ContactUsScreen extends HookConsumerWidget {
         //   );
         // },
         );
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return AppScaffold(
-        // formKey: formKey,
+        includeBackButton: true,
+        topSafeArea: true,
         resizeToAvoidBottomInset: true,
         paddingB: isKeyboardOpen ? 0 : 20,
-        // backgroundType: BackgroundType.light,
-        // onFormChanged: () => canSubmit.value =
-        //     messageController.text.isNotEmpty &&
-        //         emailController.text.isNotEmpty &&
-        //         fullNameController.text.isNotEmpty,
+        appBar: Text(
+          'تواصل معنا 📞',
+          style: TextStyle(
+            fontSize: 22.sp,
+            fontWeight: FontWeight.w900,
+            color: isDark ? Colors.white : AppColors.textBlack,
+            fontFamily: 'SomarSans',
+          ),
+        ),
         body: Form(
           key: formKey,
           onChanged: () => canSubmit.value =
@@ -76,18 +83,17 @@ class ContactUsScreen extends HookConsumerWidget {
                   emailController.text.isNotEmpty &&
                   fullNameController.text.isNotEmpty,
           child: SliverScrollingWidget(children: [
-            const CustomBackButton(),
-            20.verticalSpace,
+            12.verticalSpace,
             SizedBox(
               width: 0.9.sw,
               child: Text(
                 AppStrings.contactUsTitle,
-                // textAlign: TextAlign.,
                 style: TextStyle(
-                  fontSize: 14.sp,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textBlack,
-                  height: 1.4,
+                  color: isDark ? Colors.white70 : const Color(0xFF64748B),
+                  height: 1.5,
+                  fontFamily: 'SomarSans',
                 ),
               ),
             ),

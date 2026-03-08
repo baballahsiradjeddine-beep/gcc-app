@@ -7,97 +7,45 @@ class BacsLoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return AppScaffold(
-      paddingX: 0,
-      paddingY: 0,
-      paddingB: 0,
-      body: Column(
-        children: [
-          // Header skeleton
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.purple.shade700, Colors.deepPurple.shade800],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(24.r),
-                bottomRight: Radius.circular(24.r),
-              ),
-            ),
-            padding: EdgeInsets.fromLTRB(8.w, 48.h, 8.w, 24.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.school_rounded,
-                      color: Colors.white,
-                      size: 26.sp,
-                    ),
-                    SizedBox(width: 10.w),
-                    Text(
-                      'امتحانات الباك',
-                      style: TextStyle(
-                        fontSize: 28.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  'جاري تحميل البيانات...',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white.withOpacity(0.9),
-                  ),
-                ),
-                SizedBox(height: 16.h),
-                Container(
-                  height: 50.h,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(
-                    color: Colors.purple.shade700,
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    'جاري تحميل امتحانات الباك...',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ],
+      includeBackButton: true,
+      topSafeArea: true,
+      paddingX: 20.w,
+      bodyBackgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      appBar: Text(
+        'مواضيع البكالوريا 🎓',
+        style: TextStyle(
+          fontSize: 22.sp,
+          fontWeight: FontWeight.w900,
+          color: isDark ? Colors.white : const Color(0xFF1E293B),
+          fontFamily: 'SomarSans',
+        ),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 40.w,
+              height: 40.w,
+              child: const CircularProgressIndicator(
+                color: Color(0xFF00B4D8),
+                strokeWidth: 3,
               ),
             ),
-          ),
-        ],
+            24.verticalSpace,
+            Text(
+              'جاري تحضير المواضيع...',
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white70 : Colors.black54,
+                fontFamily: 'SomarSans',
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

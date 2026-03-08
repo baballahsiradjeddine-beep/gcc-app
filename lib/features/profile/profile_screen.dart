@@ -78,6 +78,8 @@ class ProfileScreen extends HookConsumerWidget {
         });
       }
     });
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return BlurOverlayWidget(
       hasTopSafeArea: false,
       onPopScope: isShowOverlay.value
@@ -119,20 +121,90 @@ class ProfileScreen extends HookConsumerWidget {
         body: RefreshIndicator(
           onRefresh: () async => ref.invalidate(userNotifierProvider),
           color: const Color(0xFF00B4D8),
-          child: CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              // Header
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 20.w, right: 20.w, top: 12.h, bottom: 20.h),
-                  child: const CustomAppBar(reverse: true, showActions: false, showLogo: false),
+          child: ShaderMask(
+            shaderCallback: (rect) {
+              return const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  Colors.black,
+                ],
+                stops: [0.0, 0.05], // Fade the top 5%
+              ).createShader(rect);
+            },
+            blendMode: BlendMode.dstIn,
+            child: CustomScrollView(
+              physics: const ClampingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
+              slivers: [
+                // 1. Integrated Header (Back Button + Title) that scrolls away
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 10.h),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        // Title on the RIGHT (First in RTL)
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              AppStrings.personalInformations,
+                              style: TextStyle(
+                                fontSize: 22.sp,
+                                fontWeight: FontWeight.w900,
+                                color: isDark ? Colors.white : AppColors.textBlack,
+                                fontFamily: 'SomarSans',
+                              ),
+                            ),
+                          8.horizontalSpace,
+                          const Icon(Icons.person_outline_rounded, color: Color(0xFF00B4D8)),
+                        ],
+                      ),
+
+                      const Spacer(),
+
+                      // Custom Back Button on the LEFT (Second in RTL)
+                      IconButton(
+                        onPressed: () {
+                          if (context.canPop()) context.pop();
+                        },
+                        icon: Container(
+                          width: 44.sp,
+                          height: 44.sp,
+                          decoration: BoxDecoration(
+                            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                            borderRadius: BorderRadius.circular(16.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                            border: Border.all(
+                              color: isDark
+                                  ? Colors.white.withOpacity(0.05)
+                                  : Colors.black.withOpacity(0.05),
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.arrow_forward_ios_rounded, // Arabic RTL Back Arrow
+                            color: isDark ? Colors.white : const Color(0xFF1E293B),
+                            size: 20.sp,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
                   child: Column(
                     children: [
                       // Badge & Profile Section
@@ -142,7 +214,7 @@ class ProfileScreen extends HookConsumerWidget {
                           .slideY(begin: 0.1, end: 0, curve: Curves.easeOutBack),
                       25.verticalSpace,
                       
-                      // Stats Cards
+                      // Stats Cards (Subscription Only)
                       if (user.subscriptions.isNotEmpty) 
                         _buildStatsCards(context, user, currentUserSubscription)
                             .animate()
@@ -203,8 +275,9 @@ class ProfileScreen extends HookConsumerWidget {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildProfileHeader(BuildContext context, dynamic user, ValueNotifier<File?> localImage) {
     final badgeIconUrl = user.badge?.completeIconUrl;
@@ -259,31 +332,15 @@ class ProfileScreen extends HookConsumerWidget {
 
   Widget _buildStatsCards(BuildContext context, dynamic user, dynamic subscription) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    return Row(
-      children: [
-        // Points
-        Expanded(
-          child: _StatCard(
-            title: "نقاطي",
-            value: "${user.points}",
-            icon: Icons.auto_awesome_rounded,
-            gradient: const LinearGradient(colors: [Color(0xFFF59E0B), Color(0xFFD97706)]),
-            isDark: isDark,
-          ),
-        ),
-        12.horizontalSpace,
-        // Subscription
-        Expanded(
-          flex: 2,
-          child: _StatCard(
-            title: "نوع الاشتراك",
-            value: subscription?.name ?? 'عادي',
-            icon: Icons.workspace_premium_rounded,
-            gradient: const LinearGradient(colors: [Color(0xFF8B5CF6), Color(0xFF6D28D9)]),
-            isDark: isDark,
-          ),
-        ),
-      ],
+    return Container(
+      width: double.infinity,
+      child: _StatCard(
+        title: "نوع الاشتراك الحالي",
+        value: subscription?.name ?? 'عادي',
+        icon: Icons.workspace_premium_rounded,
+        gradient: const LinearGradient(colors: [Color(0xFF8B5CF6), Color(0xFF6D28D9)]),
+        isDark: isDark,
+      ),
     );
   }
 
@@ -306,21 +363,21 @@ class ProfileScreen extends HookConsumerWidget {
           labelText: AppStrings.name,
           suffix: const Icon(Icons.person_outline_rounded, color: Color(0xFF00B4D8)),
         ),
-        20.verticalSpace,
+        16.verticalSpace,
         CustomTextFormField(
           controller: ageController,
           labelText: "العمر",
           keyboardType: TextInputType.number,
           suffix: const Icon(Icons.cake_outlined, color: Color(0xFF00B4D8)),
         ),
-        20.verticalSpace,
+        16.verticalSpace,
         CustomTextFormField(
           controller: phoneController,
           labelText: AppStrings.phoneNumber,
           keyboardType: TextInputType.phone,
           suffix: const Icon(Icons.phone_outlined, color: Color(0xFF00B4D8)),
         ),
-        20.verticalSpace,
+        16.verticalSpace,
         TayssirDropDown<Wilaya>(
           selectedItem: wilaya.value,
           items: ref.watch(wilayasProvider).isLoading ? [] : wilayas,
@@ -332,7 +389,7 @@ class ProfileScreen extends HookConsumerWidget {
           hintText: AppStrings.wilaya,
           iconPath: SVGs.icBuilding,
         ),
-        20.verticalSpace,
+        16.verticalSpace,
         TayssirDropDown<Commune>(
           selectedItem: commune.value,
           items: ref.watch(communesProvider(wilaya.value.number)).isLoading ? [] : communes,
@@ -342,7 +399,7 @@ class ProfileScreen extends HookConsumerWidget {
           hintText: AppStrings.dairaOrCommune,
           iconPath: SVGs.icCommune,
         ),
-        20.verticalSpace,
+        16.verticalSpace,
         TayssirDropDown<DivisionModel>(
           selectedItem: division.value,
           items: ref.watch(divisionsProvider).valueOrNull ?? [],
@@ -375,7 +432,7 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16.sp),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E293B) : AppColors.surfaceWhite,
         borderRadius: BorderRadius.circular(24.r),
@@ -388,36 +445,46 @@ class _StatCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
+          // Icon on the RIGHT (First in RTL)
           Container(
-            padding: EdgeInsets.all(8.r),
+            padding: EdgeInsets.all(10.r),
             decoration: BoxDecoration(
               gradient: gradient,
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(14.r),
             ),
-            child: Icon(icon, color: Colors.white, size: 20.sp),
+            child: Icon(icon, color: Colors.white, size: 22.sp),
           ),
-          12.verticalSpace,
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w900,
-              color: isDark ? Colors.white : AppColors.textBlack,
-              fontFamily: 'SomarSans',
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          4.verticalSpace,
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 11.sp,
-              color: isDark ? Colors.white54 : Colors.black54,
-              fontFamily: 'SomarSans',
+          16.horizontalSpace,
+          
+          // Texts on the LEFT
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w900,
+                    color: isDark ? Colors.white : AppColors.textBlack,
+                    fontFamily: 'SomarSans',
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                2.verticalSpace,
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    color: isDark ? Colors.white54 : Colors.black54,
+                    fontFamily: 'SomarSans',
+                  ),
+                ),
+              ],
             ),
           ),
         ],

@@ -25,7 +25,6 @@ import 'package:tayssir/features/exercice/presentation/post_exercise_screen.dart
 import 'package:tayssir/features/home/presentation/home_screen.dart';
 import 'package:tayssir/features/profile/profile_screen.dart';
 import 'package:tayssir/features/profile/achievement_log_screen.dart';
-// import 'package:tayssir/features/settings/notifications/notifications_view.dart';
 import 'package:tayssir/features/settings/security/security_screen.dart';
 import 'package:tayssir/features/tools/bacs/bacs_screen.dart';
 import 'package:tayssir/features/tools/grade_calc/grade_calculator_screen.dart';
@@ -34,6 +33,7 @@ import 'package:tayssir/features/splash/splash_screen.dart';
 import 'package:tayssir/features/tools/card_swipper/card_swipper_screen.dart';
 import 'package:tayssir/features/tools/common/pdf_content_screen.dart';
 import 'package:tayssir/features/tools/resumes/resumes_screen.dart';
+import '../features/ai_planner/presentation/ai_planner_popup.dart';
 import 'package:tayssir/router/app_transitions.dart';
 
 import '../features/chapters/chapters_screen.dart';
@@ -100,6 +100,7 @@ enum AppRoutes {
   achievementLog,
   onboarding,
   social,
+  aiPlanner,
 }
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -215,6 +216,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                       ],
                       transitionType: TransitionType.sharedAxis,
                       slideDirection: SlideDirection.left,
+                      duration: const Duration(milliseconds: 300),
+                    ),
+                    TayssirCustomGoRoute(
+                      name: AppRoutes.aiPlanner.name,
+                      path: 'ai-planner',
+                      pageBuilder: (context, state) {
+                        return const Scaffold(
+                            backgroundColor: Colors.transparent, // Background will be handled by UI
+                            body: AIPlannerPopup(), // Or a dedicated screen if needed
+                        );
+                      },
+                      transitionType: TransitionType.fade,
                       duration: const Duration(milliseconds: 300),
                     ),
                   ]),

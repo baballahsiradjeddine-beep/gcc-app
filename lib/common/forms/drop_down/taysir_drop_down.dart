@@ -29,25 +29,31 @@ class TayssirDropDown<T extends TaysirDropdownItem> extends StatelessWidget {
 
     Widget buildButtonContent(String text, {bool isHint = false}) {
       return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: isHint 
+                    ? (isDark ? const Color(0xFF475569) : const Color(0xFF94A3B8))
+                    : (isDark ? Colors.white : const Color(0xFF1E293B)),
+                fontSize: 15.sp,
+                fontWeight: isHint ? FontWeight.w500 : FontWeight.w600,
+                fontFamily: 'SomarSans',
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          8.horizontalSpace,
           SvgPicture.asset(
             iconPath,
             width: 20.sp,
             colorFilter: ColorFilter.mode(
-              AppColors.primaryColor,
+              const Color(0xFF00B4D8),
               BlendMode.srcIn,
             ),
           ),
-          Text(text,
-              style: TextStyle(
-                color: isHint 
-                    ? Colors.blueGrey.shade400 
-                    : (isDark ? Colors.white : AppColors.textBlack),
-                fontSize: 15.sp,
-                fontWeight: isHint ? FontWeight.w500 : FontWeight.bold,
-                fontFamily: 'SomarSans',
-              )),
         ],
       );
     }
@@ -60,7 +66,7 @@ class TayssirDropDown<T extends TaysirDropdownItem> extends StatelessWidget {
           child: Text(
             hintText,
             style: TextStyle(
-              color: isDark ? Colors.blueGrey.shade300 : AppColors.textBlack,
+              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
               fontSize: 14.sp,
               fontWeight: FontWeight.bold,
               fontFamily: 'SomarSans',
@@ -73,7 +79,7 @@ class TayssirDropDown<T extends TaysirDropdownItem> extends StatelessWidget {
             elevation: 8,
             maxHeight: 250.h,
             decoration: BoxDecoration(
-              color: isDark ? AppColors.secondaryDark : Colors.white,
+              color: isDark ? const Color(0xFF1E293B) : Colors.white,
               borderRadius: BorderRadius.circular(16.r),
             ),
           ),
@@ -85,7 +91,7 @@ class TayssirDropDown<T extends TaysirDropdownItem> extends StatelessWidget {
               child: Text(
                 item.name,
                 style: TextStyle(
-                  color: isDark ? Colors.white : AppColors.textBlack,
+                  color: isDark ? Colors.white : const Color(0xFF1E293B),
                   fontSize: 14.sp,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'SomarSans',
@@ -101,20 +107,20 @@ class TayssirDropDown<T extends TaysirDropdownItem> extends StatelessWidget {
           validator: validator ?? (value) => value == null ? 'الرجاء الاختيار' : null,
           decoration: InputDecoration(
             filled: true,
-            fillColor: isDark ? AppColors.secondaryDark : Colors.blueGrey.shade50,
-            contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+            fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20.r),
               borderSide: BorderSide(
-                color: isDark ? Colors.blueGrey.shade800 : Colors.blueGrey.shade200,
-                width: 1.5,
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                width: 1,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20.r),
               borderSide: BorderSide(
-                color: isDark ? Colors.blueGrey.shade800 : Colors.blueGrey.shade200,
-                width: 1.5,
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                width: 1,
               ),
             ),
             focusedBorder: OutlineInputBorder(

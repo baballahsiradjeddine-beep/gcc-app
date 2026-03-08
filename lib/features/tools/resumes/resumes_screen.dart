@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import 'package:tayssir/common/core/app_scaffold.dart';
 import 'package:tayssir/features/tools/card_swipper/card_pattern_painter.dart';
@@ -54,97 +55,45 @@ class ResumesLoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return AppScaffold(
-      paddingX: 0,
-      paddingY: 0,
-      paddingB: 0,
-      body: Column(
-        children: [
-          // Header skeleton
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.blue.shade700, Colors.indigo.shade800],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(24.r),
-                bottomRight: Radius.circular(24.r),
-              ),
-            ),
-            padding: EdgeInsets.fromLTRB(8.w, 48.h, 8.w, 24.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.menu_book_rounded,
-                      color: Colors.white,
-                      size: 26.sp,
-                    ),
-                    SizedBox(width: 10.w),
-                    Text(
-                      'ملخصات بيان',
-                      style: TextStyle(
-                        fontSize: 28.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  'جاري تحميل البيانات...',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white.withOpacity(0.9),
-                  ),
-                ),
-                SizedBox(height: 16.h),
-                Container(
-                  height: 50.h,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(
-                    color: Colors.blue.shade700,
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    'جاري تحميل الملخصات...',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ],
+      includeBackButton: true,
+      topSafeArea: true,
+      paddingX: 20.w,
+      bodyBackgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      appBar: Text(
+        'ملخصات بيان 📚',
+        style: TextStyle(
+          fontSize: 22.sp,
+          fontWeight: FontWeight.w900,
+          color: isDark ? Colors.white : const Color(0xFF1E293B),
+          fontFamily: 'SomarSans',
+        ),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 40.w,
+              height: 40.w,
+              child: const CircularProgressIndicator(
+                color: Color(0xFF00B4D8),
+                strokeWidth: 3,
               ),
             ),
-          ),
-        ],
+            24.verticalSpace,
+            Text(
+              'جاري تحضير الملخصات...',
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white70 : Colors.black54,
+                fontFamily: 'SomarSans',
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -159,6 +108,7 @@ class ResumesDataView extends HookWidget {
   Widget build(BuildContext context) {
     final currentMaterial = useState<int?>(0);
     final scrollController = useScrollController();
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Filter units if a material is selected
     final displayedUnits =
@@ -168,312 +118,209 @@ class ResumesDataView extends HookWidget {
                 .where((u) => u.materialId == currentMaterial.value)
                 .toList();
 
-    // Get the background gradient colors based on selection
-    List<Color> headerGradientColors = currentMaterial.value == 0
-        ? [Colors.blue.shade700, Colors.indigo.shade800]
-        : data.materials
-            .where((item) => item.id == currentMaterial.value)
-            .first
-            .colors;
-
     final currentColor = currentMaterial.value == 0
-        ? Colors.blue.shade700
+        ? const Color(0xFF00B4D8)
         : data.materials
             .where((item) => item.id == currentMaterial.value)
             .first
             .colors[0];
 
     return AppScaffold(
+      includeBackButton: true,
+      topSafeArea: true,
       paddingX: 0,
       paddingY: 0,
       paddingB: 0,
+      bodyBackgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      appBar: Text(
+        'ملخصات بيان 📚',
+        style: TextStyle(
+          fontSize: 22.sp,
+          fontWeight: FontWeight.w900,
+          color: isDark ? Colors.white : const Color(0xFF1E293B),
+          fontFamily: 'SomarSans',
+        ),
+      ),
       body: Column(
         children: [
-          // Enhanced Header with gradient background
+          // Filter Section
           Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: headerGradientColors,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(24.r),
-                bottomRight: Radius.circular(24.r),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            padding: EdgeInsets.fromLTRB(8.w, 48.h, 8.w, 24.h),
+            padding: EdgeInsets.only(top: 12.h, bottom: 8.h),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.menu_book_rounded,
-                      color: Colors.white,
-                      size: 26.sp,
-                    ),
-                    SizedBox(width: 10.w),
-                    Text(
-                      'ملخصات بيان',
-                      style: TextStyle(
-                        fontSize: 28.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ],
+                FilterSection(
+                  items: data.materials,
+                  isPremium: false,
+                  padding: 8,
+                  allLabel: 'جميع الملخصات',
+                  isAllOptionsPressed: currentMaterial.value == 0,
+                  onClearAllSelected: () {
+                    currentMaterial.value = 0;
+                  },
+                  getLabel: (item) => item.name,
+                  selectionExtractor: (item) =>
+                      currentMaterial.value == item.id,
+                  filterColor: const Color(0xFF0077B6),
+                  onItemPressed: (item) {
+                    currentMaterial.value = item.id;
+                    scrollController.animateTo(
+                      0.0,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOut,
+                    );
+                  },
                 ),
-                SizedBox(height: 8.h),
-                Text(
-                  'مجموعة ${data.units.length} وحدة للمراجعة',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white.withOpacity(0.9),
-                  ),
-                ),
-                SizedBox(height: 16.h),
-                Container(
-                  height: 50.h,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: FilterSection(
-                    items: data.materials,
-                    isPremium: false,
-                    padding: 0,
-                    allLabel: 'جميع الملخصات',
-                    isAllOptionsPressed: currentMaterial.value == 0,
-                    onClearAllSelected: () {
-                      currentMaterial.value = 0;
-                    },
-                    labelColor: currentColor,
-                    getLabel: (item) => item.name,
-                    selectionExtractor: (item) =>
-                        currentMaterial.value == item.id,
-                    filterColor: currentMaterial.value == 0
-                        ? Colors.white
-                        : Colors.white,
-                    onItemPressed: (item) {
-                      currentMaterial.value = item.id;
-                      scrollController.animateTo(
-                        0.0,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeOut,
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 12.h),
-          // Stats row
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.w),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
-                  decoration: BoxDecoration(
-                    color: currentColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
+                
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Icon(
-                        Icons.check_circle_rounded,
-                        size: 18.sp,
-                        color: currentColor,
-                      ),
-                      2.horizontalSpace,
-                      Text(
-                        '${displayedUnits.length} ${displayedUnits.length == 1 ? 'ملخص' : 'ملخصلات'} للمراجعة',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w600,
-                          color: currentColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                  decoration: BoxDecoration(
-                    color: currentMaterial.value == 0
-                        ? Colors.blue.shade50
-                        : data.materials
-                            .where((item) => item.id == currentMaterial.value)
-                            .first
-                            .colors[0]
-                            .withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Text(
-                    currentMaterial.value == 0
-                        ? 'عرض الكل'
-                        : data.materials
-                            .where((item) => item.id == currentMaterial.value)
-                            .first
-                            .name,
-                    style: TextStyle(
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.bold,
-                      color: currentMaterial.value == 0
-                          ? Colors.blue.shade700
-                          : data.materials
-                              .where((item) => item.id == currentMaterial.value)
-                              .first
-                              .colors[0],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 8.h),
-          // The Grid of Cards
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: GridView.builder(
-                controller: scrollController,
-                physics: const BouncingScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 14.w,
-                  mainAxisSpacing: 18.h,
-                  childAspectRatio: 0.85,
-                ),
-                itemCount: displayedUnits.length,
-                itemBuilder: (context, index) {
-                  final unit = displayedUnits[index];
-                  final material = data.materials
-                      .firstWhere((mat) => mat.id == unit.materialId);
-
-                  return GestureDetector(
-                    onTap: () {
-                      context.pushNamed(AppRoutes.pdfContent.name, extra: {
-                        'pdfUrl': unit.pdf,
-                      });
-                    },
-                    child: Card(
-                      elevation: 6,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18.r),
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      child: Container(
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: material.colors,
-                            begin: Alignment.topRight,
-                            end: Alignment.bottomLeft,
-                          ),
+                          color: currentColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12.r),
+                          border: Border.all(color: currentColor.withOpacity(0.2)),
                         ),
-                        child: Stack(
+                        child: Row(
                           children: [
-                            Positioned.fill(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20.r),
-                                child: CustomPaint(
-                                  painter: CardPatternPainter(
-                                      color: Colors.white.withOpacity(0.2)),
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(14.w),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 10.w, vertical: 4.h),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.22),
-                                      borderRadius: BorderRadius.circular(8.r),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
-                                          blurRadius: 4,
-                                          offset: const Offset(0, 1),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Text(
-                                      material.name,
-                                      style: TextStyle(
-                                        fontSize: 11.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  20.verticalSpace,
-                                  Expanded(
-                                    child: Text(
-                                      unit.name,
-                                      style: TextStyle(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                        height: 1.3,
-                                      ),
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 8.w, vertical: 4.h),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.2),
-                                          borderRadius:
-                                              BorderRadius.circular(6.r),
-                                        ),
-                                        child: Text(
-                                          'PDF',
-                                          style: TextStyle(
-                                            fontSize: 11.sp,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                            Icon(Icons.check_circle_outline, size: 14.sp, color: currentColor),
+                            6.horizontalSpace,
+                            Text(
+                              '${displayedUnits.length} وحدة متوفرة',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w900,
+                                color: currentColor,
+                                fontFamily: 'SomarSans',
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  );
-                },
+                      Text(
+                        currentMaterial.value == 0 ? "كل المواد" : "مادة محددة",
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: isDark ? Colors.white54 : Colors.black45,
+                          fontFamily: 'SomarSans',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ).animate().fadeIn(delay: 200.ms),
+              ],
+            ),
+          ),
+
+          // The Grid of Cards
+          Expanded(
+            child: GridView.builder(
+              controller: scrollController,
+              padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 40.h),
+              physics: const BouncingScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16.w,
+                mainAxisSpacing: 16.h,
+                childAspectRatio: 0.85,
               ),
+              itemCount: displayedUnits.length,
+              itemBuilder: (context, index) {
+                final unit = displayedUnits[index];
+                final material = data.materials
+                    .firstWhere((mat) => mat.id == unit.materialId);
+
+                return GestureDetector(
+                  onTap: () {
+                    context.pushNamed(AppRoutes.pdfContent.name, extra: {
+                      'pdfUrl': unit.pdf,
+                    });
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: material.colors,
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(24.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: material.colors.first.withOpacity(0.2),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: CustomPaint(
+                            painter: CardPatternPainter(
+                                color: Colors.white.withOpacity(0.12)),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(16.w),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(10.r),
+                                ),
+                                child: Text(
+                                  material.name,
+                                  style: TextStyle(
+                                    fontSize: 10.sp,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white,
+                                    fontFamily: 'SomarSans',
+                                  ),
+                                ),
+                              ),
+                              const Spacer(),
+                              Text(
+                                unit.name,
+                                style: TextStyle(
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  fontFamily: 'SomarSans',
+                                  height: 1.2,
+                                ),
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              8.verticalSpace,
+                              Row(
+                                children: [
+                                  Icon(Icons.menu_book_outlined, color: Colors.white.withOpacity(0.8), size: 14.sp),
+                                  4.horizontalSpace,
+                                  Text(
+                                    'قراءة الملخص',
+                                    style: TextStyle(
+                                      fontSize: 11.sp,
+                                      color: Colors.white.withOpacity(0.8),
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'SomarSans',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ).animate().fadeIn(delay: (index * 50).ms).slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
+                );
+              },
             ),
           ),
         ],

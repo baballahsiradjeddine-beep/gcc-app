@@ -149,42 +149,33 @@ class TrueFalseExerciseView extends ConsumerWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOutCubic,
-          height: 100.h,
+          height: 60.h,
           decoration: BoxDecoration(
             color: isSelected 
-                ? color.withOpacity(isDark ? 0.1 : 0.05) 
+                ? color.withOpacity(isDark ? 0.2 : 0.1) 
                 : (isDark ? const Color(0xFF1E293B) : Colors.white),
-            borderRadius: BorderRadius.circular(24.r),
+            borderRadius: BorderRadius.circular(16.r),
             border: Border.all(
               color: isSelected ? color : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
-              width: isSelected ? 2.5 : 1,
+              width: isSelected ? 2.0 : 1.0,
             ),
             boxShadow: isSelected 
                 ? [
                     BoxShadow(
-                      color: color.withOpacity(0.15),
-                      blurRadius: 12,
+                      color: color.withOpacity(0.2),
+                      blurRadius: 8,
                     )
                   ]
-                : [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    )
-                  ],
+                : [],
           ),
-          child: Opacity(
-            opacity: isSelected ? 1.0 : 0.6,
-            child: Center(
-              child: Text(
-                text,
-                style: TextStyle(
-                  color: isSelected ? color : (isDark ? Colors.white70 : const Color(0xFF1E293B)),
-                  fontSize: 24.sp,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'SomarSans',
-                ),
+          child: Center(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: isSelected ? color : (isDark ? Colors.white70 : const Color(0xFF1E293B)),
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w900,
+                fontFamily: 'SomarSans',
               ),
             ),
           ),

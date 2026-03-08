@@ -16,9 +16,9 @@ final toolsProvider = Provider<List<ToolModel>>((ref) {
       startColor: const Color(0xffCB2487),
       endColor: const Color(0xffFD67C0),
       isLocked: !configs.cardsActive,
-      toolImage: const ToolImage(
-        grid: Images.flashCardsGBg,
-        list: Images.flashCardsLBg,
+      toolImage: ToolImage(
+        grid: configs.toolCardsGrid.isNotEmpty ? configs.toolCardsGrid : Images.flashCardsGBg,
+        list: configs.toolCardsList.isNotEmpty ? configs.toolCardsList : Images.flashCardsLBg,
       ),
     ),
     ToolModel(
@@ -28,9 +28,9 @@ final toolsProvider = Provider<List<ToolModel>>((ref) {
       startColor: const Color(0xFF0F726D),
       endColor: const Color(0xFF48CFCB),
       isLocked: false,
-      toolImage: const ToolImage(
-        grid: Images.pomodoroBg,
-        list: Images.pomodoroBgList,
+      toolImage: ToolImage(
+        grid: configs.toolPomodoroGrid.isNotEmpty ? configs.toolPomodoroGrid : Images.pomodoroBg,
+        list: configs.toolPomodoroList.isNotEmpty ? configs.toolPomodoroList : Images.pomodoroBgList,
       ),
       isStartBottomColor: false,
     ),
@@ -41,8 +41,9 @@ final toolsProvider = Provider<List<ToolModel>>((ref) {
       startColor: const Color(0xFF00B2FF),
       endColor: const Color(0xFF054A91),
       isLocked: false,
-      toolImage: const ToolImage(
-          grid: Images.gradeCalcGrid, list: Images.gradeCalcList),
+      toolImage: ToolImage(
+          grid: configs.toolGradeCalcGrid.isNotEmpty ? configs.toolGradeCalcGrid : Images.gradeCalcGrid, 
+          list: configs.toolGradeCalcList.isNotEmpty ? configs.toolGradeCalcList : Images.gradeCalcList),
     ),
     ToolModel(
       name: 'ملخصات و مراجعات',
@@ -51,9 +52,9 @@ final toolsProvider = Provider<List<ToolModel>>((ref) {
       startColor: const Color(0xff533899),
       endColor: const Color(0xFF563A9C),
       isLocked: !configs.resumesActive,
-      toolImage: const ToolImage(
-        grid: Images.resumesGBg,
-        list: Images.resumsLBg,
+      toolImage: ToolImage(
+        grid: configs.toolResumesGrid.isNotEmpty ? configs.toolResumesGrid : Images.resumesGBg,
+        list: configs.toolResumesList.isNotEmpty ? configs.toolResumesList : Images.resumsLBg,
       ),
     ),
     ToolModel(
@@ -63,9 +64,22 @@ final toolsProvider = Provider<List<ToolModel>>((ref) {
       startColor: const Color(0xFF4C4C4C),
       endColor: const Color(0xFFA9A9A9),
       isLocked: !configs.bacSolutionsActive,
-      toolImage: const ToolImage(
-        grid: Images.reolveGridBg,
-        list: Images.resolveListBg,
+      toolImage: ToolImage(
+        grid: configs.toolBacSolutionsGrid.isNotEmpty ? configs.toolBacSolutionsGrid : Images.reolveGridBg,
+        list: configs.toolBacSolutionsList.isNotEmpty ? configs.toolBacSolutionsList : Images.resolveListBg,
+      ),
+      isStartBottomColor: false,
+    ),
+    ToolModel(
+      name: 'خطة الدراسة الذكية',
+      description: 'نظام المهام الذكي (Checked List) لتحقيق أهدافك مراجعة يومية.',
+      pathName: 'ai_planner',
+      startColor: const Color(0xFF00C6E0),
+      endColor: const Color(0xFF0077B6),
+      isLocked: false,
+      toolImage: ToolImage(
+        grid: configs.toolAiPlannerGrid.isNotEmpty ? configs.toolAiPlannerGrid : Images.pomodoroBg, 
+        list: configs.toolAiPlannerList.isNotEmpty ? configs.toolAiPlannerList : Images.pomodoroBgList,
       ),
       isStartBottomColor: false,
     ),

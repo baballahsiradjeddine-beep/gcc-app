@@ -24,6 +24,7 @@ import 'package:tayssir/features/onboarding/onboarding_notifier.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:tayssir/services/sounds/sound_manager.dart';
 import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
+import '../../ai_planner/state/ai_planner_notifier.dart';
 import 'widgets/results/result_stats_widget.dart';
 
 class ExerciceResultScreen extends HookConsumerWidget {
@@ -139,7 +140,7 @@ class ExerciceResultScreen extends HookConsumerWidget {
                         assetKey: exercisesState.accuracy.resultAssetKey(),
                         fallbackAssetPath: exercisesState.accuracy.resultIcon(),
                         type: AppAssetType.svg,
-                        height: context.isSmallDevice ? 200.h : 270.h,
+                        height: context.isSmallDevice ? 160.h : 210.h,
                       ).animate().scale(begin: const Offset(0.5, 0.5), end: const Offset(1, 1), curve: Curves.elasticOut, duration: 1.2.seconds),
                       const Spacer(flex: 1),
                       if (exercisesState.isReviewMode)
@@ -229,6 +230,25 @@ class ExerciceResultScreen extends HookConsumerWidget {
                           await Future.delayed(const Duration(milliseconds: 100));
 
                           if (context.mounted) {
+                            // 1. Check if we are in a planner study session
+                            final isPlannerSession = ref.read(isPlannerSessionActiveProvider);
+                            if (isPlannerSession) {
+                              // Reset the session
+                              ref.read(isPlannerSessionActiveProvider.notifier).state = false;
+                              
+                              // Signal Home that it should open the planner
+                              ref.read(isFromAiPlannerProvider.notifier).state = true;
+                              
+                              // Mark the task as done
+                              if (firstChapterId != -1) {
+                                ref.read(aiPlannerProvider.notifier).markChapterTaskDone(firstChapterId, 'exercise');
+                              }
+                              
+                              // MUST go to home
+                              context.goNamed(AppRoutes.home.name);
+                              return;
+                            }
+
                             if (exercisesState.isReviewMode) {
                               context.goNamed(AppRoutes.home.name);
                               return;
@@ -253,27 +273,21 @@ class ExerciceResultScreen extends HookConsumerWidget {
                             }
 
                             if (context.mounted) {
-                              final bool hasStudiedToday = streakState?.history
-                                      .any((day) => day.isToday && day.studied) ??
-                                  false;
-
-                              if (context.mounted) {
-                                if ((didStreakIncrease || hasStudiedToday) && streakState != null) {
-                                  context.pushReplacementNamed(
-                                    AppRoutes.streak.name,
-                                    extra: {
-                                      'streak': streakState,
-                                      'unitId': unitId,
-                                    },
-                                  );
-                                } else {
-                                  context.pushReplacementNamed(
-                                    AppRoutes.chapters.name,
-                                    pathParameters: {
-                                      'unitId': unitId.toString(),
-                                    },
-                                  );
-                                }
+                              if (didStreakIncrease && streakState != null) {
+                                context.pushReplacementNamed(
+                                  AppRoutes.streak.name,
+                                  extra: {
+                                    'streak': streakState,
+                                    'unitId': unitId,
+                                  },
+                                );
+                              } else {
+                                context.pushReplacementNamed(
+                                  AppRoutes.chapters.name,
+                                  pathParameters: {
+                                    'unitId': unitId.toString(),
+                                  },
+                                );
                               }
                             }
                           }

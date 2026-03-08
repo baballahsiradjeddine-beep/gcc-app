@@ -49,98 +49,78 @@ class SubscriptionCardScreen extends HookConsumerWidget {
     });
 
     return AppScaffold(
-      paddingY: 0,
+      includeBackButton: true,
       topSafeArea: true,
+      paddingX: 20.w,
+      bodyBackgroundColor: const Color(0xFF0B1120),
+      appBar: RichText(
+        text: TextSpan(
+          style: TextStyle(
+            fontSize: 26.sp,
+            fontWeight: FontWeight.w900,
+            fontFamily: 'SomarSans',
+          ),
+          children: [
+            TextSpan(
+              text: "Tay",
+              style: TextStyle(color: isDark ? Colors.white : const Color(0xFF1E293B)),
+            ),
+            const TextSpan(
+              text: "ssir",
+              style: TextStyle(color: Color(0xFF00B4D8)),
+            ),
+          ],
+        ),
+      ),
       body: Column(
         children: [
-          // Header Logo
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                RichText(
-                  text: TextSpan(
-                    style: TextStyle(
-                      fontSize: 32.sp,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'SomarSans',
-                    ),
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  20.verticalSpace,
+                  // Dolphin & Speech Bubble
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TextSpan(
-                        text: "Tay",
-                        style: TextStyle(color: isDark ? Colors.white : const Color(0xFF1E293B)),
-                      ),
-                      const TextSpan(
-                        text: "ssir",
-                        style: TextStyle(color: Color(0xFF00B4D8)),
+                      Text(
+                        "🐬",
+                        style: TextStyle(fontSize: 70.sp),
+                      ).animate(onPlay: (c) => c.repeat(reverse: true))
+                       .moveY(begin: 0, end: -6, duration: 4.seconds, curve: Curves.easeInOutSine),
+                      
+                      8.horizontalSpace,
+                      
+                      SizedBox(
+                        width: 170.w,
+                        child: const TitoBubbleTalkWidget(
+                          text: "أحسنت الإختيار! تيسير رفيقك نحو التفوق 😉",
+                          triangleSide: TriangleSide.right,
+                        ),
                       ),
                     ],
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => context.pop(),
-                  child: Container(
-                    padding: EdgeInsets.all(10.r),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.arrow_back_rounded,
-                      color: isDark ? Colors.white : const Color(0xFF64748B),
-                      size: 22.sp,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ).animate().fadeIn(),
-
-          Expanded(
-            child: SliverScrollingWidget(
-              children: [
-                20.verticalSpace,
-                
-                // Dolphin & Speech Bubble
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "🐬",
-                      style: TextStyle(fontSize: 70.sp),
-                    ).animate(onPlay: (c) => c.repeat(reverse: true))
-                     .moveY(begin: 0, end: -6, duration: 4.seconds, curve: Curves.easeInOutSine),
-                    
-                    8.horizontalSpace,
-                    
-                    SizedBox(
-                      width: 180.w,
-                      child: const TitoBubbleTalkWidget(
-                        text: "أحسنت الإختيار! تيسير رفيقك نحو التفوق 😉",
-                        triangleSide: TriangleSide.right,
-                      ),
-                    ),
-                  ],
-                ).animate().fadeIn(delay: 100.ms),
-                
-                40.verticalSpace,
-                
-                // Virtual Card with Subscription Card Input
-                SubscribeCardButton(
-                  controller: cardNumberController,
-                  hasError: shouldShowError,
-                  price: subscription.realPrice,
-                ).animate().fadeIn(delay: 200.ms).scale(curve: Curves.easeOutBack),
-                
-                20.verticalSpace,
-                
-                // Error message (if any)
-                if (shouldShowError)
+                  ).animate().fadeIn(delay: 100.ms),
+                  
+                  30.verticalSpace,
+                  
+                  // Virtual Card (Reduced width for better fit)
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24.w),
-                    child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10.w),
+                    child: SubscribeCardButton(
+                      controller: cardNumberController,
+                      hasError: shouldShowError,
+                      price: subscription.realPrice,
+                    ),
+                  ).animate().fadeIn(delay: 200.ms).scale(curve: Curves.easeOutBack),
+                  
+                  24.verticalSpace,
+                  
+                  // Error message
+                  if (shouldShowError)
+                    Container(
+                      width: double.infinity,
                       padding: EdgeInsets.all(16.r),
                       decoration: BoxDecoration(
                         color: Colors.red.withOpacity(0.08),
@@ -157,32 +137,23 @@ class SubscriptionCardScreen extends HookConsumerWidget {
                           fontFamily: 'SomarSans',
                         ),
                       ),
-                    ),
-                  ).animate().fadeIn().shake(),
-                
-                40.verticalSpace,
-              ],
+                    ).animate().fadeIn().shake(),
+                  
+                  40.verticalSpace,
+                ],
+              ),
             ),
           ),
           
           // Fixed Bottom Action
-          ClipRect(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                padding: EdgeInsets.fromLTRB(24.r, 12.r, 24.r, 32.r),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF0F172A).withOpacity(0.9) : Colors.white.withOpacity(0.9),
-                  border: Border(top: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9))),
-                ),
-                child: BigButton(
-                  text: AppStrings.check,
-                  onPressed: isValid.value && !state.state.isLoading
-                      ? () => ref.read(subscriptionControllerProvider.notifier).subscribeWithCard(cardNumberController.text, subscription)
-                      : null,
-                ).animate().fadeIn(delay: 700.ms).scale(curve: Curves.easeOutBack),
-              ),
-            ),
+          Padding(
+            padding: EdgeInsets.only(bottom: 32.h, top: 16.h),
+            child: BigButton(
+              text: AppStrings.check,
+              onPressed: isValid.value && !state.state.isLoading
+                  ? () => ref.read(subscriptionControllerProvider.notifier).subscribeWithCard(cardNumberController.text, subscription)
+                  : null,
+            ).animate().fadeIn(delay: 700.ms).scale(curve: Curves.easeOutBack),
           ),
         ],
       ),

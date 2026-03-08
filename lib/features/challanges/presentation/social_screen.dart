@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:tayssir/common/core/app_scaffold.dart';
 import 'package:tayssir/features/challanges/data/social_repository.dart';
 import 'package:tayssir/providers/data/data_provider.dart';
 import 'package:tayssir/providers/data/models/material_model.dart';
@@ -11,6 +10,7 @@ import 'package:tayssir/router/app_router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:tayssir/resources/colors/app_colors.dart';
 
 final friendsListProvider = FutureProvider<List<dynamic>>((ref) {
   return ref.watch(socialRepositoryProvider).getFriends();
@@ -20,43 +20,63 @@ final pendingRequestsProvider = FutureProvider<List<dynamic>>((ref) {
   return ref.watch(socialRepositoryProvider).getPendingRequests();
 });
 
-class SocialScreen extends HookConsumerWidget {
+class SocialScreen extends ConsumerStatefulWidget {
   const SocialScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final tabController = useTabController(initialLength: 3);
+  ConsumerState<SocialScreen> createState() => _SocialScreenState();
+}
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
-      child: Scaffold(
-        backgroundColor: const Color(0xFF0B1120),
-        appBar: AppBar(
-          backgroundColor: const Color(0xFF0B1120),
-          elevation: 0,
-          leading: IconButton(
-            icon: CircleAvatar(
-              backgroundColor: Colors.white.withOpacity(0.05),
-              child: const Icon(Icons.arrow_back, color: Colors.white),
-            ),
-            onPressed: () => context.pop(),
-          ),
-          title: Text(
-            'الأصدقاء والبحث 🤝',
+class _SocialScreenState extends ConsumerState<SocialScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this, initialIndex: 0);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return AppScaffold(
+      bodyBackgroundColor: isDark ? const Color(0xFF0F172A) : Colors.white,
+      includeBackButton: true,
+      topSafeArea: true,
+      // Fixed: Removed paddingX: 0 to restore standard 20.w padding
+      paddingB: 0,
+      appBar: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            'الأصدقاء والبحث',
             style: TextStyle(
-              fontSize: 18.sp,
+              fontSize: 20.sp,
               fontWeight: FontWeight.w900,
               fontFamily: 'SomarSans',
-              color: Colors.white,
+              color: isDark ? Colors.white : AppColors.textBlack,
             ),
           ),
-          centerTitle: true,
-          bottom: TabBar(
-            controller: tabController,
+          8.horizontalSpace,
+          const Text('🤝', style: TextStyle(fontSize: 20)),
+        ],
+      ),
+      body: Column(
+        children: [
+          TabBar(
+            controller: _tabController,
             labelColor: const Color(0xFFEC4899),
-            unselectedLabelColor: Colors.white38,
+            unselectedLabelColor: isDark ? Colors.white38 : Colors.black26,
             indicatorColor: const Color(0xFFEC4899),
             indicatorWeight: 3,
+            dividerColor: Colors.transparent,
             labelStyle: TextStyle(
               fontSize: 14.sp,
               fontWeight: FontWeight.w900,
@@ -73,57 +93,78 @@ class SocialScreen extends HookConsumerWidget {
               Tab(text: 'أصدقائي'),
             ],
           ),
-        ),
-        body: Container(
-          color: const Color(0xFF0B1120),
-          child: TabBarView(
-            controller: tabController,
-            children: const [
-              SearchUsersTab(),
-              PendingRequestsTab(),
-              FriendsListTab(),
-            ],
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: const [
+                SearchUsersTab(),
+                PendingRequestsTab(),
+                FriendsListTab(),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 }
 
-class SearchUsersTab extends HookConsumerWidget {
+class SearchUsersTab extends ConsumerStatefulWidget {
   const SearchUsersTab({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final searchController = useTextEditingController();
-    final searchResults = useState<List<dynamic>>([]);
-    final isLoading = useState(false);
+  ConsumerState<SearchUsersTab> createState() => _SearchUsersTabState();
+}
 
-    Future<void> handleSearch(String val) async {
-      if (val.length < 2) return;
-      isLoading.value = true;
-      try {
-        final results =
-            await ref.read(socialRepositoryProvider).searchUsers(val);
-        searchResults.value = results;
-      } finally {
-        isLoading.value = false;
-      }
+class _SearchUsersTabState extends ConsumerState<SearchUsersTab> {
+  final TextEditingController _searchController = TextEditingController();
+  List<dynamic> _searchResults = [];
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleSearch(String val) async {
+    if (val.length < 2) {
+      if (mounted) setState(() => _searchResults = []);
+      return;
     }
+    if (mounted) setState(() => _isLoading = true);
+    try {
+      final results = await ref.read(socialRepositoryProvider).searchUsers(val);
+      if (mounted) setState(() => _searchResults = results);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
-      padding: EdgeInsets.all(20.w),
+      padding: EdgeInsets.symmetric(vertical: 20.h),
       child: Column(
         children: [
           TextField(
-            controller: searchController,
-            onChanged: (val) => handleSearch(val),
-            style: const TextStyle(color: Colors.white, fontFamily: 'SomarSans', fontWeight: FontWeight.bold),
+            controller: _searchController,
+            onChanged: (val) => _handleSearch(val),
+            style: TextStyle(
+              color: isDark ? Colors.white : AppColors.textBlack, 
+              fontFamily: 'SomarSans', 
+              fontWeight: FontWeight.bold
+            ),
             decoration: InputDecoration(
               hintText: 'ابحث عن اسم زميلك...',
-              hintStyle: const TextStyle(color: Colors.white24, fontFamily: 'SomarSans'),
+              hintStyle: TextStyle(
+                color: isDark ? Colors.white24 : Colors.black26, 
+                fontFamily: 'SomarSans'
+              ),
               prefixIcon: const Icon(Icons.search, color: Color(0xFF00C6E0)),
-              fillColor: const Color(0xFF1E293B),
+              fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
               filled: true,
               contentPadding: EdgeInsets.symmetric(vertical: 16.h),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(22.r), borderSide: BorderSide.none),
@@ -132,27 +173,37 @@ class SearchUsersTab extends HookConsumerWidget {
             ),
           ),
           25.verticalSpace,
-          if (isLoading.value)
+          if (_isLoading)
             const Center(child: CircularProgressIndicator(color: Color(0xFF00C6E0)))
           else
             Expanded(
-              child: searchResults.value.isEmpty
+              child: _searchResults.isEmpty
                   ? Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.search_rounded, size: 70.sp, color: Colors.white.withOpacity(0.05)),
+                          Icon(
+                            Icons.search_rounded, 
+                            size: 70.sp, 
+                            color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05)
+                          ),
                           15.verticalSpace,
-                          Text("ابحث عن مستخدمين لتحديهم!", style: TextStyle(color: Colors.white24, fontSize: 14.sp, fontFamily: 'SomarSans')),
+                          Text(
+                            "ابحث عن مستخدمين لتحديهم!", 
+                            style: TextStyle(
+                              color: isDark ? Colors.white24 : Colors.black26, 
+                              fontSize: 14.sp, 
+                              fontFamily: 'SomarSans'
+                            )
+                          ),
                         ],
                       ),
                     )
                   : ListView.builder(
                       physics: const BouncingScrollPhysics(),
-                      itemCount: searchResults.value.length,
+                      itemCount: _searchResults.length,
                       itemBuilder: (context, index) {
-                        final u = searchResults.value[index];
-                        return _buildUserListItem(u, ref, context, isSearch: true);
+                        return _SocialUserItem(u: _searchResults[index], isSearch: true);
                       },
                     ),
             ),
@@ -160,15 +211,85 @@ class SearchUsersTab extends HookConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildUserListItem(dynamic u, WidgetRef ref, BuildContext context, {bool isSearch = false, bool isPending = false, bool isFriend = false}) {
+class PendingRequestsTab extends ConsumerWidget {
+  const PendingRequestsTab({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ref.watch(pendingRequestsProvider).when(
+          data: (requests) {
+            if (requests.isEmpty) {
+              final isDark = Theme.of(context).brightness == Brightness.dark;
+              return Center(child: Text("لا توجد طلبات معلقة 📥", style: TextStyle(color: isDark ? Colors.white24 : Colors.black26, fontFamily: 'SomarSans')));
+            }
+            return ListView.builder(
+              padding: EdgeInsets.symmetric(vertical: 20.h),
+              itemCount: requests.length,
+              itemBuilder: (context, index) {
+                return _SocialUserItem(u: requests[index]['sender'], isPending: true);
+              },
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF00C6E0))),
+          error: (err, stack) => Center(child: Text('Error: $err', style: const TextStyle(color: Colors.red))),
+        );
+  }
+}
+
+class FriendsListTab extends ConsumerWidget {
+  const FriendsListTab({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ref.watch(friendsListProvider).when(
+          data: (friends) {
+            if (friends.isEmpty) {
+              final isDark = Theme.of(context).brightness == Brightness.dark;
+              return Center(child: Text("ابدأ بإضافة أصدقاء جدد! 👋", style: TextStyle(color: isDark ? Colors.white24 : Colors.black26, fontFamily: 'SomarSans')));
+            }
+            return ListView.builder(
+              padding: EdgeInsets.symmetric(vertical: 20.h),
+              itemCount: friends.length,
+              itemBuilder: (context, index) {
+                return _SocialUserItem(u: friends[index], isFriend: true);
+              },
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF00C6E0))),
+          error: (err, stack) => Center(child: Text('Error: $err', style: const TextStyle(color: Colors.red))),
+        );
+  }
+}
+
+class _SocialUserItem extends ConsumerWidget {
+  final dynamic u;
+  final bool isSearch;
+  final bool isPending;
+  final bool isFriend;
+
+  const _SocialUserItem({
+    required this.u,
+    this.isSearch = false,
+    this.isPending = false,
+    this.isFriend = false,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: isDark ? Colors.white.withOpacity(0.03) : Colors.black.withOpacity(0.03),
         borderRadius: BorderRadius.circular(22.r),
-        border: Border.all(color: Colors.white.withOpacity(0.06), width: 1.5),
+        border: Border.all(
+          color: isDark ? Colors.white.withOpacity(0.06) : Colors.black.withOpacity(0.06), 
+          width: 1.5
+        ),
       ),
       child: Row(
         children: [
@@ -180,37 +301,48 @@ class SearchUsersTab extends HookConsumerWidget {
               children: [
                 Text(
                   u['name'] ?? 'مستخدم',
-                  style: TextStyle(color: Colors.white, fontSize: 15.sp, fontWeight: FontWeight.w900, fontFamily: 'SomarSans'),
+                  style: TextStyle(
+                    color: isDark ? Colors.white : AppColors.textBlack, 
+                    fontSize: 15.sp, 
+                    fontWeight: FontWeight.w900, 
+                    fontFamily: 'SomarSans'
+                  ),
                 ),
                 Text(
                   "المستوى: ${u['points'] ?? 0}",
-                  style: TextStyle(color: Colors.white38, fontSize: 12.sp, fontFamily: 'SomarSans'),
+                  style: TextStyle(
+                    color: isDark ? Colors.white38 : Colors.black38, 
+                    fontSize: 12.sp, 
+                    fontFamily: 'SomarSans'
+                  ),
                 ),
               ],
             ),
           ),
           if (isSearch)
-            _buildActionBtn("إضافة", const Color(0xFF00C6E0), () async {
+            _buildActionBtn(context, "إضافة", const Color(0xFF00C6E0), () async {
               await ref.read(socialRepositoryProvider).sendFriendRequest(u['id']);
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("تم إرسال طلب الصداقة بنجاح")));
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("تم إرسال طلب الصداقة بنجاح")));
+              }
             }),
           if (isPending)
             Row(
               children: [
-                _buildActionBtn("قبول", Colors.green, () async {
+                _buildActionBtn(context, "قبول", Colors.green, () async {
                   await ref.read(socialRepositoryProvider).acceptFriendRequest(u['id']);
                   ref.invalidate(pendingRequestsProvider);
                   ref.invalidate(friendsListProvider);
                 }),
                 10.horizontalSpace,
-                _buildActionBtn("حذف", Colors.redAccent, () async {
+                _buildActionBtn(context, "حذف", Colors.redAccent, () async {
                   await ref.read(socialRepositoryProvider).rejectFriendRequest(u['id']);
                   ref.invalidate(pendingRequestsProvider);
                 }),
               ],
             ),
           if (isFriend)
-            _buildActionBtn("تحدي ⚔️", const Color(0xFFEC4899), () {
+            _buildActionBtn(context, "تحدي ⚔️", const Color(0xFFEC4899), () {
               _showInvitationSettings(context, ref, u);
             }),
         ],
@@ -219,36 +351,44 @@ class SearchUsersTab extends HookConsumerWidget {
   }
 
   Widget _buildHexagonAvatar(dynamic pic) {
-    return Container(
-      width: 52.w,
-      height: 58.h,
-      decoration: const ShapeDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF1CB0F6), Color(0xFF0A66C2)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-        shape: HexagonShapeBorder(),
-      ),
-      padding: const EdgeInsets.all(2),
-      child: Container(
-        decoration: const ShapeDecoration(
-          color: Color(0xFF1E293B),
-          shape: HexagonShapeBorder(),
-        ),
-        child: ClipPath(
-          clipper: _HexagonClipper(),
-          child: CachedNetworkImage(
-            imageUrl: _getValidUrl(pic),
-            fit: BoxFit.cover,
-            errorWidget: (c, e, s) => const Icon(Icons.person, color: Colors.white10),
+    return Consumer(
+      builder: (context, ref, child) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return Container(
+          width: 52.w,
+          height: 58.h,
+          decoration: const ShapeDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF1CB0F6), Color(0xFF0A66C2)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            shape: HexagonShapeBorder(),
           ),
-        ),
-      ),
+          padding: const EdgeInsets.all(2),
+          child: Container(
+            decoration: ShapeDecoration(
+              color: isDark ? const Color(0xFF1E293B) : Colors.white,
+              shape: HexagonShapeBorder(),
+            ),
+            child: ClipPath(
+              clipper: _HexagonClipper(),
+              child: CachedNetworkImage(
+                imageUrl: _getValidUrl(pic),
+                fit: BoxFit.cover,
+                errorWidget: (c, e, s) => Icon(
+                  Icons.person, 
+                  color: isDark ? Colors.white10 : Colors.black12
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildActionBtn(String label, Color color, VoidCallback onTap) {
+  Widget _buildActionBtn(BuildContext context, String label, Color color, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -278,9 +418,9 @@ class SearchUsersTab extends HookConsumerWidget {
     return 'https://gcc.tayssir-bac.com/storage/${url.replaceAll(RegExp(r"^/"), "")}';
   }
 
-  void _showInvitationSettings(
-      BuildContext context, WidgetRef ref, dynamic friend) {
+  void _showInvitationSettings(BuildContext context, WidgetRef ref, dynamic friend) {
     final courses = ref.read(dataProvider).contentData.modules;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     showModalBottomSheet(
       context: context,
@@ -289,14 +429,26 @@ class SearchUsersTab extends HookConsumerWidget {
       builder: (ctx) => Container(
         padding: EdgeInsets.all(24.w),
         height: 600.h,
-        decoration: const BoxDecoration(
-          color: Color(0xFF0F172A),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF0F172A) : Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
-          border: Border(top: BorderSide(color: Colors.white10, width: 1)),
+          border: Border(
+            top: BorderSide(
+              color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05), 
+              width: 1
+            )
+          ),
         ),
         child: Column(
           children: [
-            Container(width: 50.w, height: 5.h, decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(10))),
+            Container(
+              width: 50.w, 
+              height: 5.h, 
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05), 
+                borderRadius: BorderRadius.circular(10)
+              )
+            ),
             30.verticalSpace,
             Text('اختر المادة للتحدي ⚔️',
                 style: TextStyle(
@@ -314,19 +466,26 @@ class SearchUsersTab extends HookConsumerWidget {
                   return Container(
                     margin: EdgeInsets.only(bottom: 12.h),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
+                      color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.03),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withOpacity(0.05)),
+                      border: Border.all(
+                        color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.03)
+                      ),
                     ),
                     child: ListTile(
                       contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
                       title: Text(course.title,
                           style: TextStyle(
-                              color: Colors.white, 
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16.sp,
-                              fontFamily: 'SomarSans')),
-                      trailing: const Icon(Icons.arrow_back_ios_new, color: Colors.white24, size: 18),
+                            color: isDark ? Colors.white : AppColors.textBlack, 
+                            fontWeight: FontWeight.bold, 
+                            fontSize: 16.sp, 
+                            fontFamily: 'SomarSans'
+                          )),
+                      trailing: Icon(
+                        Icons.arrow_back_ios_new, 
+                        color: isDark ? Colors.white24 : Colors.black26, 
+                        size: 18
+                      ),
                       onTap: () {
                         Navigator.pop(ctx);
                         _showUnitSelection(context, ref, friend, course);
@@ -342,14 +501,9 @@ class SearchUsersTab extends HookConsumerWidget {
     );
   }
 
-  void _showUnitSelection(BuildContext context, WidgetRef ref, dynamic friend,
-      MaterialModel course) {
-    final units = ref
-        .read(dataProvider)
-        .contentData
-        .units
-        .where((u) => u.materialId == course.id)
-        .toList();
+  void _showUnitSelection(BuildContext context, WidgetRef ref, dynamic friend, MaterialModel course) {
+    final units = ref.read(dataProvider).contentData.units.where((u) => u.materialId == course.id).toList();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     showModalBottomSheet(
       context: context,
@@ -358,14 +512,26 @@ class SearchUsersTab extends HookConsumerWidget {
       builder: (ctx) => Container(
         padding: EdgeInsets.all(24.w),
         height: 600.h,
-        decoration: const BoxDecoration(
-          color: Color(0xFF0F172A),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF0F172A) : Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
-          border: Border(top: BorderSide(color: Colors.white10, width: 1)),
+          border: Border(
+            top: BorderSide(
+              color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05), 
+              width: 1
+            )
+          ),
         ),
         child: Column(
           children: [
-            Container(width: 50.w, height: 5.h, decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(10))),
+            Container(
+              width: 50.w, 
+              height: 5.h, 
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05), 
+                borderRadius: BorderRadius.circular(10)
+              )
+            ),
             30.verticalSpace,
             Text('اختر المحور للتحدي 🎯',
                 style: TextStyle(
@@ -378,7 +544,7 @@ class SearchUsersTab extends HookConsumerWidget {
             if (units.isEmpty)
               Padding(
                 padding: EdgeInsets.only(top: 50.h),
-                child: Text('لا توجد محاور متاحة حالياً.', style: TextStyle(color: Colors.white38, fontFamily: 'SomarSans', fontSize: 14.sp)),
+                child: Text('لا توجد محاور متاحة حالياً.', style: TextStyle(color: isDark ? Colors.white38 : Colors.black38, fontFamily: 'SomarSans', fontSize: 14.sp)),
               )
             else
               Expanded(
@@ -389,13 +555,15 @@ class SearchUsersTab extends HookConsumerWidget {
                     return Container(
                       margin: EdgeInsets.only(bottom: 12.h),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
+                        color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.03),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.white.withOpacity(0.05)),
+                        border: Border.all(
+                          color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.03)
+                        ),
                       ),
                       child: ListTile(
                         contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
-                        title: Text(unit.title, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16.sp, fontFamily: 'SomarSans')),
+                        title: Text(unit.title, style: TextStyle(color: isDark ? Colors.white : AppColors.textBlack, fontWeight: FontWeight.bold, fontSize: 16.sp, fontFamily: 'SomarSans')),
                         trailing: const Icon(Icons.play_circle_fill, color: Color(0xFF00C6E0), size: 30),
                         onTap: () async {
                           Navigator.pop(ctx);
@@ -412,91 +580,33 @@ class SearchUsersTab extends HookConsumerWidget {
     );
   }
 
-  Future<void> _handleInvite(BuildContext context, WidgetRef ref,
-      dynamic friend, dynamic unit, String courseTitle) async {
+  Future<void> _handleInvite(BuildContext context, WidgetRef ref, dynamic friend, dynamic unit, String courseTitle) async {
     try {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('جاري تجهيز التحدي وإرسال الدعوة...')));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('جاري تجهيز التحدي وإرسال الدعوة...')));
+      }
 
-      final matchmaking = ref.read(matchmakingServiceProvider);
-      final social = ref.read(socialRepositoryProvider);
-
-      // 1. Create Private Match
-      final code = await matchmaking.createPrivateMatch(unit.id, courseTitle);
-
-      // 2. Send Invitation Push
-      await social.sendChallengeInvite(
+      final code = await ref.read(matchmakingServiceProvider).createPrivateMatch(unit.id, courseTitle);
+      await ref.read(socialRepositoryProvider).sendChallengeInvite(
         receiverId: friend['id'],
         unitId: unit.id,
         courseTitle: courseTitle,
         invitationCode: code,
       );
 
-      // 3. Go to Matchmaking Screen
       if (context.mounted) {
-        context.pushNamed(
-          AppRoutes.challengeMatchmaking.name,
-          extra: {
-            'unitId': unit.id,
-            'courseTitle': courseTitle,
-            'initialSearchMode': 'create_private',
-            'invitationCode': code,
-          },
-        );
+        context.pushNamed(AppRoutes.challengeMatchmaking.name, extra: {
+          'unitId': unit.id,
+          'courseTitle': courseTitle,
+          'initialSearchMode': 'create_private',
+          'invitationCode': code,
+        });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('خطأ: $e')));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('خطأ: $e')));
+      }
     }
-  }
-}
-class PendingRequestsTab extends HookConsumerWidget {
-  const PendingRequestsTab({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final searchUsersTab = SearchUsersTab();
-    return ref.watch(pendingRequestsProvider).when(
-          data: (requests) {
-            if (requests.isEmpty) {
-              return const Center(child: Text("لا توجد طلبات معلقة 📥", style: TextStyle(color: Colors.white24, fontFamily: 'SomarSans')));
-            }
-            return ListView.builder(
-              padding: EdgeInsets.all(16.w),
-              itemCount: requests.length,
-              itemBuilder: (context, index) {
-                return searchUsersTab._buildUserListItem(requests[index]['sender'], ref, context, isPending: true);
-              },
-            );
-          },
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, stack) => Center(child: Text('Error: $err')),
-        );
-  }
-}
-
-class FriendsListTab extends HookConsumerWidget {
-  const FriendsListTab({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final searchUsersTab = SearchUsersTab();
-    return ref.watch(friendsListProvider).when(
-          data: (friends) {
-            if (friends.isEmpty) {
-              return const Center(child: Text("ابدأ بإضافة أصدقاء جدد! 👋", style: TextStyle(color: Colors.white24, fontFamily: 'SomarSans')));
-            }
-            return ListView.builder(
-              padding: EdgeInsets.all(16.w),
-              itemCount: friends.length,
-              itemBuilder: (context, index) {
-                return searchUsersTab._buildUserListItem(friends[index], ref, context, isFriend: true);
-              },
-            );
-          },
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, stack) => Center(child: Text('Error: $err')),
-        );
   }
 }
 

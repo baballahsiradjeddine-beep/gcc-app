@@ -48,67 +48,82 @@ class SubscriptionOptionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          PushableButton(
-            height: discountedPrice != null || percentageDiscount != null
-                ? 140.h
-                : 100.h,
-            allowDisabledClick: true,
-            elevation: 7,
-            onPressed: !isSelected ? onPressed : null,
-            hslColor: HSLColor.fromColor(innerColor),
-            hasBorder: false,
-            borderRadius: 16,
-            hslDisabledColor: HSLColor.fromColor(disabledColor ?? innerColor),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              decoration: BoxDecoration(
-                gradient: isSelected
-                    ? LinearGradient(
-                        colors: gradientColors,
-                      )
-                    : null,
-                color: isSelected ? null : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E293B) : AppColors.surfaceWhite),
-                borderRadius: const BorderRadius.all(
-                  Radius.circular(16),
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 8.h),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24.r),
+          gradient: isSelected
+              ? LinearGradient(
+                  colors: gradientColors,
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          color: isSelected ? null : (isDark ? const Color(0xFF1E293B) : Colors.white),
+          boxShadow: [
+            BoxShadow(
+              color: isSelected 
+                  ? gradientColors.first.withOpacity(0.3) 
+                  : (isDark ? Colors.black26 : Colors.black.withOpacity(0.04)),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
+          ],
+          border: Border.all(
+            color: isSelected 
+                ? Colors.white.withOpacity(0.2) 
+                : (isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.02)),
+            width: 1.5,
+          ),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24.r),
+          child: Stack(
+            children: [
+              if (isSelected)
+                Positioned.fill(
+                  child: Opacity(
+                    opacity: 0.1,
+                    child: CustomPaint(
+                      painter: _DotPatternPainter(),
+                    ),
+                  ),
                 ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _buildPriceSection(),
-                  10.verticalSpace,
-                  SizedBox(
-                    width: 0.6.sw,
-                    child: Text(
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildPriceSection(),
+                    12.verticalSpace,
+                    Text(
                       descriptionText,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color:
-                            isSelected ? descriptionColor : AppColors.textBlack,
-                        fontSize: descriptionFontSize,
-                        fontWeight: descriptionFontWeight,
+                        color: isSelected ? Colors.white.withOpacity(0.9) : (isDark ? Colors.white70 : const Color(0xFF64748B)),
+                        fontSize: descriptionFontSize.sp,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'SomarSans',
+                        height: 1.4,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+              if (hasDiscount && isSelected)
+                Positioned(
+                  top: 12.h,
+                  left: 12.w,
+                  child: _buildDiscountBadge(),
+                ),
+            ],
           ),
-
-          // Discount Badge
-          if (hasDiscount && isSelected)
-            Positioned(
-              top: -8,
-              left: 16,
-              child: _buildDiscountBadge(),
-            ),
-        ],
+        ),
       ),
     );
   }
@@ -252,4 +267,23 @@ class SubscriptionOptionWidget extends StatelessWidget {
       ),
     );
   }
+}
+
+class _DotPatternPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.2);
+
+    const double spacing = 12.0;
+
+    for (double i = 0; i < size.width; i += spacing) {
+      for (double j = 0; j < size.height; j += spacing) {
+        canvas.drawCircle(Offset(i, j), 1.0, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

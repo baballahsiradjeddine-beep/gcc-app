@@ -32,78 +32,60 @@ class ResultBottomSheet extends ConsumerWidget {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     final Color primaryColor = isCorrect ? const Color(0xFF10B981) : const Color(0xFFF43F5E);
-    final Color secondaryColor = isCorrect ? const Color(0xFF059669) : const Color(0xFFE11D48);
 
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [primaryColor, secondaryColor],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: primaryColor,
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(40.r),
-          topRight: Radius.circular(40.r),
+          topLeft: Radius.circular(32.r),
+          topRight: Radius.circular(32.r),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: primaryColor.withOpacity(0.4),
-            blurRadius: 30,
-            offset: const Offset(0, -10),
-          ),
-        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(40.r),
-          topRight: Radius.circular(40.r),
+          topLeft: Radius.circular(32.r),
+          topRight: Radius.circular(32.r),
         ),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
           child: Container(
-            padding: EdgeInsets.fromLTRB(24.w, 32.h, 24.w, 40.h),
+            padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 32.h),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Header Row
+                // Header Row (RTL friendly)
                 Row(
                   children: [
-                    // Icon Wrapper
+                    // Right: Status Icon
                     Container(
-                      width: 50.sp,
-                      height: 50.sp,
+                      width: 44.sp,
+                      height: 44.sp,
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF334155) : AppColors.surfaceWhite,
-                        borderRadius: BorderRadius.circular(16.r),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(14.r),
                       ),
                       child: Icon(
-                        isCorrect ? Icons.check_circle_rounded : Icons.close_rounded,
-                        color: primaryColor,
-                        size: 32.sp,
+                        isCorrect ? Icons.check_circle_rounded : Icons.info_rounded,
+                        color: Colors.white,
+                        size: 28.sp,
                       ),
                     ),
-                    16.horizontalSpace,
-                    // Title
+                    12.horizontalSpace,
+                    // Center: Result Text
                     Expanded(
                       child: Text(
-                        isCorrect ? 'صحيح ! أحسنت' : 'أوبس! إجابة غير دقيقة',
+                        isCorrect ? 'صحيح ! أحسنت' : 'أوبس! إجابة خاطئة',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 24.sp,
+                          fontSize: 20.sp,
                           fontWeight: FontWeight.w900,
                           fontFamily: 'SomarSans',
                         ),
                       ),
                     ),
-                    // Action Buttons (Report, Video)
+                    // Left: Actions (Video/Report)
                     Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         if (hasVideo)
                           IconButton(
@@ -111,8 +93,11 @@ class ResultBottomSheet extends ConsumerWidget {
                               context.pop();
                               ref.read(exercicesProvider.notifier).showVideo();
                             },
-                            icon: const Icon(Icons.play_circle_fill, color: Colors.white, size: 30),
+                            icon: const Icon(Icons.play_circle_fill, color: Colors.white, size: 28),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
                           ),
+                        if (hasVideo) 8.horizontalSpace,
                         IconButton(
                           onPressed: () {
                             showDialog(
@@ -121,7 +106,9 @@ class ResultBottomSheet extends ConsumerWidget {
                               builder: (context) => const ReportExoDialog(),
                             );
                           },
-                          icon: const Icon(Icons.report_problem_rounded, color: Colors.white, size: 28),
+                          icon: const Icon(Icons.report_gmailerrorred_rounded, color: Colors.white70, size: 24),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
                         ),
                       ],
                     ),
@@ -187,8 +174,7 @@ class ResultBottomSheet extends ConsumerWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.r),
                       ),
-                      elevation: 8,
-                      shadowColor: Colors.black.withOpacity(0.2),
+                      elevation: 0,
                     ),
                     child: Text(
                       'التالي',

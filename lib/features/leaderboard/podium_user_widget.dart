@@ -7,6 +7,7 @@ import 'package:tayssir/constants/app_consts.dart';
 import 'package:tayssir/features/leaderboard/leaderboard_user.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';
 import 'package:tayssir/resources/colors/app_colors.dart';
+import 'package:tayssir/common/core/shield_badge.dart';
 
 class PodiumUserWidget extends ConsumerWidget {
   final LeaderboardUser user;
@@ -49,45 +50,17 @@ class PodiumUserWidget extends ConsumerWidget {
               alignment: Alignment.center,
               clipBehavior: Clip.none,
               children: [
-                // Avatar
-                Container(
+                // Shield Badge Avatar
+                ShieldBadge(
+                  userAvatarUrl: user.prodImage,
+                  badgeIconUrl: user.badge?.completeIconUrl,
+                  themeColor: user.badge?.color != null 
+                      ? Color(int.parse(user.badge!.color!.replaceAll('#', '0xFF')))
+                      : const Color(0xFF00B4D8),
                   width: size,
-                  height: size,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: isMe 
-                          ? AppColors.primaryColor.withOpacity(0.5) 
-                          : (isDark ? AppColors.greyColor.withOpacity(0.3) : Colors.grey.shade200),
-                      width: 2.w,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(2.w),
-                    child: CachedNetworkImage(
-                      imageUrl: user.prodImage ?? AppConsts.defaultImageUrl,
-                      imageBuilder: (context, imageProvider) => Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: imageProvider,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      placeholder: (context, url) => Shimmer.fromColors(
-                        baseColor: isDark ? AppColors.greyColor.withOpacity(0.2) : Colors.grey.shade200,
-                        highlightColor: isDark ? AppColors.greyColor.withOpacity(0.3) : Colors.grey.shade50,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: isDark ? const Color(0xFF334155) : Colors.white,
-                          ),
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => const Icon(Icons.person),
-                    ),
-                  ),
+                  height: size * 1.25,
+                  avatarPaddingTop: size * 0.25,
+                  avatarSize: size * 0.85,
                 ),
                 
                 // Rank Badge
@@ -152,7 +125,7 @@ class PodiumUserWidget extends ConsumerWidget {
                   ),
               ],
             ),
-            20.verticalSpace,
+            30.verticalSpace,
             // Name
             Text(
               isMe ? "أنت (${user.name})" : user.name,

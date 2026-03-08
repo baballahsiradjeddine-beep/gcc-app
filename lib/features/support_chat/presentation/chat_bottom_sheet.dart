@@ -28,12 +28,15 @@ class ChatBottomSheet extends HookConsumerWidget {
         }
       });
       return null;
-    }, [chatState.messages.length]);
+    }, [chatState.messages.length, MediaQuery.of(context).viewInsets.bottom]);
 
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     
+    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+
     return Container(
       height: 0.85.sh,
+      padding: EdgeInsets.only(bottom: bottomPadding),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF0F172A) : AppColors.surfaceWhite,
         borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
@@ -72,7 +75,7 @@ class ChatBottomSheet extends HookConsumerWidget {
 
           // Input Area
           _ChatInput(controller: textController, isLoading: chatState.isLoading),
-          16.verticalSpace,
+          10.verticalSpace,
         ],
       ),
     );

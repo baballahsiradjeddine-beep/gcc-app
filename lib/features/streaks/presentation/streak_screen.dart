@@ -41,12 +41,9 @@ class StreakScreen extends HookConsumerWidget {
       onPopScope: () {},
       paddingX: 0,
       paddingY: 0,
-      body: Container(
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF0F172A) : AppColors.scaffoldColor,
-        ),
-        child: Stack(
-          children: [
+      bodyBackgroundColor: isDark ? const Color(0xFF0F172A) : AppColors.scaffoldColor,
+      body: Stack(
+        children: [
             // Ambient Orance Glow (Top)
             Positioned(
               top: -100.h,
@@ -209,18 +206,7 @@ class StreakScreen extends HookConsumerWidget {
                       ),
                     ),
 
-                    const Spacer(flex: 2),
-
-                    // Tito Mascot
-                    SizedBox(
-                      height: 130.h,
-                      child: DynamicAppAsset(
-                        assetKey: 'tito_good',
-                        fallbackAssetPath: SVGs.titoGood,
-                        type: AppAssetType.svg,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
+                    const Spacer(flex: 3),
 
                     const Spacer(flex: 1),
 
@@ -271,8 +257,7 @@ class StreakScreen extends HookConsumerWidget {
                 ),
               ),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }

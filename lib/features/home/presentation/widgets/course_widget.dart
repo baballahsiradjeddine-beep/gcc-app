@@ -48,11 +48,6 @@ class CardWidget extends ConsumerWidget {
 
   Widget _buildGridCard(BuildContext context, WidgetRef ref) {
     // Default to math image if empty
-    final String actualGridImage = imageGrid.isNotEmpty ? imageGrid : 'modules/images_grid/math.png';
-    final String fullImageUrl = actualGridImage.startsWith('http') 
-        ? actualGridImage 
-        : 'https://gcc.tayssir-bac.com/storage/${actualGridImage.replaceAll(RegExp(r'^/'), '')}';
-
     return GestureDetector(
       onTap: () {
         if (!isLocked) {
@@ -97,19 +92,14 @@ class CardWidget extends ConsumerWidget {
               
               // Image (Vertically Centered on the LEFT)
               Positioned(
-                left: -22.w, // Brought back inside from -45.w
+                left: -22.w,
                 top: 0,
                 bottom: 0,
                 child: Center(
-                  child: CachedNetworkImage(
-                    imageUrl: fullImageUrl,
-                    height: 105.h,
-                    width: 105.h,
-                    fit: BoxFit.contain,
-                    errorWidget: (context, url, error) => Text(
-                      _getEmojiForSubject(title),
-                      style: TextStyle(fontSize: 75.sp),
-                    ),
+                  child: _buildImageWidget(
+                    isGrid ? (toolImage?.grid ?? imageGrid) : (toolImage?.list ?? imageList),
+                    105.h,
+                    isGrid ? 105.h : 105.h,
                   ),
                 ),
               ),
@@ -192,11 +182,6 @@ class CardWidget extends ConsumerWidget {
 
   Widget _buildListCard(BuildContext context, WidgetRef ref) {
     // Default to math image if empty
-    final String actualListImage = imageList.isNotEmpty ? imageList : 'modules/images_list/math.png';
-    final String fullImageUrl = actualListImage.startsWith('http') 
-        ? actualListImage 
-        : 'https://gcc.tayssir-bac.com/storage/${actualListImage.replaceAll(RegExp(r'^/'), '')}';
-
     return GestureDetector(
       onTap: () {
         if (!isLocked) {
@@ -301,15 +286,10 @@ class CardWidget extends ConsumerWidget {
                     16.horizontalSpace,
 
                     // Image (Strictly Left side in RTL Row)
-                    CachedNetworkImage(
-                      imageUrl: fullImageUrl,
-                      height: 105.h,
-                      width: 105.h,
-                      fit: BoxFit.contain,
-                      errorWidget: (context, url, error) => Text(
-                        _getEmojiForSubject(title),
-                        style: TextStyle(fontSize: 90.sp),
-                      ),
+                    _buildImageWidget(
+                      toolImage?.list ?? imageList,
+                      105.h,
+                      105.h,
                     ),
                   ],
                 ),
@@ -317,6 +297,42 @@ class CardWidget extends ConsumerWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildImageWidget(String imagePath, double height, double width) {
+    if (imagePath.isEmpty) {
+      // Default fallback for subjects/tools
+      final fallbackPath = isGrid ? 'modules/images_grid/math.png' : 'modules/images_list/math.png';
+      return _renderNetworkImage(fallbackPath, height, width);
+    }
+
+    if (imagePath.startsWith('assets/')) {
+      return Image.asset(
+        imagePath,
+        height: height,
+        width: width,
+        fit: BoxFit.contain,
+      );
+    }
+
+    return _renderNetworkImage(imagePath, height, width);
+  }
+
+  Widget _renderNetworkImage(String path, double height, double width) {
+    final String fullImageUrl = path.startsWith('http')
+        ? path
+        : 'https://gcc.tayssir-bac.com/storage/${path.replaceAll(RegExp(r'^/'), '')}';
+
+    return CachedNetworkImage(
+      imageUrl: fullImageUrl,
+      height: height,
+      width: width,
+      fit: BoxFit.contain,
+      errorWidget: (context, url, error) => Text(
+        _getEmojiForSubject(title),
+        style: TextStyle(fontSize: isGrid ? 75.sp : 90.sp),
       ),
     );
   }

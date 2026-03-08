@@ -35,31 +35,30 @@ class NotificationCard extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 0.w, vertical: 8.h),
+      margin: EdgeInsets.only(bottom: 16.h),
       decoration: BoxDecoration(
-        color: notification.isRead 
-            ? (isDark ? const Color(0xFF1E293B).withOpacity(0.5) : AppColors.scaffoldColor)
-            : (isDark ? const Color(0xFF1E293B) : AppColors.surfaceWhite),
-        borderRadius: BorderRadius.circular(20.r),
+        color: isDark 
+            ? (notification.isRead ? const Color(0xFF1E293B).withOpacity(0.3) : const Color(0xFF1E293B))
+            : (notification.isRead ? Colors.white.withOpacity(0.6) : Colors.white),
+        borderRadius: BorderRadius.circular(24.r),
         border: Border.all(
-          color: notification.isRead 
-              ? (isDark ? const Color(0xFF334155).withOpacity(0.3) : const Color(0xFFE2E8F0))
-              : (isDark ? const Color(0xFF00B4D8).withOpacity(0.5) : const Color(0xFF00B4D8).withOpacity(0.2)),
-          width: 1.5,
+          color: isDark 
+              ? (notification.isRead ? Colors.white.withOpacity(0.05) : Colors.white.withOpacity(0.1))
+              : (notification.isRead ? Colors.grey.withOpacity(0.1) : Colors.white),
+          width: 1,
         ),
         boxShadow: [
-          if (!notification.isRead)
-            BoxShadow(
-              color: const Color(0xFF00B4D8).withOpacity(isDark ? 0.1 : 0.05),
-              blurRadius: 15,
-              offset: const Offset(0, 4),
-            ),
+          BoxShadow(
+            color: isDark ? Colors.black.withOpacity(0.2) : Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(20.r),
+          borderRadius: BorderRadius.circular(24.r),
           onTap: () {
             if (!notification.isRead) {
               ref
@@ -68,29 +67,29 @@ class NotificationCard extends ConsumerWidget {
             }
           },
           child: Padding(
-            padding: EdgeInsets.all(16.w),
+            padding: EdgeInsets.all(20.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.all(8.w),
+                      padding: EdgeInsets.all(10.w),
                       decoration: BoxDecoration(
                         color: notification.isRead 
-                            ? (isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9))
+                            ? (isDark ? Colors.white.withOpacity(0.05) : Colors.grey.withOpacity(0.05))
                             : const Color(0xFF00B4D8).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12.r),
+                        borderRadius: BorderRadius.circular(14.r),
                       ),
                       child: Icon(
                         notification.isRead ? Icons.notifications_none_rounded : Icons.notifications_active_rounded,
-                        size: 20.sp,
+                        size: 22.sp,
                         color: notification.isRead 
-                            ? (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B))
+                            ? (isDark ? Colors.white30 : Colors.grey.shade400)
                             : const Color(0xFF00B4D8),
                       ),
                     ),
-                    12.horizontalSpace,
+                    14.horizontalSpace,
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,11 +97,11 @@ class NotificationCard extends ConsumerWidget {
                           Text(
                             notification.title,
                             style: TextStyle(
-                              fontSize: 16.sp,
+                              fontSize: 15.sp,
                               fontWeight: FontWeight.w900,
                               color: notification.isRead
-                                  ? (isDark ? Colors.white60 : AppColors.textBody.withOpacity(0.6))
-                                  : (isDark ? Colors.white : AppColors.textBlack),
+                                  ? (isDark ? Colors.white38 : Colors.grey.shade500)
+                                  : (isDark ? Colors.white : const Color(0xFF1E293B)),
                               fontFamily: 'SomarSans',
                             ),
                           ),
@@ -110,8 +109,9 @@ class NotificationCard extends ConsumerWidget {
                           Text(
                             notification.time,
                             style: TextStyle(
-                              fontSize: 12.sp,
-                              color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
+                              fontSize: 11.sp,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white.withOpacity(0.2) : Colors.black.withOpacity(0.2),
                               fontFamily: 'SomarSans',
                             ),
                           ),
@@ -120,17 +120,19 @@ class NotificationCard extends ConsumerWidget {
                     ),
                     if (!notification.isRead)
                       Container(
-                        width: 10.w,
-                        height: 10.w,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF00B4D8),
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0xFF00B4D8),
-                              blurRadius: 4,
-                            )
-                          ]
+                        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF00B4D8).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        child: Text(
+                          'جديد',
+                          style: TextStyle(
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.w900,
+                            color: const Color(0xFF00B4D8),
+                            fontFamily: 'SomarSans',
+                          ),
                         ),
                       ),
                   ],
@@ -139,11 +141,11 @@ class NotificationCard extends ConsumerWidget {
                 Text(
                   notification.body,
                   style: TextStyle(
-                    fontSize: 14.sp,
+                    fontSize: 13.sp,
                     color: notification.isRead
-                        ? (isDark ? Colors.white38 : AppColors.textBody.withOpacity(0.4))
-                        : (isDark ? Colors.white70 : AppColors.textBody),
-                    height: 1.5,
+                        ? (isDark ? Colors.white.withOpacity(0.2) : Colors.grey.shade400)
+                        : (isDark ? Colors.white70 : const Color(0xFF475569)),
+                    height: 1.6,
                     fontFamily: 'SomarSans',
                     fontWeight: notification.isRead ? FontWeight.normal : FontWeight.w500,
                   ),

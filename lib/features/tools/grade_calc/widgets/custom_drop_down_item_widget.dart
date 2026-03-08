@@ -15,20 +15,28 @@ class CustomDropDownItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        SvgPicture.asset(
-          iconPath,
-          width: 20.w,
-        ),
-        Text(itemName,
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 4.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SvgPicture.asset(
+            iconPath,
+            width: 24.w,
+          ),
+          Text(
+            itemName,
             style: TextStyle(
-              color: AppColors.primaryColor,
-              fontSize: 16.sp,
-              fontWeight: FontWeight.bold,
-            )),
-      ],
+              color: isDark ? Colors.white : AppColors.textBlack,
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w900,
+              fontFamily: 'SomarSans',
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -31,104 +31,69 @@ class SubscriptionsScreen extends HookConsumerWidget {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AppScaffold(
-      paddingY: 0,
+      includeBackButton: true,
       topSafeArea: true,
+      paddingX: 20.w,
+      appBar: Text(
+        'الدفع والتفعيل ✅',
+        style: TextStyle(
+          fontSize: 22.sp,
+          fontWeight: FontWeight.w900,
+          color: isDark ? Colors.white : AppColors.textBlack,
+          fontFamily: 'SomarSans',
+        ),
+      ),
       body: Column(
         children: [
-          // Header Logo (matching other screens)
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                RichText(
-                  text: TextSpan(
-                    style: TextStyle(
-                      fontSize: 32.sp,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'SomarSans',
-                    ),
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  20.verticalSpace,
+                  // Dolphin & Speech Bubble
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TextSpan(
-                        text: "Tay",
-                        style: TextStyle(color: isDark ? Colors.white : const Color(0xFF1E293B)),
-                      ),
-                      const TextSpan(
-                        text: "ssir",
-                        style: TextStyle(color: Color(0xFF00B4D8)),
+                      Text(
+                        "🐬",
+                        style: TextStyle(fontSize: 70.sp),
+                      ).animate(onPlay: (c) => c.repeat(reverse: true))
+                       .moveY(begin: 0, end: -6, duration: 4.seconds, curve: Curves.easeInOutSine)
+                       .rotate(begin: -0.02, end: 0.01, duration: 4.seconds, curve: Curves.easeInOutSine),
+                      
+                      8.horizontalSpace,
+                      
+                      SizedBox(
+                        width: 170.w,
+                        child: const TitoBubbleTalkWidget(
+                          text: "لماذا تدفع شهرياً؟ تعلم طوال العام بسعر واحد! 😁",
+                          triangleSide: TriangleSide.right,
+                        ),
                       ),
                     ],
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => context.pop(),
-                  child: Container(
-                    padding: EdgeInsets.all(10.r),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.arrow_back_rounded,
-                      color: isDark ? Colors.white : const Color(0xFF64748B),
-                      size: 22.sp,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ).animate().fadeIn(),
-
-          Expanded(
-            child: SliverScrollingWidget(
-              children: [
-                20.verticalSpace,
-                
-                // Dolphin & Speech Bubble (Matched to payments.html)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "🐬",
-                      style: TextStyle(fontSize: 75.sp),
-                    ).animate(onPlay: (c) => c.repeat(reverse: true))
-                     .moveY(begin: 0, end: -6, duration: 4.seconds, curve: Curves.easeInOutSine)
-                     .rotate(begin: -0.02, end: 0.01, duration: 4.seconds, curve: Curves.easeInOutSine),
-                    
-                    8.horizontalSpace,
-                    
-                    SizedBox(
-                      width: 180.w,
-                      child: const TitoBubbleTalkWidget(
-                        text: "لماذا تدفع شهرياً؟ تعلم طوال العام بسعر واحد! 😁",
-                        triangleSide: TriangleSide.right,
-                      ),
-                    ),
-                  ],
-                ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.1, end: 0),
-                
-                20.verticalSpace,
-                
-                // Hero Banner
-                PremiumSubscriptionBanner(
-                  price: subscription.realPrice,
-                  description: subscription.description,
-                ).animate().fadeIn(delay: 200.ms).scale(curve: Curves.easeOutBack),
-                
-                24.verticalSpace,
-                
-                // Payment Title (with brand-primary indicator)
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4.w),
-                  child: Row(
+                  ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.1, end: 0),
+                  
+                  30.verticalSpace,
+                  
+                  // Hero Banner
+                  PremiumSubscriptionBanner(
+                    price: subscription.realPrice,
+                    description: subscription.description,
+                  ).animate().fadeIn(delay: 200.ms).scale(curve: Curves.easeOutBack),
+                  
+                  24.verticalSpace,
+                  
+                  // Payment Title
+                  Row(
                     children: [
                       Container(
-                        width: 4.w,
+                        width: 6.w,
                         height: 24.h,
                         decoration: BoxDecoration(
                           color: const Color(0xFF00B4D8),
-                          borderRadius: BorderRadius.circular(2.r),
+                          borderRadius: BorderRadius.circular(4.r),
                         ),
                       ),
                       12.horizontalSpace,
@@ -142,57 +107,48 @@ class SubscriptionsScreen extends HookConsumerWidget {
                         ),
                       ),
                     ],
-                  ),
-                ).animate().fadeIn(delay: 300.ms),
-                
-                20.verticalSpace,
-                
-                // Payment Methods List
-                ...paymentsMethodes.asMap().entries.map(
-                  (entry) {
-                    final index = entry.key;
-                    final method = entry.value;
-                    final isSelected = selectedPaymentMethod.value == method;
+                  ).animate().fadeIn(delay: 300.ms),
+                  
+                  20.verticalSpace,
+                  
+                  // Payment Methods List
+                  ...paymentsMethodes.asMap().entries.map(
+                    (entry) {
+                      final index = entry.key;
+                      final method = entry.value;
+                      final isSelected = selectedPaymentMethod.value == method;
 
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: 16.h),
-                      child: OptionSelection(
-                        iconPath: method.icon,
-                        text: method.value,
-                        subText: _getSubTextForMethod(method.value),
-                        onPressed: () => selectedPaymentMethod.value = method,
-                        isSelected: isSelected,
-                        accentColor: method.value.contains('إلكتروني') ? const Color(0xFFEC4899) : null,
-                      ).animate().fadeIn(delay: (400 + index * 100).ms).slideX(begin: 0.05, end: 0),
-                    );
-                  },
-                ),
-                
-                40.verticalSpace,
-              ],
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: 16.h),
+                        child: OptionSelection(
+                          iconPath: method.icon,
+                          text: method.value,
+                          subText: _getSubTextForMethod(method.value),
+                          onPressed: () => selectedPaymentMethod.value = method,
+                          isSelected: isSelected,
+                          accentColor: method.value.contains('إلكتروني') ? const Color(0xFFEC4899) : null,
+                        ).animate().fadeIn(delay: (400 + index * 100).ms).slideX(begin: 0.05, end: 0),
+                      );
+                    },
+                  ),
+                  
+                  20.verticalSpace,
+                ],
+              ),
             ),
           ),
           
           // Fixed Bottom Action
-          ClipRect(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                padding: EdgeInsets.fromLTRB(24.r, 12.r, 24.r, 32.r),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF0F172A).withOpacity(0.9) : Colors.white.withOpacity(0.9),
-                  border: Border(top: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9))),
-                ),
-                child: BigButton(
-                  text: AppStrings.continueText,
-                  onPressed: () {
-                    context.pushNamed(selectedPaymentMethod.value.path, extra: {
-                      'subscription': subscription,
-                    });
-                  },
-                ).animate().fadeIn(delay: 700.ms).scale(curve: Curves.easeOutBack),
-              ),
-            ),
+          Padding(
+            padding: EdgeInsets.only(bottom: 32.h, top: 16.h),
+            child: BigButton(
+              text: AppStrings.continueText,
+              onPressed: () {
+                context.pushNamed(selectedPaymentMethod.value.path, extra: {
+                  'subscription': subscription,
+                });
+              },
+            ).animate().fadeIn(delay: 700.ms).scale(curve: Curves.easeOutBack),
           ),
         ],
       ),

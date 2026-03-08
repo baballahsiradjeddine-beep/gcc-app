@@ -33,12 +33,7 @@ class BlurOverlayWidget extends StatelessWidget {
       body: Stack(
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(
-              20.r,
-              20.r,
-              20.r,
-              0.r,
-            ),
+            padding: padding ?? EdgeInsets.zero,
             child: child,
           ),
           if (showOverlay)

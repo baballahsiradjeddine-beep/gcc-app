@@ -80,13 +80,11 @@ class _AchievementLogScreenState extends ConsumerState<AchievementLogScreen> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AppScaffold(
-      topSafeArea: false,
+      topSafeArea: true,
       paddingX: 0,
-      body: Container(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
-        child: SafeArea(
-          child: Column(
-            children: [
+      bodyBackgroundColor: isDark ? const Color(0xFF0F172A) : Colors.white,
+      body: Column(
+        children: [
               // Header
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
@@ -176,10 +174,8 @@ class _AchievementLogScreenState extends ConsumerState<AchievementLogScreen> {
                   onPressed: _shareScreen,
                   buttonType: ButtonType.primary,
                 ),
-              ),
-            ],
           ),
-        ),
+        ],
       ),
     );
   }

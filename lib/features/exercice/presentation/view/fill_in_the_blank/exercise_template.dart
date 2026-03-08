@@ -44,7 +44,7 @@ class ExerciseTemplate extends HookConsumerWidget {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24.w),
+      padding: EdgeInsets.symmetric(horizontal: 12.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

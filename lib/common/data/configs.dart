@@ -26,6 +26,20 @@ class ConfigModel {
   final String titoAvailableMaterials;
   final String titoSocialLinks;
   final bool titoStrictMode;
+  
+  // Tool Images Overrides
+  final String toolCardsGrid;
+  final String toolCardsList;
+  final String toolResumesGrid;
+  final String toolResumesList;
+  final String toolBacSolutionsGrid;
+  final String toolBacSolutionsList;
+  final String toolPomodoroGrid;
+  final String toolPomodoroList;
+  final String toolGradeCalcGrid;
+  final String toolGradeCalcList;
+  final String toolAiPlannerGrid;
+  final String toolAiPlannerList;
 
   ConfigModel({
     required this.cardsActive,
@@ -49,6 +63,19 @@ class ConfigModel {
     required this.titoAvailableMaterials,
     required this.titoSocialLinks,
     required this.titoStrictMode,
+    // Tool Images
+    required this.toolCardsGrid,
+    required this.toolCardsList,
+    required this.toolResumesGrid,
+    required this.toolResumesList,
+    required this.toolBacSolutionsGrid,
+    required this.toolBacSolutionsList,
+    required this.toolPomodoroGrid,
+    required this.toolPomodoroList,
+    required this.toolGradeCalcGrid,
+    required this.toolGradeCalcList,
+    required this.toolAiPlannerGrid,
+    required this.toolAiPlannerList,
   });
   factory ConfigModel.fromMap(Map<String, dynamic> map) {
     return ConfigModel(
@@ -73,6 +100,20 @@ class ConfigModel {
       titoAvailableMaterials: map['tito_available_materials'] ?? '',
       titoSocialLinks: map['tito_social_links'] ?? '',
       titoStrictMode: map['tito_strict_mode'] ?? true,
+      
+      // Tool Images
+      toolCardsGrid: map['tool_cards_grid'] ?? '',
+      toolCardsList: map['tool_cards_list'] ?? '',
+      toolResumesGrid: map['tool_resumes_grid'] ?? '',
+      toolResumesList: map['tool_resumes_list'] ?? '',
+      toolBacSolutionsGrid: map['tool_bac_solutions_grid'] ?? '',
+      toolBacSolutionsList: map['tool_bac_solutions_list'] ?? '',
+      toolPomodoroGrid: map['tool_pomodoro_grid'] ?? '',
+      toolPomodoroList: map['tool_pomodoro_list'] ?? '',
+      toolGradeCalcGrid: map['tool_grade_calc_grid'] ?? '',
+      toolGradeCalcList: map['tool_grade_calc_list'] ?? '',
+      toolAiPlannerGrid: map['tool_ai_planner_grid'] ?? '',
+      toolAiPlannerList: map['tool_ai_planner_list'] ?? '',
     );
   }
 }
@@ -128,6 +169,18 @@ final configsProvider = FutureProvider<ConfigModel>((ref) async {
       titoAvailableMaterials: 'كل مواد البكالوريا حسب الشعبة: رياضيات، علوم، فيزياء، لغات، أدب...',
       titoSocialLinks: 'فيسبوك وتيك توك تحت اسم: Tayssir Bac',
       titoStrictMode: true,
+      toolCardsGrid: '',
+      toolCardsList: '',
+      toolResumesGrid: '',
+      toolResumesList: '',
+      toolBacSolutionsGrid: '',
+      toolBacSolutionsList: '',
+      toolPomodoroGrid: '',
+      toolPomodoroList: '',
+      toolGradeCalcGrid: '',
+      toolGradeCalcList: '',
+      toolAiPlannerGrid: '',
+      toolAiPlannerList: '',
     );
   }
 });

@@ -273,12 +273,7 @@ class ExerciseNotifier extends StateNotifier<ExerciseState> {
 
   void _markAITaskDone(String type) {
     try {
-      final dataState = ref.read(dataProvider);
-      final chapter = dataState.contentData.chapters.firstWhere((c) => c.id == chapterId);
-      final unit = dataState.contentData.units.firstWhere((u) => u.id == chapter.unitId);
-      final materialId = unit.materialId.toString();
-      
-      ref.read(aiPlannerProvider.notifier).markSubjectTaskDone(materialId, type);
+      ref.read(aiPlannerProvider.notifier).markChapterTaskDone(chapterId, type);
     } catch (e) {
       AppLogger.logError('Failed to mark AI task as done: $e');
     }

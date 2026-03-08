@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -20,13 +19,30 @@ import '../home/presentation/widgets/courses_grid_view.dart';
 import '../home/presentation/widgets/courses_list_view.dart';
 import '../home/presentation/widgets/home_header.dart';
 
-class ToolsScreen extends HookConsumerWidget {
+class ToolsScreen extends ConsumerStatefulWidget {
   const ToolsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final viewStyle = useState<ViewStyle>(ViewStyle.list);
+  ConsumerState<ToolsScreen> createState() => _ToolsScreenState();
+}
+
+class _ToolsScreenState extends ConsumerState<ToolsScreen> {
+  ViewStyle _viewStyle = ViewStyle.list;
+
+  @override
+  Widget build(BuildContext context) {
     final tools = ref.watch(toolsProvider);
+    
+    // Wrap the header toggle logic
+    final viewStyleNotifier = ValueNotifier<ViewStyle>(_viewStyle);
+    viewStyleNotifier.addListener(() {
+      if (mounted && viewStyleNotifier.value != _viewStyle) {
+        setState(() {
+          _viewStyle = viewStyleNotifier.value;
+        });
+      }
+    });
+
     return AppScaffold(
       topSafeArea: false,
       extendBody: true,
@@ -37,7 +53,7 @@ class ToolsScreen extends HookConsumerWidget {
         onRefresh: () async => ref.invalidate(toolsProvider),
         color: const Color(0xFF00B4D8),
         child: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
+          physics: const ClampingScrollPhysics(),
           slivers: [
             // App Bar
             SliverToBoxAdapter(
@@ -49,21 +65,21 @@ class ToolsScreen extends HookConsumerWidget {
 
             // Hero Banner Section
             SliverToBoxAdapter(
-              child: SubscribeSection(),
+              child: const SubscribeSection(),
             ),
 
             // Section Header
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
-                child: HomeHeader(title: 'الأدوات المتاحة', viewStyle: viewStyle),
+                child: HomeHeader(title: 'الأدوات المتاحة', viewStyle: viewStyleNotifier),
               ),
             ),
 
             // Tools Content
             SliverPadding(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 0),
-              sliver: viewStyle.value == ViewStyle.list
+              sliver: _viewStyle == ViewStyle.list
                   ? SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) => Padding(
@@ -126,7 +142,7 @@ class ToolsScreen extends HookConsumerWidget {
                     ),
             ),
 
-            SliverToBoxAdapter(child: 120.verticalSpace),
+            SliverToBoxAdapter(child: 40.verticalSpace),
           ],
         ),
       ),

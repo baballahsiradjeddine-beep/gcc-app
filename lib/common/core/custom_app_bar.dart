@@ -104,11 +104,22 @@ class CustomAppBar extends ConsumerWidget {
 
   Widget _buildActionIcon(BuildContext context, IconData icon, bool isDark, {Color? color}) {
     return Container(
-      width: 40.sp,
-      height: 40.sp,
+      width: 44.sp,
+      height: 44.sp,
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         shape: BoxShape.circle,
+        border: Border.all(
+          color: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFE2E8F0),
+          width: 1,
+        ),
+        boxShadow: isDark ? null : [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          )
+        ],
       ),
       child: Icon(
         icon,

@@ -8,6 +8,7 @@ class PlanItem extends Equatable {
   final bool isCompleted;
   final String? subjectId;
   final String? unitId;
+  final int? chapterId; // ID for direct navigation
   final String type; // 'study', 'exercise', 'review'
 
   const PlanItem({
@@ -18,6 +19,7 @@ class PlanItem extends Equatable {
     this.isCompleted = false,
     this.subjectId,
     this.unitId,
+    this.chapterId,
     this.type = 'study',
   });
 
@@ -29,6 +31,7 @@ class PlanItem extends Equatable {
     bool? isCompleted,
     String? subjectId,
     String? unitId,
+    int? chapterId,
     String? type,
   }) {
     return PlanItem(
@@ -39,12 +42,13 @@ class PlanItem extends Equatable {
       isCompleted: isCompleted ?? this.isCompleted,
       subjectId: subjectId ?? this.subjectId,
       unitId: unitId ?? this.unitId,
+      chapterId: chapterId ?? this.chapterId,
       type: type ?? this.type,
     );
   }
 
   @override
-  List<Object?> get props => [id, title, timeRange, description, isCompleted, subjectId, unitId, type];
+  List<Object?> get props => [id, title, timeRange, description, isCompleted, subjectId, unitId, chapterId, type];
 }
 
 class LearningPlan extends Equatable {

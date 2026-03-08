@@ -6,7 +6,7 @@ import 'package:tayssir/providers/app_assets/app_assets_provider.dart';
 
 enum AppAssetType { svg, image }
 
-class DynamicAppAsset extends HookConsumerWidget {
+class DynamicAppAsset extends ConsumerWidget {
   /// The unique key for this asset (matches the backend key)
   final String assetKey;
 

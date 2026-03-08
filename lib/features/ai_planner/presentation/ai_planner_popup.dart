@@ -7,8 +7,16 @@ import 'package:tayssir/providers/data/data_provider.dart';
 import '../state/ai_planner_notifier.dart';
 import 'package:tayssir/services/sounds/sound_manager.dart';
 import 'package:tayssir/providers/special_effect/special_effect_provider.dart';
+import 'package:tayssir/resources/colors/app_colors.dart';
 
-class AIPlannerPopup extends StatefulHookConsumerWidget {
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:equatable/equatable.dart';
+import 'package:go_router/go_router.dart';
+import 'package:tayssir/router/app_router.dart';
+import 'package:tayssir/features/exercice/presentation/state/exercice_controller.dart';
+import '../models/learning_plan.dart';
+
+class AIPlannerPopup extends ConsumerStatefulWidget {
   const AIPlannerPopup({super.key});
 
   @override
@@ -17,295 +25,224 @@ class AIPlannerPopup extends StatefulHookConsumerWidget {
 
 class _AIPlannerPopupState extends ConsumerState<AIPlannerPopup> {
   final List<int> selectedSubjectIds = [];
-  int selectedDuration = 30; // Default 30 min
+  int selectedDuration = 10;
 
   @override
   Widget build(BuildContext context) {
     final modules = ref.watch(dataProvider).contentData.modules;
     final isLoading = ref.watch(aiPlannerProvider).isLoading;
     final isSoundOn = ref.watch(isSoundEnabledProvider);
+    final activePlan = ref.watch(aiPlannerProvider).activePlan;
 
-    return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFF0F172A).withOpacity(0.85),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(45.r)),
-          border: Border(
-            top: BorderSide(
-              color: Colors.white.withOpacity(0.12),
-              width: 2.5,
-            ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    final backgroundColor = isDark ? AppColors.secondaryDark : AppColors.surfaceWhite;
+    final shellColor = isDark ? const Color(0xFF1E293B) : AppColors.scaffoldColor;
+    final titleTextColor = isDark ? Colors.white : AppColors.textBlack;
+    final subtitleTextColor = isDark ? AppColors.disabledTextColor : AppColors.greyColor;
+
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Container(
+          decoration: BoxDecoration(
+            color: backgroundColor.withOpacity(isDark ? 0.95 : 0.98),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 40,
+                offset: const Offset(0, -10),
+              ),
+            ],
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.5),
-              blurRadius: 40,
-              offset: const Offset(0, -10),
-            ),
-          ],
-        ),
-        padding: EdgeInsets.fromLTRB(24.w, 15.h, 24.w, 24.h),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Premium Handle
-            Container(
-              width: 50.w,
-              height: 5.h,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            30.verticalSpace,
-            
-            // AI Aura Icon
-            Container(
-              width: 70.w,
-              height: 70.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF00C6E0), Color(0xFF00B4D8)],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF00B4D8).withOpacity(0.4),
-                    blurRadius: 20,
-                    spreadRadius: 2,
-                  ),
-                ],
-              ),
-              child: const Icon(Icons.psychology_alt_rounded, color: Colors.white, size: 40),
-            ).animate(onPlay: (c) => c.repeat(reverse: true))
-             .scale(begin: const Offset(1, 1), end: const Offset(1.1, 1.1), duration: 2.seconds)
-             .shimmer(delay: 3.seconds, duration: 2.seconds),
-            
-            25.verticalSpace,
-            
-            Text(
-              "واش حاب تقرا اليوم؟ 🤔",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 26.sp,
-                fontWeight: FontWeight.w900,
-                fontFamily: 'SomarSans',
-                letterSpacing: -0.5,
-              ),
-            ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.2, end: 0),
-            
-            10.verticalSpace,
-            
-            Text(
-              "حدد وقتك وخلي الباقي على بيان!",
-              style: TextStyle(
-                color: const Color(0xFF94A3B8),
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w500,
-                fontFamily: 'SomarSans',
-              ),
-            ).animate().fadeIn(delay: 200.ms),
-            
-            35.verticalSpace,
-            
-            // Duration Selection (New Mode)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+          constraints: BoxConstraints(maxHeight: 0.9.sh),
+          child: SafeArea(
+            bottom: true,
+            child: Column(
               children: [
-                _buildModeCard(15, "١٥ دقيقة", "⚡", const Color(0xFFF59E0B)).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2, end: 0),
-                12.horizontalSpace,
-                _buildModeCard(30, "٣٠ دقيقة", "🧠", const Color(0xFF00C6E0)).animate().fadeIn(delay: 500.ms).slideY(begin: 0.2, end: 0),
-                12.horizontalSpace,
-                _buildModeCard(60, "ساعة واحدة", "🏆", const Color(0xFF10B981)).animate().fadeIn(delay: 600.ms).slideY(begin: 0.2, end: 0),
-              ],
-            ),
-            
-            35.verticalSpace,
-            
-            // Subject Selection Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "اختر المواد الدراسية",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 17.sp,
-                    fontWeight: FontWeight.w900,
-                    fontFamily: 'SomarSans',
+                16.verticalSpace,
+                // Handle
+                Container(
+                  width: 45.w,
+                  height: 5.h,
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.white12 : Colors.black.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                Text(
-                  "${selectedSubjectIds.length} مختارة",
-                  style: TextStyle(
-                    color: const Color(0xFF00B4D8),
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'SomarSans',
-                  ),
-                ),
-              ],
-            ).animate().fadeIn(delay: 500.ms),
-            
-            15.verticalSpace,
-            
-            SizedBox(
-              height: 150.h,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                itemCount: modules.length,
-                itemBuilder: (context, index) {
-                  final module = modules[index];
-                  final isSelected = selectedSubjectIds.contains(module.id);
-                  final color = _getSubjectColor(module.title);
-                  
-                  return GestureDetector(
-                    onTap: () {
-                      if (isSoundOn) SoundService.playClickPremium();
-                      setState(() {
-                        if (isSelected) {
-                          selectedSubjectIds.remove(module.id);
-                        } else {
-                          selectedSubjectIds.add(module.id);
-                        }
-                      });
-                    },
-                    child: AnimatedContainer(
-                      duration: 300.ms,
-                      width: 105.w,
-                      margin: EdgeInsets.only(left: 14.w),
-                      decoration: BoxDecoration(
-                        color: isSelected ? color.withOpacity(0.12) : Colors.white.withOpacity(0.04),
-                        borderRadius: BorderRadius.circular(24.r),
-                        border: Border.all(
-                          color: isSelected ? color : Colors.white.withOpacity(0.08),
-                          width: 2,
-                        ),
-                        boxShadow: isSelected ? [
-                          BoxShadow(color: color.withOpacity(0.2), blurRadius: 15, offset: const Offset(0, 5))
-                        ] : [],
+                28.verticalSpace,
+                
+                // Centered Header
+                Column(
+                  children: [
+                    Text(
+                      "خطة الدراسة الذكية 🧠",
+                      style: TextStyle(
+                        color: titleTextColor,
+                        fontSize: 22.sp,
+                        fontWeight: FontWeight.w900,
+                        fontFamily: 'SomarSans',
                       ),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          if (isSelected)
-                            Positioned(
-                              top: 8.h,
-                              right: 8.w,
-                              child: Icon(Icons.check_circle, color: color, size: 18.sp),
-                            ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                    ),
+                    8.verticalSpace,
+                    Text(
+                      "حدد وقتك المتاح ودع \"بيان\" يرتب أولوياتك",
+                      style: TextStyle(
+                        color: subtitleTextColor,
+                        fontSize: 13.sp,
+                        fontFamily: 'SomarSans',
+                      ),
+                    ),
+                  ],
+                ).animate().fadeIn().slideY(begin: 0.1, end: 0),
+                
+                24.verticalSpace,
+                
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.symmetric(horizontal: 24.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (activePlan == null) ...[
+                          // Time Selection
+                          _buildSectionLabel("كم عندك وقت للدراسة؟", titleTextColor),
+                          16.verticalSpace,
+                          Row(
                             children: [
-                              Container(
-                                padding: EdgeInsets.all(12.r),
-                                decoration: BoxDecoration(
-                                  color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Text(
-                                  _getEmojiForSubject(module.title),
-                                  style: TextStyle(fontSize: 32.sp),
-                                ),
-                              ),
-                              8.verticalSpace,
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8.w),
-                                child: Text(
-                                  module.title,
-                                  textAlign: TextAlign.center,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: isSelected ? Colors.white : const Color(0xFF94A3B8),
-                                    fontSize: 12.sp,
-                                    fontWeight: isSelected ? FontWeight.w900 : FontWeight.bold,
-                                    fontFamily: 'SomarSans',
-                                  ),
-                                ),
-                              ),
+                              _buildTimeChip(10, "10 دقايق", "⚡", isDark),
+                              12.horizontalSpace,
+                              _buildTimeChip(20, "20 دقيقة", "🎯", isDark),
+                              12.horizontalSpace,
+                              _buildTimeChip(30, "30 دقيقة", "🔥", isDark),
                             ],
                           ),
-                        ],
-                      ),
-                    ).animate().fadeIn(delay: (700 + index * 100).ms).slideX(begin: 0.1, end: 0),
-                  );
-                },
-              ),
-            ).animate().fadeIn(delay: 600.ms),
-            
-            40.verticalSpace,
-            
-            // Action Button
-            GestureDetector(
-              onTap: (selectedSubjectIds.isEmpty || isLoading) ? null : () async {
-                if (isSoundOn) SoundService.playAiMagic();
-                final List<String> names = modules
-                    .where((m) => selectedSubjectIds.contains(m.id))
-                    .map((m) => m.title)
-                    .toList();
-                    
-                await ref.read(aiPlannerProvider.notifier).generatePlan(
-                  subjects: selectedSubjectIds.map((e) => e.toString()).toList(),
-                  subjectNames: names,
-                  durationMinutes: selectedDuration,
-                );
-                if (mounted) Navigator.pop(context);
-              },
-              child: AnimatedOpacity(
-                duration: 300.ms,
-                opacity: selectedSubjectIds.isEmpty ? 0.5 : 1.0,
-                child: Container(
-                  width: double.infinity,
-                  height: 65.h,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF00C6E0), Color(0xFF0077B6)],
-                    ),
-                    borderRadius: BorderRadius.circular(24.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF00B4D8).withOpacity(0.4),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: isLoading 
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "انطلق الآن! 🔥",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.w900,
-                                fontFamily: 'SomarSans',
-                                letterSpacing: 0.5,
+                          
+                          35.verticalSpace,
+                          
+                          // Subject Selection
+                          _buildSectionLabel("فيم تريد التركيز اليوم؟", titleTextColor),
+                          16.verticalSpace,
+                          
+                          Wrap(
+                            spacing: 12.w,
+                            runSpacing: 12.h,
+                            children: modules.map((module) {
+                              final isSelected = selectedSubjectIds.contains(module.id);
+                              final subjectColor = _hexToColor(module.gradiantColorStart);
+                              return _buildSubjectChip(module, isSelected, subjectColor, isDark, shellColor);
+                            }).toList(),
+                          ).animate().fadeIn(delay: 300.ms),
+                          
+                          45.verticalSpace,
+                          
+                          // Action Button
+                          if (!isLoading)
+                          GestureDetector(
+                            onTap: (selectedSubjectIds.isEmpty) ? null : () async {
+                              if (isSoundOn) SoundService.playAiMagic();
+                              final List<String> names = modules
+                                  .where((m) => selectedSubjectIds.contains(m.id))
+                                  .map((m) => m.title)
+                                  .toList();
+                                  
+                              await ref.read(aiPlannerProvider.notifier).generatePlan(
+                                subjects: selectedSubjectIds.map((e) => e.toString()).toList(),
+                                subjectNames: names,
+                                durationMinutes: selectedDuration,
+                              );
+                            },
+                            child: Container(
+                              width: double.infinity,
+                              height: 60.h,
+                              decoration: BoxDecoration(
+                                gradient: selectedSubjectIds.isEmpty 
+                                    ? null 
+                                    : AppColors.primaryGradient,
+                                color: selectedSubjectIds.isEmpty 
+                                    ? (isDark ? Colors.white10 : Colors.black.withOpacity(0.05))
+                                    : null,
+                                borderRadius: BorderRadius.circular(20.r),
+                                boxShadow: selectedSubjectIds.isEmpty ? [] : [
+                                  BoxShadow(
+                                    color: AppColors.primaryColor.withOpacity(0.25),
+                                    blurRadius: 15,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.auto_awesome, 
+                                    color: selectedSubjectIds.isEmpty ? subtitleTextColor : Colors.white,
+                                    size: 20.sp,
+                                  ),
+                                  12.horizontalSpace,
+                                  Text(
+                                    "ابدأ رحلة التعلم",
+                                    style: TextStyle(
+                                      color: selectedSubjectIds.isEmpty ? subtitleTextColor : Colors.white,
+                                      fontSize: 17.sp,
+                                      fontWeight: FontWeight.w900,
+                                      fontFamily: 'SomarSans',
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            10.horizontalSpace,
-                            const Icon(Icons.rocket_launch_rounded, color: Colors.white),
-                          ],
-                        ),
+                          ).animate().scale(delay: 500.ms, curve: Curves.easeOutBack),
+                          
+                          if (isLoading)
+                            const Center(child: CircularProgressIndicator(color: AppColors.primaryColor)),
+                        ] else ...[
+                          _buildPlanList(activePlan, isDark, isDark ? Colors.white12 : AppColors.borderColor),
+                          24.verticalSpace,
+                          _buildActionButtons(isDark),
+                          50.verticalSpace,
+                        ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ).animate().fadeIn(delay: 800.ms).scale(curve: Curves.easeOutBack),
-            
-            10.verticalSpace,
-          ],
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildModeCard(int minutes, String label, String icon, Color color) {
+  Widget _buildSectionLabel(String text, Color color) {
+    return Row(
+      children: [
+        Container(
+          width: 4.w,
+          height: 18.h,
+          decoration: BoxDecoration(
+            color: AppColors.primaryColor,
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        10.horizontalSpace,
+        Text(
+          text,
+          style: TextStyle(
+            color: color,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w900,
+            fontFamily: 'SomarSans',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTimeChip(int minutes, String label, String emo, bool isDark) {
     final isSelected = selectedDuration == minutes;
     return Expanded(
       child: GestureDetector(
@@ -314,24 +251,23 @@ class _AIPlannerPopupState extends ConsumerState<AIPlannerPopup> {
           duration: 300.ms,
           padding: EdgeInsets.symmetric(vertical: 16.h),
           decoration: BoxDecoration(
-            color: isSelected ? color.withOpacity(0.12) : Colors.white.withOpacity(0.04),
-            borderRadius: BorderRadius.circular(24.r),
+            color: isSelected 
+                ? AppColors.primaryColor.withOpacity(0.08) 
+                : (isDark ? Colors.white.withOpacity(0.03) : Colors.white),
+            borderRadius: BorderRadius.circular(18.r),
             border: Border.all(
-              color: isSelected ? color : Colors.white.withOpacity(0.08),
-              width: 2,
+              color: isSelected ? AppColors.primaryColor : (isDark ? Colors.white10 : AppColors.borderColor),
+              width: 1.5,
             ),
-            boxShadow: isSelected ? [
-              BoxShadow(color: color.withOpacity(0.15), blurRadius: 10, offset: const Offset(0, 4))
-            ] : [],
           ),
           child: Column(
             children: [
-              Text(icon, style: TextStyle(fontSize: 26.sp)),
+              Text(emo, style: TextStyle(fontSize: 24.sp)),
               8.verticalSpace,
               Text(
                 label,
                 style: TextStyle(
-                  color: isSelected ? Colors.white : const Color(0xFF94A3B8),
+                  color: isSelected ? AppColors.primaryColor : (isDark ? Colors.white38 : AppColors.greyColor),
                   fontSize: 12.sp,
                   fontWeight: isSelected ? FontWeight.w900 : FontWeight.bold,
                   fontFamily: 'SomarSans',
@@ -344,6 +280,190 @@ class _AIPlannerPopupState extends ConsumerState<AIPlannerPopup> {
     );
   }
 
+  Widget _buildSubjectChip(dynamic module, bool isSelected, Color subjectColor, bool isDark, Color bgColor) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (isSelected) {
+            selectedSubjectIds.remove(module.id);
+          } else {
+            selectedSubjectIds.add(module.id);
+          }
+        });
+      },
+      child: AnimatedContainer(
+        duration: 250.ms,
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          color: isSelected ? subjectColor.withOpacity(0.12) : (isDark ? Colors.white.withOpacity(0.05) : bgColor),
+          borderRadius: BorderRadius.circular(15.r),
+          border: Border.all(
+            color: isSelected ? subjectColor : (isDark ? Colors.white10 : AppColors.borderColor),
+            width: 1.2,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(_getEmojiForSubject(module.title), style: TextStyle(fontSize: 18.sp)),
+            8.horizontalSpace,
+            Text(
+              module.title,
+              style: TextStyle(
+                color: isSelected ? subjectColor : (isDark ? Colors.white70 : AppColors.textBody),
+                fontSize: 13.sp,
+                fontWeight: isSelected ? FontWeight.w900 : FontWeight.bold,
+                fontFamily: 'SomarSans',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlanList(LearningPlan plan, bool isDark, Color borderColor) {
+    final items = plan.items;
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        final modules = ref.read(dataProvider).contentData.modules;
+        final module = modules.firstWhere((m) => m.id.toString() == item.subjectId, orElse: () => modules.first);
+        final isFirstInSubject = index == 0 || items[index - 1].subjectId != item.subjectId;
+        final startColor = _hexToColor(module.gradiantColorStart);
+        final endColor = _hexToColor(module.gradiantColorEnd);
+        
+        final chapters = ref.read(dataProvider).contentData.chapters;
+        final chapter = chapters.firstWhere((c) => c.id == item.chapterId, orElse: () => chapters.first);
+        final chapterImage = chapter.image ?? '';
+        final String fullChapterImageUrl = chapterImage.startsWith('http') 
+            ? chapterImage 
+            : 'https://gcc.tayssir-bac.com/storage/${chapterImage.replaceAll(RegExp(r'^/'), '')}';
+
+        return Column(
+          children: [
+            if (isFirstInSubject) ...[
+              25.verticalSpace,
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                    decoration: BoxDecoration(
+                      color: startColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Text(
+                      module.title,
+                      style: TextStyle(color: startColor, fontSize: 12.sp, fontWeight: FontWeight.w900, fontFamily: 'SomarSans'),
+                    ),
+                  ),
+                  10.horizontalSpace,
+                  Expanded(child: Divider(color: borderColor, thickness: 1)),
+                ],
+              ),
+              16.verticalSpace,
+            ],
+            GestureDetector(
+              onTap: () {
+                 if (item.chapterId != null) {
+                     // 1. Close popup
+                     Navigator.pop(context);
+
+                     // 2. Mark that we are STARTING a planner session
+                     ref.read(isPlannerSessionActiveProvider.notifier).state = true;
+                     
+                     // 3. Go to exercise
+                     ref.read(currentChapterIdProvider.notifier).state = item.chapterId!;
+                     context.pushNamed(AppRoutes.exercices.name);
+                 }
+              },
+              child: Row(
+                children: [
+                  Container(
+                    width: 65.sp, height: 65.sp,
+                    padding: EdgeInsets.all(3.sp),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: item.isCompleted ? AppColors.greenColor : startColor.withOpacity(0.3), width: 2),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(32.sp),
+                      child: CachedNetworkImage(
+                        imageUrl: fullChapterImageUrl,
+                        fit: BoxFit.cover,
+                        errorWidget: (context, url, error) => Container(
+                          color: startColor.withOpacity(0.1),
+                          child: Center(child: Text(_getEmojiForSubject(module.title), style: TextStyle(fontSize: 28.sp))),
+                        ),
+                      ),
+                    ),
+                  ),
+                  12.horizontalSpace,
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [startColor, endColor]),
+                        borderRadius: BorderRadius.circular(20.r),
+                        boxShadow: [BoxShadow(color: startColor.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 4))],
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(item.title, style: TextStyle(color: Colors.white, fontSize: 15.sp, fontWeight: FontWeight.w900, fontFamily: 'SomarSans', decoration: item.isCompleted ? TextDecoration.lineThrough : null)),
+                                Text(item.timeRange, style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 11.sp, fontFamily: 'SomarSans')),
+                              ],
+                            ),
+                          ),
+                          Icon(item.isCompleted ? Icons.check_circle_rounded : Icons.keyboard_arrow_left_rounded, color: Colors.white, size: 22.sp),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            12.verticalSpace,
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildActionButtons(bool isDark) {
+    return Row(
+      children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              height: 52.h,
+              decoration: BoxDecoration(color: isDark ? Colors.white12 : Colors.black.withOpacity(0.05), borderRadius: BorderRadius.circular(15.r)),
+              child: Center(child: Text("إغفاء", style: TextStyle(color: isDark ? Colors.white70 : AppColors.textBody, fontWeight: FontWeight.bold, fontSize: 15.sp, fontFamily: 'SomarSans'))),
+            ),
+          ),
+        ),
+        12.horizontalSpace,
+        Expanded(
+          child: GestureDetector(
+            onTap: () => ref.read(aiPlannerProvider.notifier).resetPlan(),
+            child: Container(
+              height: 52.h,
+              decoration: BoxDecoration(color: AppColors.redColor.withOpacity(0.1), borderRadius: BorderRadius.circular(15.r), border: Border.all(color: AppColors.redColor.withOpacity(0.5))),
+              child: Center(child: Text("إلغاء الخطة", style: TextStyle(color: AppColors.redColor, fontWeight: FontWeight.bold, fontSize: 15.sp, fontFamily: 'SomarSans'))),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   String _getEmojiForSubject(String title) {
     title = title.toLowerCase();
     if (title.contains('رياضيات')) return '📐';
@@ -353,19 +473,17 @@ class _AIPlannerPopupState extends ConsumerState<AIPlannerPopup> {
     if (title.contains('تاريخ')) return '🌍';
     if (title.contains('إسلامية')) return '🕌';
     if (title.contains('عربية')) return '📖';
-    if (title.contains('فرنسية')) return '🇫🇷';
-    if (title.contains('إنجليزية')) return '🇬🇧';
     return '📚';
   }
 
-  Color _getSubjectColor(String title) {
-    title = title.toLowerCase();
-    if (title.contains('رياضيات')) return const Color(0xFF00C6E0);
-    if (title.contains('فلسفة')) return const Color(0xFFEC4899);
-    if (title.contains('علوم')) return const Color(0xFF10B981);
-    if (title.contains('فيزياء')) return const Color(0xFFF59E0B);
-    if (title.contains('تاريخ') || title.contains('جغرافيا')) return const Color(0xFF6366F1);
-    if (title.contains('إسلامية')) return const Color(0xFF8B5CF6);
-    return const Color(0xFF00B4D8);
+  Color _hexToColor(String hexCode) {
+    try {
+      final hex = hexCode.replaceAll('#', '').trim();
+      if (hex.length == 6) return Color(int.parse('0xFF$hex'));
+      if (hex.length == 8) return Color(int.parse('0x$hex'));
+      return AppColors.primaryColor;
+    } catch (e) {
+      return AppColors.primaryColor;
+    }
   }
 }

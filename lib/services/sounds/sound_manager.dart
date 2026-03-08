@@ -40,6 +40,6 @@ class SoundService {
   static void playAction() => play('assets/sounds/action.mp3');
 
   static void playDefaultClick() {
-    play('assets/sounds/ms_click.mp3');
+    play('assets/sounds/ui_click_premium.mp3');
   }
 }

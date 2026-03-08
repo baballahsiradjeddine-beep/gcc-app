@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:lottie/lottie.dart';
 import 'package:share_plus/share_plus.dart';
 
 class SuccessCard extends StatelessWidget {
@@ -47,11 +46,26 @@ class SuccessCard extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Lottie.network(
-                  'https://assets10.lottiefiles.com/packages/lf20_toufyc92.json',
-                  height: 150.h,
-                  repeat: false,
-                ),
+                Container(
+                  width: 120.w,
+                  height: 120.w,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF00B4D8).withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.emoji_events_rounded,
+                      color: const Color(0xFFF59E0B),
+                      size: 70.sp,
+                    ),
+                  ),
+                ).animate(onPlay: (c) => c.repeat())
+                 .scale(duration: 1.seconds, curve: Curves.easeInOut)
+                 .shimmer(delay: 2.seconds, duration: 1.5.seconds)
+                 .shake(hz: 2, curve: Curves.easeInOut),
+                
+                20.verticalSpace,
                 
                 Text(
                   "إنجاز مبهر! 🏆",
@@ -128,8 +142,6 @@ class SuccessCard extends StatelessWidget {
               ],
             ),
           ).animate().scale(curve: Curves.elasticOut, duration: 800.ms),
-          
-          // Confetti overlay could go here
         ],
       ),
     );

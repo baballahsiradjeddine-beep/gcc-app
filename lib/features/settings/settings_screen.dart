@@ -6,42 +6,41 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:tayssir/common/app_buttons/logout_button.dart';
 import 'package:tayssir/common/core/app_scaffold.dart';
-import 'package:tayssir/common/core/custom_app_bar.dart';
-import 'package:tayssir/common/tayssir_icon.dart';
 import 'package:tayssir/constants/app_consts.dart';
 import 'package:tayssir/features/settings/widgets/custom_switch_button.dart';
 import 'package:tayssir/features/settings/widgets/settings_item.dart';
 import 'package:tayssir/router/app_router.dart';
 import 'package:tayssir/services/actions/snack_bar_service.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../constants/strings.dart';
 import 'package:tayssir/resources/colors/app_colors.dart';
 import '../../resources/resources.dart';
 
-class SettingsScreen extends HookConsumerWidget {
-  const SettingsScreen({
-    super.key,
-  });
+class SettingsScreen extends ConsumerStatefulWidget {
+  const SettingsScreen({super.key});
 
+  @override
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> requestReview() async {
     final InAppReview inAppReview = InAppReview.instance;
     if (await inAppReview.isAvailable()) {
       try {
         inAppReview.openStoreListing();
-        // inAppReview.requestReview();
       } catch (e) {}
     }
   }
 
-  // use launcher to open url
   Future<void> _launchUrl(String url, BuildContext context) async {
     final Uri uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       if (!context.mounted) return;
-
       SnackBarService.showErrorToast(
         'Could not launch the app. Please install it or try another method.',
       );
@@ -49,40 +48,62 @@ class SettingsScreen extends HookConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AppScaffold(
+      includeBackButton: false, // We will build the back button inside the scroll view
       topSafeArea: true,
       extendBody: true,
       bodyBackgroundColor: Colors.transparent,
-      paddingX: 0,
       paddingB: 0,
-      body: CustomScrollView(
-        physics: const ClampingScrollPhysics(),
-        slivers: [
-          // App Bar
-          SliverToBoxAdapter(
-              child: const CustomAppBar(showActions: false, showLogo: false),
+      paddingX: 0, // Zero padding for the scaffold body to handle it inside slivers
+      paddingY: 0,
+      body: ShaderMask(
+        shaderCallback: (rect) {
+          return const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.transparent,
+              Colors.black,
+            ],
+            stops: [0.0, 0.05], // Fade the top 5%
+          ).createShader(rect);
+        },
+        blendMode: BlendMode.dstIn,
+        child: CustomScrollView(
+          physics: const ClampingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
           ),
+          slivers: [
+          // 1. Integrated Header (Back Button + Title) that scrolls away
           SliverToBoxAdapter(
-            child: SizedBox(height: 8.h), // This acts as the margin bottom
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    AppStrings.settings,
+                    style: TextStyle(
+                      fontSize: 22.sp,
+                      fontWeight: FontWeight.w900,
+                      color: isDark ? Colors.white : AppColors.textBlack,
+                      fontFamily: 'SomarSans',
+                    ),
+                  ),
+                  8.horizontalSpace,
+                  const Icon(Icons.settings_outlined, color: Color(0xFF00B4D8)),
+                ],
+              ),
+            ),
           ),
 
           SliverPadding(
             padding: EdgeInsets.symmetric(horizontal: 20.w),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                15.verticalSpace,
-                Text(
-                  AppStrings.settings,
-                  style: TextStyle(
-                    fontSize: 22.sp,
-                    fontWeight: FontWeight.w900,
-                    color: isDark ? Colors.white : AppColors.textBlack,
-                    fontFamily: 'SomarSans',
-                  ),
-                ),
                 15.verticalSpace,
 
                 // Account Section
@@ -126,7 +147,7 @@ class SettingsScreen extends HookConsumerWidget {
                 Container(
                   padding: EdgeInsets.all(20.w),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1E293B) : AppColors.scaffoldColor, // Slate-100
+                    color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
                     borderRadius: BorderRadius.circular(24.r),
                     border: Border.all(
                       color: isDark ? Colors.white10 : const Color(0xFFE2E8F0), 
@@ -180,8 +201,9 @@ class SettingsScreen extends HookConsumerWidget {
               ]),
             ),
           ),
-        ],
-      ),
+            ],
+          ),
+        ),
     );
   }
 

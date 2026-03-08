@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tayssir/common/app_buttons/subscribe_button.dart';
@@ -19,94 +18,96 @@ final bannerItemsProvider = FutureProvider<List<BannerModel>>((ref) async {
   return res;
 });
 
-// final carouselItemsProvider = Provider<List<Widget>>((ref) {
-//   final user = ref.watch(userNotifierProvider).requireValue;
-//   if (user == null) {
-//     return [];
-//   }
-//   final List<Widget> items = [];
-
-//   // Add subscribe button for non-subscribers
-//   if (!user.isSub) {
-//     items.add(
-//       const SubscribeButton(),
-//     );
-//   }
-
-//   items.add(
-//     const UserProgressWidget(
-//         // courses: [],
-//         ),
-//   );
-
-//   return items;
-// });
-
-class SubscribeSection extends HookConsumerWidget {
+class SubscribeSection extends ConsumerStatefulWidget {
   final bool showProgress;
   const SubscribeSection({super.key, this.showProgress = true});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final index = useState<int>(0);
+  ConsumerState<SubscribeSection> createState() => _SubscribeSectionState();
+}
 
-    // final items = ref.watch(carouselItemsProvider);
-    final isLoading = ref.watch(bannerItemsProvider).isLoading;
+class _SubscribeSectionState extends ConsumerState<SubscribeSection> {
+  int _currentIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    // We don't use the state anymore as it's purely for the carousel UI, 
+    // but we can keep it in class state for consistency.
+    
+    final bannerAsync = ref.watch(bannerItemsProvider);
+    final user = ref.watch(userNotifierProvider).valueOrNull;
+    final isLoading = bannerAsync.isLoading;
+    
     final List<Widget> items = [
-      if (ref.watch(userNotifierProvider).valueOrNull?.isSub != true)
-        const SubscribeButton(),
+      if (user?.isSub != true)
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 4.w),
+          child: const SubscribeButton(),
+        ),
       if (!isLoading)
-        ...ref.watch(bannerItemsProvider).valueOrNull?.map((banner) {
-          return BannerWidget(
-            title: banner.title,
-            description: banner.description,
-            actionUrl: banner.actionUrl,
-            gradientStart: banner.gradientStart,
-            gradientEnd: banner.gradientEnd,
-            image: banner.image,
+        ...bannerAsync.valueOrNull?.map((banner) {
+          return Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4.w),
+            child: BannerWidget(
+              title: banner.title,
+              description: banner.description,
+              actionUrl: banner.actionUrl,
+              gradientStart: banner.gradientStart,
+              gradientEnd: banner.gradientEnd,
+              image: banner.image,
+            ),
           );
         }) ?? [],
-      if (showProgress) const UserProgressWidget(),
+      if (widget.showProgress) 
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 4.w),
+          child: const UserProgressWidget(),
+        ),
     ];
 
-    return items.isNotEmpty
-        ? Column(
-            children: [
-              ref.watch(bannerItemsProvider).when(
-                    data: (banners) {
-                      return Directionality(
-                        textDirection: TextDirection.ltr,
-                        child: SizedBox(
-                          height: 130.h,
-                          child: Stack(
-                            alignment: Alignment.bottomLeft,
-                            children: [
-                              CarouselSlider(
-                                key: ValueKey('carousel_${items.length}'), 
-                                items: items,
-                                options: CarouselOptions(
-                                  height: 128.h,
-                                  viewportFraction: 1.0,
-                                  autoPlay: true,
-                                  enableInfiniteScroll: items.length > 1,
-                                  autoPlayInterval: const Duration(seconds: 4),
-                                  onPageChanged: (i, _) => index.value = i,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
-                    error: (error, stackTrace) => Center(
-                      child: Text(error.toString()),
+    if (items.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      children: [
+        bannerAsync.when(
+          data: (banners) {
+            return Directionality(
+              textDirection: TextDirection.ltr,
+              child: SizedBox(
+                height: 130.h,
+                child: Stack(
+                  alignment: Alignment.bottomLeft,
+                  children: [
+                    CarouselSlider(
+                      key: ValueKey('carousel_${items.length}'), 
+                      items: items,
+                      options: CarouselOptions(
+                        height: 128.h,
+                        viewportFraction: 1.0,
+                        autoPlay: true,
+                        enableInfiniteScroll: items.length > 1,
+                        autoPlayInterval: const Duration(seconds: 4),
+                        onPageChanged: (i, _) {
+                          if (mounted) {
+                            setState(() {
+                              _currentIndex = i;
+                            });
+                          }
+                        },
+                      ),
                     ),
-                  ),
-            ],
-          )
-        : const SizedBox.shrink();
+                  ],
+                ),
+              ),
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stackTrace) => Center(
+            child: Text(error.toString()),
+          ),
+        ),
+      ],
+    );
   }
 }
 

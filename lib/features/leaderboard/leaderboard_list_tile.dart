@@ -7,6 +7,7 @@ import 'package:tayssir/constants/app_consts.dart';
 import 'package:tayssir/features/leaderboard/leaderboard_user.dart';
 import 'package:tayssir/providers/user/user_notifier.dart';
 import 'package:tayssir/resources/colors/app_colors.dart';
+import 'package:tayssir/common/core/shield_badge.dart';
 
 class LeaderboardListTile extends ConsumerWidget {
   final LeaderboardUser user;
@@ -64,45 +65,17 @@ class LeaderboardListTile extends ConsumerWidget {
                 ),
               ),
               12.horizontalSpace,
-              // Avatar
-              Container(
-                width: 44.sp,
-                height: 44.sp,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: isMe 
-                        ? const Color(0xFF00B4D8) 
-                        : (isDark ? const Color(0xFF334155) : Colors.grey.shade200),
-                    width: 1.5.w,
-                  ),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(2.w),
-                  child: CachedNetworkImage(
-                    imageUrl: user.prodImage ?? AppConsts.defaultImageUrl,
-                    imageBuilder: (context, imageProvider) => Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: imageProvider,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    placeholder: (context, url) => Shimmer.fromColors(
-                      baseColor: isDark ? const Color(0xFF334155) : Colors.grey.shade200,
-                      highlightColor: isDark ? const Color(0xFF475569) : Colors.grey.shade50,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: isDark ? const Color(0xFF334155) : Colors.white,
-                        ),
-                      ),
-                    ),
-                    errorWidget: (context, url, error) => const Icon(Icons.person),
-                  ),
-                ),
+              // Shield Badge Avatar
+              ShieldBadge(
+                userAvatarUrl: user.prodImage,
+                badgeIconUrl: user.badge?.completeIconUrl,
+                themeColor: user.badge?.color != null 
+                    ? Color(int.parse(user.badge!.color!.replaceAll('#', '0xFF')))
+                    : const Color(0xFF00B4D8),
+                width: 48.sp,
+                height: 60.sp,
+                avatarPaddingTop: 12.sp,
+                avatarSize: 42.sp,
               ),
               16.horizontalSpace,
               // Name and Wilaya

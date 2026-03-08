@@ -84,7 +84,11 @@ class ArenaScreen extends HookConsumerWidget {
     }, []);
 
     if (matchData.value == null || myUid == null) {
-      return const Scaffold(backgroundColor: Color(0xFF111827), body: Center(child: CircularProgressIndicator()));
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+      return Scaffold(
+        backgroundColor: isDark ? const Color(0xFF0B1120) : Colors.white,
+        body: const Center(child: CircularProgressIndicator(color: Color(0xFF00C6E0)))
+      );
     }
 
     final data = matchData.value!;
@@ -210,37 +214,39 @@ class ArenaScreen extends HookConsumerWidget {
       );
     }
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
+      value: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
       child: Scaffold(
-        backgroundColor: const Color(0xFF0B1120),
+        backgroundColor: isDark ? const Color(0xFF0B1120) : Colors.white,
         body: Container(
           width: double.infinity,
           height: double.infinity,
-          color: const Color(0xFF0B1120),
+          color: isDark ? const Color(0xFF0B1120) : Colors.white,
           child: SafeArea(
             bottom: false,
             child: Column(
               children: [
-                _buildBattleHeader(myInfo!, opInfo!),
-                if (!isFinished) _buildTimer(currentIndex, handleAnswer),
+                _buildBattleHeader(myInfo!, opInfo!, isDark),
+                if (!isFinished) _buildTimer(currentIndex, handleAnswer, isDark),
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 24.w),
                     child: isFinished
                         ? _buildFinishedState(isWinner, opInfo!['status'] == 'disconnected',
-                            myInfo!['score'] ?? 0, ref, matchRef, isSubmitting.value, _submitResult)
+                            myInfo!['score'] ?? 0, ref, matchRef, isSubmitting.value, _submitResult, isDark)
                         : SingleChildScrollView(
                             physics: const BouncingScrollPhysics(),
                             child: _buildQuestionArea(questions[currentIndex], currentIndex, questions.length,
-                                handleAnswer, selectedOption.value, isOptionCorrect.value),
+                                handleAnswer, selectedOption.value, isOptionCorrect.value, isDark),
                           ),
                   ),
                 ),
                 if (!isFinished) 
                   Padding(
                     padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 10.h),
-                    child: _buildEmojiPicker(matchRef, myUid, isPrivate, isSoundOn, _showChat),
+                    child: _buildEmojiPicker(matchRef, myUid, isPrivate, isSoundOn, _showChat, isDark),
                   ),
               ],
             ),
@@ -250,22 +256,22 @@ class ArenaScreen extends HookConsumerWidget {
     );
   }
 
-  Widget _buildBattleHeader(Map myInfo, Map opInfo) {
+  Widget _buildBattleHeader(Map myInfo, Map opInfo, bool isDark) {
     return Container(
       padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 5.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildPlayerProfile(myInfo, isMe: true),
+          _buildPlayerProfile(myInfo, isDark, isMe: true),
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
                   borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  border: Border.all(color: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05)),
                 ),
                 child: Text(
                   "VS",
@@ -285,7 +291,7 @@ class ArenaScreen extends HookConsumerWidget {
                    Text(
                     "${(myInfo['score'] ?? 0) + (opInfo['score'] ?? 0)}",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
                       fontSize: 22.sp,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'SomarSans',
@@ -297,13 +303,13 @@ class ArenaScreen extends HookConsumerWidget {
               ),
             ],
           ),
-          _buildPlayerProfile(opInfo, isMe: false),
+          _buildPlayerProfile(opInfo, isDark, isMe: false),
         ],
       ),
     );
   }
 
-  Widget _buildPlayerProfile(Map info, {required bool isMe}) {
+  Widget _buildPlayerProfile(Map info, bool isDark, {required bool isMe}) {
     final name = info['name'] ?? 'لاعب';
     final score = info['score'] ?? 0;
     final pic = info['avatar'] ?? info['avatar_url'] ?? '';
@@ -381,7 +387,7 @@ class ArenaScreen extends HookConsumerWidget {
         Text(
           name,
           style: TextStyle(
-            color: Colors.white,
+            color: isDark ? Colors.white : const Color(0xFF1E293B),
             fontSize: 12.sp,
             fontWeight: FontWeight.bold,
             fontFamily: 'SomarSans',
@@ -438,7 +444,7 @@ class ArenaScreen extends HookConsumerWidget {
   }
 
 
-  Widget _buildTimer(int index, Function handleAnswer) {
+  Widget _buildTimer(int index, Function handleAnswer, bool isDark) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
       child: TweenAnimationBuilder<double>(
@@ -450,9 +456,9 @@ class ArenaScreen extends HookConsumerWidget {
           height: 12.h,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
             borderRadius: BorderRadius.circular(20.r),
-            border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+            border: Border.all(color: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05), width: 1),
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20.r),
@@ -508,7 +514,7 @@ class ArenaScreen extends HookConsumerWidget {
     );
   }
 
-  Widget _buildQuestionArea(Map q, int current, int total, Function handleAnswer, dynamic selected, bool? isCorrect) {
+  Widget _buildQuestionArea(Map q, int current, int total, Function handleAnswer, dynamic selected, bool? isCorrect, bool isDark) {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Column(
@@ -544,7 +550,7 @@ class ArenaScreen extends HookConsumerWidget {
                     Text(
                       q['question_type'] == 'multiple_choices' ? 'اختر الإجابة الصحيحة' : 'أجب بصحيح أو خطأ',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: isDark ? Colors.white : const Color(0xFF1E293B),
                         fontSize: 22.sp,
                         fontWeight: FontWeight.w900,
                         fontFamily: 'SomarSans',
@@ -564,15 +570,15 @@ class ArenaScreen extends HookConsumerWidget {
             width: double.infinity,
             padding: EdgeInsets.all(24.r),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E293B).withOpacity(0.5),
+              color: isDark ? const Color(0xFF1E293B).withOpacity(0.5) : const Color(0xFFF1F5F9),
               borderRadius: BorderRadius.circular(24.r),
               border: Border.all(
-                color: const Color(0xFF1E293B).withOpacity(0.8),
+                color: isDark ? const Color(0xFF1E293B).withOpacity(0.8) : const Color(0xFFE2E8F0),
                 width: 1,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -581,7 +587,7 @@ class ArenaScreen extends HookConsumerWidget {
             child: Text(
               q['question'] ?? '',
               style: TextStyle(
-                color: const Color(0xFFCBD5E1),
+                color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
                 fontSize: 18.sp,
                 fontWeight: FontWeight.normal,
                 fontFamily: 'SomarSans',
@@ -594,7 +600,7 @@ class ArenaScreen extends HookConsumerWidget {
           30.verticalSpace,
           
           // Options Area
-          ..._buildOptions(q, handleAnswer, selected, isCorrect),
+          ..._buildOptions(q, handleAnswer, selected, isCorrect, isDark),
           
           20.verticalSpace,
         ],
@@ -602,7 +608,7 @@ class ArenaScreen extends HookConsumerWidget {
     );
   }
 
-  List<Widget> _buildOptions(Map q, Function handleAnswer, dynamic selected, bool? isCorrect) {
+  List<Widget> _buildOptions(Map q, Function handleAnswer, dynamic selected, bool? isCorrect, bool isDark) {
     if (q['question_type'] == 'multiple_choices') {
       return (q['options'] as List).map<Widget>((opt) {
         bool isSelected = selected == opt['id'];
@@ -612,7 +618,7 @@ class ArenaScreen extends HookConsumerWidget {
 
         return _buildOptionButton(
           opt['text'], isSelected, isRightAnswer, isWrongAnswer, shouldShowGreen, 
-          () => handleAnswer(opt['is_correct'] == 1, opt['id'])
+          () => handleAnswer(opt['is_correct'] == 1, opt['id']), isDark
         );
       }).toList();
     } else {
@@ -620,9 +626,9 @@ class ArenaScreen extends HookConsumerWidget {
       return [
         Row(
           children: [
-            _buildTrueFalseOption('صحيح', 'true', selected, isCorrect, correctIsTrue, handleAnswer, const Color(0xFF10B981)),
+            _buildTrueFalseOption('صحيح', 'true', selected, isCorrect, correctIsTrue, handleAnswer, const Color(0xFF10B981), isDark),
             15.horizontalSpace,
-            _buildTrueFalseOption('خطأ', 'false', selected, isCorrect, !correctIsTrue, handleAnswer, const Color(0xFFF43F5E)),
+            _buildTrueFalseOption('خطأ', 'false', selected, isCorrect, !correctIsTrue, handleAnswer, const Color(0xFFF43F5E), isDark),
           ]
         )
       ];
@@ -630,11 +636,11 @@ class ArenaScreen extends HookConsumerWidget {
   }
 
   Widget _buildOptionButton(
-      String text, bool isSelected, bool isRightAnswer, bool isWrongAnswer, bool shouldShowGreen, VoidCallback onTap) {
+      String text, bool isSelected, bool isRightAnswer, bool isWrongAnswer, bool shouldShowGreen, VoidCallback onTap, bool isDark) {
       
-    Color borderColor = const Color(0xFF334155);
-    Color bgColor = const Color(0xFF1E293B);
-    Color textColor = const Color(0xFFCBD5E1);
+    Color borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+    Color bgColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    Color textColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569);
     
     if (isRightAnswer || shouldShowGreen) {
         borderColor = const Color(0xFF10B981);
@@ -646,7 +652,7 @@ class ArenaScreen extends HookConsumerWidget {
         textColor = const Color(0xFFF43F5E);
     } else if (isSelected) {
         borderColor = const Color(0xFF00B4D8);
-        bgColor = const Color(0xFF00B4D8).withOpacity(0.15);
+        bgColor = const Color(0xFF00B4D8).withOpacity(isDark ? 0.15 : 0.08);
         textColor = const Color(0xFF00B4D8);
     }
     
@@ -680,9 +686,12 @@ class ArenaScreen extends HookConsumerWidget {
       width: double.infinity,
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-        color: isSelected ? null : const Color(0xFF1E293B),
+        color: isSelected ? null : (isDark ? const Color(0xFF1E293B) : Colors.white),
         gradient: isSelected ? LinearGradient(
-          colors: [const Color(0xFF0C4A6E).withOpacity(0.4), const Color(0xFF1E293B)],
+          colors: [
+            isDark ? const Color(0xFF0C4A6E).withOpacity(0.4) : const Color(0xFFBAE6FD).withOpacity(0.3), 
+            isDark ? const Color(0xFF1E293B) : Colors.white
+          ],
           begin: Alignment.centerRight,
           end: Alignment.centerLeft,
         ) : null,
@@ -695,7 +704,7 @@ class ArenaScreen extends HookConsumerWidget {
           if (isSelected || isRightAnswer || isWrongAnswer || shouldShowGreen)
             BoxShadow(color: borderColor.withOpacity(0.25), blurRadius: 15, offset: const Offset(0, 4))
           else
-            BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4)),
+            BoxShadow(color: Colors.black.withOpacity(isDark ? 0.2 : 0.05), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       child: Material(
@@ -730,15 +739,15 @@ class ArenaScreen extends HookConsumerWidget {
   }
 
   Widget _buildTrueFalseOption(String text, String id, dynamic selected, bool? isCorrect,
-      bool isProperAns, Function handleAnswer, Color themeColor) {
+      bool isProperAns, Function handleAnswer, Color themeColor, bool isDark) {
     bool isSelected = selected == id;
     bool isRightAnswer = isSelected && isCorrect == true;
     bool isWrongAnswer = isSelected && isCorrect == false;
     bool shouldShowGreen = selected != null && isProperAns;
 
-    Color borderColor = const Color(0xFF334155);
-    Color bgColor = const Color(0xFF1E293B);
-    Color textColor = const Color(0xFFCBD5E1);
+    Color borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+    Color bgColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    Color textColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569);
     
     if (isRightAnswer || shouldShowGreen) {
         borderColor = const Color(0xFF10B981);
@@ -750,16 +759,19 @@ class ArenaScreen extends HookConsumerWidget {
         textColor = const Color(0xFFF43F5E);
     } else if (isSelected) {
         borderColor = themeColor;
-        bgColor = themeColor.withOpacity(0.15);
+        bgColor = themeColor.withOpacity(isDark ? 0.15 : 0.08);
         textColor = themeColor;
     }
 
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected ? null : const Color(0xFF1E293B),
+          color: isSelected ? null : (isDark ? const Color(0xFF1E293B) : Colors.white),
           gradient: isSelected ? LinearGradient(
-            colors: [themeColor.withOpacity(0.2), const Color(0xFF1E293B)],
+            colors: [
+              themeColor.withOpacity(isDark ? 0.2 : 0.1), 
+              isDark ? const Color(0xFF1E293B) : Colors.white
+            ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ) : null,
@@ -772,7 +784,7 @@ class ArenaScreen extends HookConsumerWidget {
             if (isSelected || isRightAnswer || isWrongAnswer || shouldShowGreen)
               BoxShadow(color: borderColor.withOpacity(0.25), blurRadius: 15, offset: const Offset(0, 4))
             else
-              BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4)),
+              BoxShadow(color: Colors.black.withOpacity(isDark ? 0.2 : 0.05), blurRadius: 10, offset: const Offset(0, 4)),
           ],
         ),
         child: Material(
@@ -801,7 +813,7 @@ class ArenaScreen extends HookConsumerWidget {
   }
 
   Widget _buildFinishedState(bool winner, bool ranAway, int score, WidgetRef ref,
-      DatabaseReference matchRef, bool loading, Function(int, bool) onSubmit) {
+      DatabaseReference matchRef, bool loading, Function(int, bool) onSubmit, bool isDark) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -817,7 +829,7 @@ class ArenaScreen extends HookConsumerWidget {
               child: Icon(
                 winner || ranAway ? Icons.emoji_events : Icons.sentiment_very_dissatisfied,
                 size: 100.sp,
-                color: winner || ranAway ? Colors.amber : Colors.white24,
+                color: winner || ranAway ? Colors.amber : (isDark ? Colors.white24 : Colors.black12),
               ),
             ).animate().scale(duration: 600.ms, curve: Curves.elasticOut);
           },
@@ -827,7 +839,7 @@ class ArenaScreen extends HookConsumerWidget {
                 ? "🏆 المنافس انسحب! فوز ساحق!"
                 : (winner ? "تهانينا! أنت البطل 🏆" : "حظ ممتع المرة القادمة ⚔️"),
             style: TextStyle(
-                color: Colors.white,
+                color: isDark ? Colors.white : const Color(0xFF1E293B),
                 fontSize: 22.sp,
                 fontWeight: FontWeight.w900,
                 fontFamily: 'SomarSans'),
@@ -874,16 +886,16 @@ class ArenaScreen extends HookConsumerWidget {
 
 
 
-  Widget _buildEmojiPicker(DatabaseReference matchRef, String uid, bool isPrivate, bool isSoundOn, VoidCallback onChat) {
+  Widget _buildEmojiPicker(DatabaseReference matchRef, String uid, bool isPrivate, bool isSoundOn, VoidCallback onChat, bool isDark) {
     return Container(
       margin: EdgeInsets.only(bottom: 20.h, left: 30.w, right: 30.w),
       padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 10.w),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
+        color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.05),
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white.withOpacity(0.15)),
+        border: Border.all(color: isDark ? Colors.white.withOpacity(0.15) : Colors.black.withOpacity(0.05)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10),
+          BoxShadow(color: Colors.black.withOpacity(isDark ? 0.2 : 0.05), blurRadius: 10),
         ],
       ),
       child: Row(
@@ -892,10 +904,10 @@ class ArenaScreen extends HookConsumerWidget {
           if (isPrivate)
             IconButton(
               onPressed: onChat,
-              icon: Icon(Icons.chat_bubble_outline, color: Colors.white, size: 22.sp),
+              icon: Icon(Icons.chat_bubble_outline, color: isDark ? Colors.white : const Color(0xFF1E293B), size: 22.sp),
               padding: EdgeInsets.zero,
             ),
-          if (isPrivate) Container(width: 1, height: 20, color: Colors.white10),
+          if (isPrivate) Container(width: 1, height: 20, color: isDark ? Colors.white10 : Colors.black12),
           ...['😂', '🔥', '💪', '😱', '🥳'].map((e) {
             return InkWell(
               onTap: () {
@@ -938,20 +950,23 @@ class _ChallengeChatSheet extends HookWidget {
       return null;
     }, [messages.length]);
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       height: 0.7.sh,
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(30.r)),
+        border: Border.all(color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05)),
       ),
       child: Column(
         children: [
           15.verticalSpace,
-          Container(width: 40.w, height: 4.h, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(10))),
+          Container(width: 40.w, height: 4.h, decoration: BoxDecoration(color: isDark ? Colors.white24 : Colors.black12, borderRadius: BorderRadius.circular(10))),
           Padding(
             padding: EdgeInsets.all(20.w),
-            child: Text("دردشة الأصدقاء 💬", style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.w900, fontFamily: 'SomarSans')),
+            child: Text("دردشة الأصدقاء 💬", style: TextStyle(color: isDark ? Colors.white : const Color(0xFF1E293B), fontSize: 18.sp, fontWeight: FontWeight.w900, fontFamily: 'SomarSans')),
           ),
           Expanded(
             child: ListView.builder(
@@ -967,15 +982,15 @@ class _ChallengeChatSheet extends HookWidget {
                     margin: EdgeInsets.only(bottom: 10.h),
                     padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
                     decoration: BoxDecoration(
-                      color: isMe ? const Color(0xFF00B4D8).withOpacity(0.2) : Colors.white.withOpacity(0.05),
+                      color: isMe ? const Color(0xFF00B4D8).withOpacity(isDark ? 0.2 : 0.1) : (isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.03)),
                       borderRadius: BorderRadius.circular(15.r),
-                      border: Border.all(color: isMe ? const Color(0xFF00B4D8).withOpacity(0.3) : Colors.white10),
+                      border: Border.all(color: isMe ? const Color(0xFF00B4D8).withOpacity(0.3) : (isDark ? Colors.white10 : Colors.black.withOpacity(0.05))),
                     ),
                     child: Column(
                       crossAxisAlignment: isMe ? CrossAxisAlignment.start : CrossAxisAlignment.end,
                       children: [
                         if (!isMe) Text(m['name'] ?? '', style: TextStyle(color: const Color(0xFFF43F5E), fontSize: 10.sp, fontWeight: FontWeight.bold)),
-                        Text(m['text'] ?? '', style: TextStyle(color: Colors.white, fontSize: 13.sp, fontFamily: 'SomarSans')),
+                        Text(m['text'] ?? '', style: TextStyle(color: isDark ? Colors.white : const Color(0xFF1E293B), fontSize: 13.sp, fontFamily: 'SomarSans')),
                       ],
                     ),
                   ),
@@ -990,13 +1005,20 @@ class _ChallengeChatSheet extends HookWidget {
                 Expanded(
                   child: TextField(
                     controller: controller,
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(color: isDark ? Colors.white : const Color(0xFF1E293B)),
                     decoration: InputDecoration(
                       hintText: "اكتب رسالة...",
-                      hintStyle: TextStyle(color: Colors.white24, fontSize: 14.sp),
-                      fillColor: Colors.white.withOpacity(0.05),
+                      hintStyle: TextStyle(color: isDark ? Colors.white24 : Colors.black26, fontSize: 14.sp),
+                      fillColor: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
                       filled: true,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(25.r), borderSide: BorderSide.none),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25.r), 
+                        borderSide: BorderSide(color: isDark ? Colors.transparent : Colors.black.withOpacity(0.05))
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25.r), 
+                        borderSide: BorderSide(color: isDark ? Colors.transparent : Colors.black.withOpacity(0.05))
+                      ),
                       contentPadding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
                     ),
                     onSubmitted: (val) {

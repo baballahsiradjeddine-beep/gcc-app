@@ -125,8 +125,8 @@ class CustomTextFormField extends HookConsumerWidget {
                   ? (isFocused.value ? const Color(0xFF1E293B) : const Color(0xFF0F172A))
                   : (isFocused.value ? Colors.white : const Color(0xFFF8FAFC)),
               contentPadding: EdgeInsets.symmetric(
-                horizontal: 24.w,
-                vertical: 20.h,
+                horizontal: 20.w,
+                vertical: 14.h,
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(20.r),

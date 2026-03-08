@@ -13,7 +13,7 @@ class QuestionSection extends StatelessWidget {
     
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(24.r),
+      padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E293B).withOpacity(0.5) : AppColors.surfaceWhite.withOpacity(0.8),
         borderRadius: BorderRadius.circular(24.r),

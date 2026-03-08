@@ -22,7 +22,7 @@ class ExerciceAppBar extends ConsumerWidget {
     final settings = ref.watch(settingsNotifierProvider);
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 16.h),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF0F172A).withOpacity(0.7) : Colors.white.withOpacity(0.7),
         border: Border(

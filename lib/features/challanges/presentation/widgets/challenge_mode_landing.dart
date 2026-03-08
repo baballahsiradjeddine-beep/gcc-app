@@ -121,7 +121,7 @@ class _ChallengeModeLandingState extends State<ChallengeModeLanding> {
             // ── Main Content ──
             SafeArea(
               child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
+                physics: const ClampingScrollPhysics(), // Smoother, non-bouncing scroll
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20.w),
                   child: Column(
@@ -301,8 +301,8 @@ class _ChallengeModeLandingState extends State<ChallengeModeLanding> {
                         .fadeIn(duration: 500.ms)
                         .slideY(begin: 0.3, end: 0),
   
-                      // Add enough space for the bottom navigation bar
-                      SizedBox(height: 120.h),
+                      // Cleaner bottom spacing
+                      SizedBox(height: 40.h),
                     ],
                   ),
                 ),
@@ -445,8 +445,18 @@ class _PortalOverlayState extends State<_PortalOverlay>
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final size = MediaQuery.of(context).size;
     final maxR = size.longestSide * 1.25;
+
+    final bgColor = isDark ? const Color(0xFF0B1120) : const Color(0xFFE0F2FE);
+    final rippleColor1 = isDark ? const Color(0xFF0B1120) : const Color(0xFFBAE6FD);
+    final rippleColor2 = isDark ? const Color(0xFF0D1830) : const Color(0xFFF0F9FF);
+    final rippleColor3 = isDark ? const Color(0xFF111827) : Colors.white;
+
+    final portalGradient = isDark 
+        ? [const Color(0xFF111827), const Color(0xFF0B1120), const Color(0xFF060C18)]
+        : [Colors.white, const Color(0xFFF1F5F9), const Color(0xFFE0F2FE)];
 
     return Material(
       type: MaterialType.transparency,
@@ -456,18 +466,15 @@ class _PortalOverlayState extends State<_PortalOverlay>
           final fillR = _fill.value * maxR;
           return Stack(
             children: [
-              // ── Instant full-screen dark background (no flash) ──
-              const Positioned.fill(
-                child: ColoredBox(color: Color(0xFF0B1120)),
+              // ── Instant full-screen background (matching theme) ──
+              Positioned.fill(
+                child: ColoredBox(color: bgColor),
               ),
 
-              // ── Three dark-mode ripple rings ──
-              _ripple(size, _ring1.value, maxR * 0.50,
-                  const Color(0xFF0B1120), 3.5),
-              _ripple(size, _ring2.value, maxR * 0.68,
-                  const Color(0xFF0D1830), 2.5),
-              _ripple(size, _ring3.value, maxR * 0.85,
-                  const Color(0xFF111827), 1.5),
+              // ── Three ripple rings ──
+              _ripple(size, _ring1.value, maxR * 0.50, rippleColor1, 3.5),
+              _ripple(size, _ring2.value, maxR * 0.68, rippleColor2, 2.5),
+              _ripple(size, _ring3.value, maxR * 0.85, rippleColor3, 1.5),
 
               // ── Teal particles ──
               Positioned.fill(
@@ -479,7 +486,7 @@ class _PortalOverlayState extends State<_PortalOverlay>
                 ),
               ),
 
-              // ── Dark portal filling screen — same bg as challenge dashboard ──
+              // ── Portal filling screen ──
               if (_fill.value > 0)
                 Positioned(
                   left: size.width / 2 - fillR,
@@ -490,11 +497,7 @@ class _PortalOverlayState extends State<_PortalOverlay>
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: RadialGradient(
-                        colors: [
-                          const Color(0xFF111827),
-                          const Color(0xFF0B1120),
-                          const Color(0xFF060C18),
-                        ],
+                        colors: portalGradient,
                         stops: const [0.0, 0.55, 1.0],
                         radius: 0.9,
                       ),

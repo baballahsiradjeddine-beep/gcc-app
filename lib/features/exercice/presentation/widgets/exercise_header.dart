@@ -16,7 +16,7 @@ class ExerciseHeader extends StatelessWidget {
     
     return Expanded(
       child: Stack(
-        alignment: Alignment.centerLeft,
+        alignment: Alignment.centerRight,
         children: [
           // Glassy Background Bar
           ClipRRect(
@@ -46,12 +46,12 @@ class ExerciseHeader extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 colors: [
-                  Color(0xFF00C6E0), 
+                  Color(0xFF00B4D8), 
                   Color(0xFF0077B6),
-                  Color(0xFF00B4D8),
+                  Color(0xFF00C6E0), 
                 ],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
+                begin: Alignment.centerRight,
+                end: Alignment.centerLeft,
               ),
               borderRadius: BorderRadius.circular(20.r),
               boxShadow: [
