@@ -27,6 +27,32 @@ class ShieldBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool hasBadge = badgeIconUrl != null && badgeIconUrl!.trim().isNotEmpty;
+
+    if (!hasBadge) {
+      return SizedBox(
+        width: width,
+        height: height,
+        child: Center(
+          child: Container(
+            width: avatarSize,
+            height: avatarSize,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: themeColor.withOpacity(0.2),
+                width: 2,
+              ),
+            ),
+            child: ClipOval(
+              child: _buildAvatarImage(),
+            ),
+          ),
+        ),
+      );
+    }
+
     return SizedBox(
       width: width,
       height: height,
@@ -57,50 +83,44 @@ class ShieldBadge extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: ClipOval(
-                  child: localAvatarImage != null
-                      ? Image(image: localAvatarImage!, fit: BoxFit.cover)
-                      : (userAvatarUrl != null &&
-                              userAvatarUrl!.trim().isNotEmpty
-                          ? CachedNetworkImage(
-                              imageUrl: userAvatarUrl!.startsWith('http')
-                                  ? userAvatarUrl!
-                                  : 'https://gcc.tayssir-bac.com/storage/${userAvatarUrl!.replaceAll(RegExp(r'^/'), '')}',
-                              fit: BoxFit.cover,
-                              errorWidget: (context, url, error) =>
-                                  const Icon(Icons.person),
-                              placeholder: (context, url) =>
-                                  const CircularProgressIndicator(
-                                      strokeWidth: 2),
-                            )
-                          : const Icon(Icons.person)),
+                  child: _buildAvatarImage(),
                 ),
               ),
             ),
           ),
 
           // 3. Top Layer: Shield Badge PNG
-          if (badgeIconUrl != null && badgeIconUrl!.trim().isNotEmpty)
-            CachedNetworkImage(
-              imageUrl: badgeIconUrl!.startsWith('http')
-                  ? badgeIconUrl!
-                  : 'https://gcc.tayssir-bac.com/storage/${badgeIconUrl!.replaceAll(RegExp(r'^/'), '')}',
-              width: width,
-              height: height,
-              fit: BoxFit.contain,
-              errorWidget: (context, url, error) => const SizedBox.shrink(),
-              placeholder: (context, url) => const SizedBox.shrink(),
-            )
-          else
-            // Fallback Shield Paint
-            IgnorePointer(
-              child: CustomPaint(
-                size: Size(width * 0.9, height * 0.9),
-                painter: _ShieldPainter(color: themeColor),
-              ),
-            ),
+          CachedNetworkImage(
+            imageUrl: badgeIconUrl!.startsWith('http')
+                ? badgeIconUrl!
+                : 'https://gcc.tayssir-bac.com/storage/${badgeIconUrl!.replaceAll(RegExp(r'^/'), '')}',
+            width: width,
+            height: height,
+            fit: BoxFit.contain,
+            errorWidget: (context, url, error) => const SizedBox.shrink(),
+            placeholder: (context, url) => const SizedBox.shrink(),
+          ),
         ],
       ),
     );
+  }
+
+  Widget _buildAvatarImage() {
+    if (localAvatarImage != null) {
+      return Image(image: localAvatarImage!, fit: BoxFit.cover);
+    }
+    if (userAvatarUrl != null && userAvatarUrl!.trim().isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: userAvatarUrl!.startsWith('http')
+            ? userAvatarUrl!
+            : 'https://gcc.tayssir-bac.com/storage/${userAvatarUrl!.replaceAll(RegExp(r'^/'), '')}',
+        fit: BoxFit.cover,
+        errorWidget: (context, url, error) => const Icon(Icons.person),
+        placeholder: (context, url) =>
+            const CircularProgressIndicator(strokeWidth: 2),
+      );
+    }
+    return const Icon(Icons.person);
   }
 }
 
